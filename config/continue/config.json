@@ -1,0 +1,106 @@
+{
+  "models": [
+    {
+      "title": "SaleHSaaS AI - llama3",
+      "provider": "ollama",
+      "model": "llama3",
+      "apiBase": "http://ollama:11434",
+      "contextLength": 4096,
+      "systemMessage": "أنت مساعد برمجة ذكي متخصص في منصة SaleHSaaS 3.0. تعمل محلياً 100% في مكة المكرمة، المملكة العربية السعودية. ساعد المطور في كتابة وتحسين وشرح الكود. أجب باللغة العربية عند الحاجة."
+    },
+    {
+      "title": "SaleHSaaS AI - qwen2 (عربي)",
+      "provider": "ollama",
+      "model": "qwen2",
+      "apiBase": "http://ollama:11434",
+      "contextLength": 4096,
+      "systemMessage": "أنت مساعد برمجة ذكي متخصص في منصة SaleHSaaS 3.0. أجب دائماً باللغة العربية."
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "llama3 Autocomplete",
+    "provider": "ollama",
+    "model": "llama3",
+    "apiBase": "http://ollama:11434"
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text",
+    "apiBase": "http://ollama:11434"
+  },
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "تعديل الكود المحدد"
+    },
+    {
+      "name": "comment",
+      "description": "إضافة تعليقات للكود"
+    },
+    {
+      "name": "share",
+      "description": "مشاركة المحادثة"
+    },
+    {
+      "name": "cmd",
+      "description": "تنفيذ أمر في Terminal"
+    },
+    {
+      "name": "explain",
+      "description": "شرح الكود المحدد"
+    },
+    {
+      "name": "test",
+      "description": "كتابة اختبارات للكود"
+    }
+  ],
+  "customCommands": [
+    {
+      "name": "review",
+      "prompt": "راجع هذا الكود وأعطني ملاحظات لتحسينه من حيث الأداء والأمان والامتثال لمعايير NCA السعودية:\n\n{{{ input }}}",
+      "description": "مراجعة الكود وفق معايير NCA"
+    },
+    {
+      "name": "arabic",
+      "prompt": "اشرح هذا الكود باللغة العربية بشكل مبسط:\n\n{{{ input }}}",
+      "description": "شرح الكود بالعربية"
+    },
+    {
+      "name": "optimize",
+      "prompt": "حسّن هذا الكود للأداء الأمثل مع الحفاظ على وظيفته:\n\n{{{ input }}}",
+      "description": "تحسين أداء الكود"
+    }
+  ],
+  "contextProviders": [
+    {
+      "name": "code",
+      "params": {}
+    },
+    {
+      "name": "docs",
+      "params": {}
+    },
+    {
+      "name": "diff",
+      "params": {}
+    },
+    {
+      "name": "terminal",
+      "params": {}
+    },
+    {
+      "name": "problems",
+      "params": {}
+    },
+    {
+      "name": "folder",
+      "params": {}
+    },
+    {
+      "name": "codebase",
+      "params": {}
+    }
+  ],
+  "allowAnonymousTelemetry": false,
+  "enableTabAutocomplete": true
+}
