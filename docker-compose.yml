@@ -1,0 +1,299 @@
+###############################################################################
+# SaleHSaaS 3.0 - Docker Compose Configuration
+# منصة الذكاء الأعمال السيادية - إعداد Docker Compose
+#
+# جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
+# All data processed locally - Zero external transmission
+###############################################################################
+
+version: "3.9"
+
+# ── Shared Network ────────────────────────────────────────────────────────────
+networks:
+  salehsaas_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ── Persistent Volumes ────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  ollama_models:
+  qdrant_data:
+  n8n_data:
+  redis_data:
+  open_webui_data:
+  searxng_data:
+  grafana_data:
+  prometheus_data:
+  dashboard_data:
+
+###############################################################################
+# SERVICES
+###############################################################################
+services:
+
+  # ── 1. PostgreSQL - Main Database ──────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: salehsaas_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-salehsaas}
+      POSTGRES_USER: ${POSTGRES_USER:-salehsaas_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-salehsaas_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "salehsaas.service=database"
+      - "salehsaas.description=قاعدة البيانات الرئيسية"
+
+  # ── 2. Redis - Cache & Queue ────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: salehsaas_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.11
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "salehsaas.service=cache"
+      - "salehsaas.description=ذاكرة التخزين المؤقت"
+
+  # ── 3. Ollama - Local LLM Engine ───────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: salehsaas_ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.20
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-2}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    labels:
+      - "salehsaas.service=ai-engine"
+      - "salehsaas.description=محرك الذكاء الاصطناعي المحلي"
+
+  # ── 4. Open WebUI - AI Chat Interface ──────────────────────────────────────
+  open_webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: salehsaas_open_webui
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
+      - WEBUI_NAME=SaleHSaaS AI
+      - DEFAULT_LOCALE=ar
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-false}
+      - ENABLE_COMMUNITY_SHARING=false
+      - WEBUI_AUTH=true
+    volumes:
+      - open_webui_data:/app/backend/data
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.21
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    labels:
+      - "salehsaas.service=ai-chat"
+      - "salehsaas.description=واجهة الدردشة مع الذكاء الاصطناعي"
+
+  # ── 5. Qdrant - Vector Database (RAG) ──────────────────────────────────────
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: salehsaas_qdrant
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.30
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+    environment:
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY:-}
+    labels:
+      - "salehsaas.service=vector-db"
+      - "salehsaas.description=قاعدة البيانات المتجهية للذاكرة الذكية"
+
+  # ── 6. n8n - Automation Workflows ──────────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: salehsaas_n8n
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-salehsaas}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-salehsaas_user}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:?N8N_PASSWORD is required}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?N8N_ENCRYPTION_KEY is required}
+      - WEBHOOK_URL=http://localhost:${N8N_PORT:-5678}/
+      - N8N_PERSONALIZATION_ENABLED=false
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./services/n8n_workflows:/home/node/.n8n/workflows:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.40
+    ports:
+      - "${N8N_PORT:-5678}:5678"
+    labels:
+      - "salehsaas.service=automation"
+      - "salehsaas.description=محرك أتمتة سير العمل"
+
+  # ── 7. SearXNG - Local Web Search ──────────────────────────────────────────
+  searxng:
+    image: searxng/searxng:latest
+    container_name: salehsaas_searxng
+    restart: unless-stopped
+    volumes:
+      - searxng_data:/etc/searxng
+      - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.50
+    ports:
+      - "${SEARXNG_PORT:-8080}:8080"
+    environment:
+      - SEARXNG_SECRET=${SEARXNG_SECRET:?SEARXNG_SECRET is required}
+    labels:
+      - "salehsaas.service=search"
+      - "salehsaas.description=محرك البحث المحلي"
+
+  # ── 8. Arabic Dashboard - Main UI ──────────────────────────────────────────
+  dashboard:
+    build:
+      context: ./ui/arabic_dashboard
+      dockerfile: Dockerfile
+    container_name: salehsaas_dashboard
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+      - ollama
+    environment:
+      - POSTGRES_URL=postgresql://${POSTGRES_USER:-salehsaas_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-salehsaas}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_URL=http://ollama:11434
+      - QDRANT_URL=http://qdrant:6333
+      - SECRET_KEY=${DASHBOARD_SECRET_KEY:?DASHBOARD_SECRET_KEY is required}
+      - FLASK_DEBUG=${FLASK_DEBUG:-false}
+      - DASHBOARD_PORT=5000
+    volumes:
+      - dashboard_data:/app/data
+      - ./data/uploads:/app/uploads
+      - ./data/exports:/app/exports
+      - ./logs:/app/logs
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.60
+    ports:
+      - "${DASHBOARD_PORT:-8000}:5000"
+    labels:
+      - "salehsaas.service=dashboard"
+      - "salehsaas.description=لوحة التحكم العربية الرئيسية"
+
+  # ── 9. Code Server - Dev Studio ────────────────────────────────────────────
+  code_server:
+    image: codercom/code-server:latest
+    container_name: salehsaas_code_server
+    restart: unless-stopped
+    environment:
+      - PASSWORD=${CODE_SERVER_PASSWORD:?CODE_SERVER_PASSWORD is required}
+    volumes:
+      - ./:/home/coder/project
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.70
+    ports:
+      - "${CODE_SERVER_PORT:-8443}:8080"
+    labels:
+      - "salehsaas.service=dev-studio"
+      - "salehsaas.description=استوديو التطوير المتكامل"
+
+  # ── 10. Prometheus - Metrics ────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: salehsaas_prometheus
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/prometheus
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.80
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    labels:
+      - "salehsaas.service=monitoring"
+      - "salehsaas.description=مراقبة الأداء"
+
+  # ── 11. Grafana - Monitoring Dashboard ─────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: salehsaas_grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD is required}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.81
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    labels:
+      - "salehsaas.service=monitoring-ui"
+      - "salehsaas.description=لوحة مراقبة الأداء"

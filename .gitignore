@@ -1,0 +1,66 @@
+# Environment variables (NEVER commit these)
+.env
+*.env.local
+*.env.production
+
+# Data directories
+data/uploads/*
+data/exports/*
+!data/uploads/.gitkeep
+!data/exports/.gitkeep
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Docker volumes (local only)
+postgres_data/
+redis_data/
+ollama_models/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backups
+backups/
+*.bak
+*.backup
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Security
+*.pem
+*.key
+*.crt
+*.p12
+secrets/

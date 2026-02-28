@@ -1,0 +1,39 @@
+use_default_settings: true
+
+general:
+  instance_name: "SaleHSaaS Search"
+  privacypolicy_url: false
+  donation_url: false
+  contact_url: false
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "ar"
+  languages:
+    - ar
+    - en
+
+server:
+  secret_key: "${SEARXNG_SECRET}"
+  limiter: false
+  image_proxy: true
+  http_protocol_version: "1.0"
+
+ui:
+  static_use_hash: true
+  default_locale: "ar"
+  query_in_title: true
+  infinite_scroll: false
+  center_alignment: false
+  default_theme: simple
+  theme_args:
+    simple_style: dark
+
+outgoing:
+  request_timeout: 3.0
+  max_request_timeout: 10.0
+  useragent_suffix: ""
+  pool_connections: 100
+  pool_maxsize: 20

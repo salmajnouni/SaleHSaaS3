@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم{% endblock %}
+{% block page_title %}لوحة التحكم الرئيسية{% endblock %}
+
+{% block content %}
+
+<!-- ── Welcome Banner ── -->
+<div class="card mb-4" style="background: linear-gradient(135deg, #1a1a2e, #0f3460); border: 1px solid rgba(245,166,35,0.3);">
+    <div class="card-body p-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-1" style="font-weight: 800;">
+                    ⚡ مرحباً بك في <span style="color: #f5a623;">SaleHSaaS 3.0</span>
+                </h2>
+                <p class="mb-0" style="color: rgba(255,255,255,0.7);">
+                    منصة الذكاء الأعمال السيادية — تعمل 100% محلياً | آخر فحص: {{ stats.last_scan }}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-gold" onclick="runFullScan()">
+                    <i class="fas fa-search-plus me-2"></i>
+                    فحص شامل الآن
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── GRC Score Cards ── -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card gold">
+            <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="stat-value" style="color: #f5a623;">{{ stats.grc_score }}%</div>
+            <div class="stat-label">درجة GRC الإجمالية</div>
+            <div class="mt-2">
+                <div class="progress">
+                    <div class="progress-bar bg-warning" style="width: {{ stats.grc_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-lock"></i></div>
+            <div class="stat-value" style="color: #74b9ff;">{{ stats.nca_score }}%</div>
+            <div class="stat-label">امتثال NCA</div>
+            <div class="mt-2">
+                <div class="progress">
+                    <div class="progress-bar" style="width: {{ stats.nca_score }}%; background: #74b9ff;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-user-shield"></i></div>
+            <div class="stat-value" style="color: #00b894;">{{ stats.pdpl_score }}%</div>
+            <div class="stat-label">امتثال PDPL</div>
+            <div class="mt-2">
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width: {{ stats.pdpl_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="fas fa-broadcast-tower"></i></div>
+            <div class="stat-value" style="color: #e94560;">{{ stats.citc_score }}%</div>
+            <div class="stat-label">امتثال CITC</div>
+            <div class="mt-2">
+                <div class="progress">
+                    <div class="progress-bar bg-danger" style="width: {{ stats.citc_score }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── System Stats ── -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-robot"></i></div>
+            <div class="stat-value" style="color: #00b894;">{{ stats.active_agents }}</div>
+            <div class="stat-label">وكيل ذكي نشط</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card blue">
+            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-value" style="color: #74b9ff;">{{ stats.connected_databases }}</div>
+            <div class="stat-label">قاعدة بيانات متصلة</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card red">
+            <div class="stat-icon"><i class="fas fa-bell"></i></div>
+            <div class="stat-value" style="color: #e94560;">{{ stats.pending_alerts }}</div>
+            <div class="stat-label">تنبيه معلق</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card gold">
+            <div class="stat-icon"><i class="fas fa-server"></i></div>
+            <div class="stat-value" style="color: #f5a623; font-size: 1.5rem;">محلي</div>
+            <div class="stat-label">وضع المعالجة</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts & Alerts Row ── -->
+<div class="row g-3 mb-4">
+    <!-- Compliance Chart -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-chart-radar me-2"></i>
+                مؤشرات الامتثال
+            </div>
+            <div class="card-body">
+                <canvas id="complianceChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-exclamation-triangle me-2"></i>آخر التنبيهات</span>
+                <span class="badge bg-danger">{{ stats.pending_alerts }}</span>
+            </div>
+            <div class="card-body">
+                <div class="alert-item alert-high">
+                    <i class="fas fa-times-circle text-danger"></i>
+                    <div>
+                        <strong>تحذير NCA:</strong> كلمة مرور ضعيفة في إعدادات قاعدة البيانات
+                        <div class="text-muted small">منذ 5 دقائق</div>
+                    </div>
+                </div>
+                <div class="alert-item alert-medium">
+                    <i class="fas fa-exclamation-circle text-warning"></i>
+                    <div>
+                        <strong>تنبيه PDPL:</strong> بيانات شخصية بدون تصنيف في جدول العملاء
+                        <div class="text-muted small">منذ 2 ساعة</div>
+                    </div>
+                </div>
+                <div class="alert-item alert-low">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <div>
+                        <strong>نجاح:</strong> تم اكتمال النسخ الاحتياطي التلقائي
+                        <div class="text-muted small">منذ 6 ساعات</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Quick Actions ── -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-bolt me-2"></i>
+        الإجراءات السريعة
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-6 col-md-2">
+                <a href="/grc" class="btn btn-outline-warning w-100 py-3">
+                    <i class="fas fa-shield-alt d-block mb-2 fs-4"></i>
+                    فحص GRC
+                </a>
+            </div>
+            <div class="col-6 col-md-2">
+                <a href="/data-connector" class="btn btn-outline-info w-100 py-3">
+                    <i class="fas fa-database d-block mb-2 fs-4"></i>
+                    ربط بيانات
+                </a>
+            </div>
+            <div class="col-6 col-md-2">
+                <a href="/agents" class="btn btn-outline-success w-100 py-3">
+                    <i class="fas fa-robot d-block mb-2 fs-4"></i>
+                    تشغيل وكيل
+                </a>
+            </div>
+            <div class="col-6 col-md-2">
+                <a href="/social-media" class="btn btn-outline-primary w-100 py-3">
+                    <i class="fas fa-share-alt d-block mb-2 fs-4"></i>
+                    محتوى اجتماعي
+                </a>
+            </div>
+            <div class="col-6 col-md-2">
+                <button class="btn btn-outline-secondary w-100 py-3" onclick="generateReport()">
+                    <i class="fas fa-file-pdf d-block mb-2 fs-4"></i>
+                    تقرير PDF
+                </button>
+            </div>
+            <div class="col-6 col-md-2">
+                <a href="/settings" class="btn btn-outline-light w-100 py-3">
+                    <i class="fas fa-cog d-block mb-2 fs-4"></i>
+                    الإعدادات
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Compliance Radar Chart
+const ctx = document.getElementById('complianceChart').getContext('2d');
+new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: ['NCA', 'PDPL', 'CITC', 'ISO 27001', 'نظام العمل', 'حوكمة البيانات'],
+        datasets: [{
+            label: 'درجة الامتثال',
+            data: [{{ stats.nca_score }}, {{ stats.pdpl_score }}, {{ stats.citc_score }}, 78, 90, 82],
+            backgroundColor: 'rgba(245, 166, 35, 0.2)',
+            borderColor: '#f5a623',
+            pointBackgroundColor: '#f5a623',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#f5a623'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            r: {
+                min: 0,
+                max: 100,
+                ticks: { color: 'rgba(255,255,255,0.5)', stepSize: 20 },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+                pointLabels: { color: 'rgba(255,255,255,0.8)', font: { family: 'Tajawal', size: 12 } }
+            }
+        },
+        plugins: {
+            legend: { labels: { color: 'rgba(255,255,255,0.8)', font: { family: 'Tajawal' } } }
+        }
+    }
+});
+
+// Actions
+function runFullScan() {
+    fetch('/api/grc/scan', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' })
+        .then(r => r.json())
+        .then(data => alert('✅ ' + data.message + '\nالوقت المتوقع: ' + data.estimated_duration));
+}
+
+function generateReport() {
+    alert('📄 جاري إنشاء التقرير الشامل...\nسيكون جاهزاً خلال لحظات.');
+}
+</script>
+{% endblock %}

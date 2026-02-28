@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}محرك GRC{% endblock %}
+{% block page_title %}محرك الحوكمة والمخاطر والامتثال (GRC){% endblock %}
+
+{% block content %}
+
+<!-- GRC Overview -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card blue">
+            <div class="stat-value" style="color: #74b9ff;">{{ stats.nca_score }}%</div>
+            <div class="stat-label">الأمن السيبراني (NCA)</div>
+            <div class="mt-2"><div class="progress"><div class="progress-bar" style="width: {{ stats.nca_score }}%; background: #74b9ff;"></div></div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card green">
+            <div class="stat-value" style="color: #00b894;">{{ stats.pdpl_score }}%</div>
+            <div class="stat-label">حماية البيانات (PDPL)</div>
+            <div class="mt-2"><div class="progress"><div class="progress-bar bg-success" style="width: {{ stats.pdpl_score }}%"></div></div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card red">
+            <div class="stat-value" style="color: #e94560;">{{ stats.citc_score }}%</div>
+            <div class="stat-label">الاتصالات (CITC)</div>
+            <div class="mt-2"><div class="progress"><div class="progress-bar bg-danger" style="width: {{ stats.citc_score }}%"></div></div></div>
+        </div>
+    </div>
+</div>
+
+<!-- NCA Controls Table -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-lock me-2"></i>
+        ضوابط الأمن السيبراني (NCA ECC-1:2018)
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>رقم الضابط</th>
+                        <th>اسم الضابط</th>
+                        <th>الحالة</th>
+                        <th>الأولوية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1-1</td>
+                        <td>حوكمة الأمن السيبراني</td>
+                        <td><span class="badge bg-success">ممتثل</span></td>
+                        <td><span class="badge bg-danger">حرجة</span></td>
+                    </tr>
+                    <tr>
+                        <td>2-2</td>
+                        <td>إدارة الهويات والصلاحيات</td>
+                        <td><span class="badge bg-warning text-dark">جزئي</span></td>
+                        <td><span class="badge bg-danger">حرجة</span></td>
+                    </tr>
+                    <tr>
+                        <td>2-7</td>
+                        <td>أمن البيانات</td>
+                        <td><span class="badge bg-danger">غير ممتثل</span></td>
+                        <td><span class="badge bg-danger">حرجة</span></td>
+                    </tr>
+                    <tr>
+                        <td>2-8</td>
+                        <td>الاستمرارية التشغيلية</td>
+                        <td><span class="badge bg-success">ممتثل</span></td>
+                        <td><span class="badge bg-warning text-dark">عالية</span></td>
+                    </tr>
+                    <tr>
+                        <td>3-1</td>
+                        <td>الاستجابة للحوادث</td>
+                        <td><span class="badge bg-warning text-dark">جزئي</span></td>
+                        <td><span class="badge bg-warning text-dark">عالية</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="d-flex gap-3">
+    <button class="btn btn-gold" onclick="runGRCScan()">
+        <i class="fas fa-search me-2"></i>
+        تشغيل فحص GRC شامل
+    </button>
+    <button class="btn btn-outline-info" onclick="downloadReport()">
+        <i class="fas fa-download me-2"></i>
+        تحميل تقرير الامتثال
+    </button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function runGRCScan() {
+    fetch('/api/grc/scan', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' })
+        .then(r => r.json())
+        .then(data => alert('✅ ' + data.message));
+}
+function downloadReport() {
+    alert('📄 جاري إعداد تقرير الامتثال الشامل بصيغة PDF...');
+}
+</script>
+{% endblock %}

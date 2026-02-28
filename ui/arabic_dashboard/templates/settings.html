@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}الإعدادات{% endblock %}
+{% block page_title %}إعدادات المنصة{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+    <!-- Ollama Settings -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-brain me-2"></i>إعدادات الذكاء الاصطناعي (Ollama)</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">رابط Ollama</label>
+                    <input type="text" class="form-control bg-dark text-light border-secondary" value="http://ollama:11434">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">النموذج الافتراضي</label>
+                    <select class="form-select bg-dark text-light border-secondary">
+                        <option>llama3</option>
+                        <option>mistral</option>
+                        <option>gemma2</option>
+                        <option>qwen2</option>
+                        <option>ALLaM (عربي)</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline-success">
+                    <i class="fas fa-save me-2"></i>حفظ الإعدادات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-shield-alt me-2"></i>إعدادات الأمان</div>
+            <div class="card-body">
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="mfaSwitch" checked>
+                    <label class="form-check-label" for="mfaSwitch">المصادقة متعددة العوامل (MFA)</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="encryptSwitch" checked>
+                    <label class="form-check-label" for="encryptSwitch">تشفير البيانات (AES-256)</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="auditSwitch" checked>
+                    <label class="form-check-label" for="auditSwitch">سجل المراجعة (Audit Log)</label>
+                </div>
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="backupSwitch" checked>
+                    <label class="form-check-label" for="backupSwitch">النسخ الاحتياطي التلقائي</label>
+                </div>
+                <button class="btn btn-outline-warning">
+                    <i class="fas fa-save me-2"></i>حفظ إعدادات الأمان
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Info -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle me-2"></i>معلومات النظام</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="text-muted small">الإصدار</div>
+                        <div class="fw-bold">{{ config.version }}</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">وضع المعالجة</div>
+                        <div class="fw-bold text-success">محلي 100%</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">الامتثال</div>
+                        <div class="fw-bold">NCA + PDPL + CITC</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-muted small">اللغة</div>
+                        <div class="fw-bold">عربي (أساسي) + إنجليزي</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

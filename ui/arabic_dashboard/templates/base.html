@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ config.name_ar }}{% endblock %} | {{ config.tagline }}</title>
+
+    <!-- Bootstrap 5 RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --gold: #f5a623;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --text-light: #dfe6e9;
+            --sidebar-width: 260px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #0d1117;
+            color: var(--text-light);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .sidebar-brand .brand-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--highlight));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-brand .brand-tagline {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.25rem;
+        }
+
+        .sidebar-nav { padding: 1rem 0; }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.5rem 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-radius: 0;
+            font-size: 0.9rem;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+            border-right: 3px solid var(--gold);
+        }
+
+        .nav-item a .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* ── Main Content ── */
+        .main-content {
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top Bar ── */
+        .topbar {
+            background: rgba(22, 33, 62, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .topbar-actions { display: flex; gap: 0.75rem; align-items: center; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: rgba(0, 184, 148, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(0, 184, 148, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ── Page Content ── */
+        .page-content { padding: 1.5rem; flex: 1; }
+
+        /* ── Cards ── */
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: var(--text-light);
+        }
+
+        .card-header {
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        /* ── Stat Cards ── */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover { transform: translateY(-3px); }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-card.gold::before { background: linear-gradient(90deg, var(--gold), #f39c12); }
+        .stat-card.blue::before { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+        .stat-card.green::before { background: linear-gradient(90deg, var(--success), #00cec9); }
+        .stat-card.red::before { background: linear-gradient(90deg, var(--highlight), var(--danger)); }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 0.5rem;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2.5rem;
+            opacity: 0.15;
+        }
+
+        /* ── Progress Bars ── */
+        .progress {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 8px;
+        }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--highlight));
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), #e67e22);
+            border: none;
+            color: #000;
+            font-weight: 700;
+        }
+
+        /* ── Alerts ── */
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-high { background: rgba(214, 48, 49, 0.15); border: 1px solid rgba(214, 48, 49, 0.3); }
+        .alert-medium { background: rgba(253, 203, 110, 0.15); border: 1px solid rgba(253, 203, 110, 0.3); }
+        .alert-low { background: rgba(0, 184, 148, 0.15); border: 1px solid rgba(0, 184, 148, 0.3); }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-name">⚡ SaleHSaaS</div>
+        <div class="brand-tagline">منصة الذكاء الأعمال السيادية</div>
+        <div class="mt-2">
+            <span class="status-badge status-online">
+                <span class="status-dot"></span>
+                يعمل محلياً
+            </span>
+        </div>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-section-title">الرئيسية</div>
+        <div class="nav-item">
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+                لوحة التحكم
+            </a>
+        </div>
+
+        <div class="nav-section-title">الامتثال والحوكمة</div>
+        <div class="nav-item">
+            <a href="/grc" class="{% if request.path == '/grc' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+                محرك GRC
+            </a>
+        </div>
+
+        <div class="nav-section-title">البيانات والاتصال</div>
+        <div class="nav-item">
+            <a href="/data-connector" class="{% if request.path == '/data-connector' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-database"></i></span>
+                موصل البيانات
+            </a>
+        </div>
+
+        <div class="nav-section-title">الوكلاء الذكيون</div>
+        <div class="nav-item">
+            <a href="/agents" class="{% if request.path == '/agents' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-robot"></i></span>
+                الوكلاء المتخصصون
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="/social-media" class="{% if request.path == '/social-media' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-share-alt"></i></span>
+                التواصل الاجتماعي
+            </a>
+        </div>
+
+        <div class="nav-section-title">الإعدادات</div>
+        <div class="nav-item">
+            <a href="/settings" class="{% if request.path == '/settings' %}active{% endif %}">
+                <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                الإعدادات
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main-content">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+        <div class="topbar-title">
+            <button class="btn btn-sm btn-outline-secondary d-md-none me-2" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            {% block page_title %}لوحة التحكم{% endblock %}
+        </div>
+        <div class="topbar-actions">
+            <span class="text-muted small">{{ config.name_ar }} v{{ config.version }}</span>
+            <span class="status-badge status-online">
+                <span class="status-dot"></span>
+                100% محلي
+            </span>
+        </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © {{ config.year }} {{ config.name_ar }} — {{ config.tagline }} — جميع البيانات تُعالج محلياً
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+}
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
