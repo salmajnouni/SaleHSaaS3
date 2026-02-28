@@ -32,6 +32,7 @@ volumes:
   prometheus_data:
   dashboard_data:
   anythingllm_data:
+  saleh_brain_logs:
 
 ###############################################################################
 # SERVICES
@@ -365,3 +366,34 @@ services:
     labels:
       - "salehsaas.service=container-metrics"
       - "salehsaas.description=مقاييس الحاويات"
+
+  # ── 15. SaleH Brain - AI Operations Agent ──────────────────────────────────
+  saleh_brain:
+    build:
+      context: ./saleh_brain
+      dockerfile: Dockerfile
+    container_name: salehsaas_brain
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+      - ollama
+      - n8n
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_URL=http://n8n:5678
+      - N8N_API_KEY=${N8N_API_KEY:-}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3:latest}
+      - CHECK_INTERVAL=${BRAIN_CHECK_INTERVAL:-300}
+      - CPU_HIGH_THRESHOLD=${CPU_HIGH_THRESHOLD:-80}
+      - CPU_LOW_THRESHOLD=${CPU_LOW_THRESHOLD:-20}
+      - MEMORY_HIGH_THRESHOLD=${MEMORY_HIGH_THRESHOLD:-85}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - saleh_brain_logs:/app/logs
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.93
+    labels:
+      - "salehsaas.service=ai-brain"
+      - "salehsaas.description=العقل الذكي - مراقبة وقرارات تلقائية"

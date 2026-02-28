@@ -1,0 +1,204 @@
+{
+  "name": "SaleH Brain - مراقبة ذكية للأداء",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "كل 5 دقائق",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://prometheus:9090/api/v1/query",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "sum(rate(container_cpu_usage_seconds_total{name=~\"salehsaas_.*\"}[5m])) * 100"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-cpu",
+      "name": "قراءة CPU الكلي",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://prometheus:9090/api/v1/query",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "sum(container_memory_usage_bytes{name=~\"salehsaas_.*\"}) / 1024 / 1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-memory",
+      "name": "قراءة الذاكرة الكلية",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 480]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cpuData = $('قراءة CPU الكلي').first().json;\nconst memData = $('قراءة الذاكرة الكلية').first().json;\n\nconst cpu = cpuData?.data?.result?.[0]?.value?.[1]\n  ? parseFloat(cpuData.data.result[0].value[1])\n  : 0;\n\nconst memory = memData?.data?.result?.[0]?.value?.[1]\n  ? parseFloat(memData.data.result[0].value[1])\n  : 0;\n\nlet status = 'normal';\nlet action = 'none';\nlet message = '';\n\nif (cpu > 80) {\n  status = 'critical';\n  action = 'defer_tasks';\n  message = `تحذير: CPU مرتفع جداً (${cpu.toFixed(1)}%) - سيتم تأجيل المهام الثقيلة`;\n} else if (cpu > 60) {\n  status = 'warning';\n  action = 'monitor';\n  message = `تنبيه: CPU مرتفع (${cpu.toFixed(1)}%) - المراقبة مستمرة`;\n} else if (cpu < 20) {\n  status = 'low';\n  action = 'advance_tasks';\n  message = `الموارد متاحة: CPU منخفض (${cpu.toFixed(1)}%) - يمكن تقديم المهام المؤجلة`;\n} else {\n  status = 'normal';\n  action = 'none';\n  message = `النظام يعمل بشكل طبيعي - CPU: ${cpu.toFixed(1)}%`;\n}\n\nreturn [{\n  json: {\n    cpu: cpu.toFixed(2),\n    memory_mb: memory.toFixed(0),\n    status,\n    action,\n    message,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "analyze-metrics",
+      "name": "تحليل المقاييس",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 380]
+    },
+    {
+      "parameters": {
+        "url": "http://ollama:11434/api/generate",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "llama3:latest"
+            },
+            {
+              "name": "prompt",
+              "value": "=أنت مساعد مراقبة ذكي لمنصة SaleHSaaS. البيانات الحالية:\n- CPU: {{ $json.cpu }}%\n- الذاكرة: {{ $json.memory_mb }} MB\n- الحالة: {{ $json.status }}\n\nاكتب توصية قصيرة بالعربية (جملة واحدة فقط) لما يجب فعله الآن."
+            },
+            {
+              "name": "stream",
+              "value": false
+            },
+            {
+              "name": "options",
+              "value": "={\"temperature\": 0.1, \"num_predict\": 100}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-advice",
+      "name": "توصية Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [940, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "const metrics = $('تحليل المقاييس').first().json;\nconst ollamaResponse = $('توصية Ollama').first().json;\n\nconst advice = ollamaResponse?.response || 'لا توجد توصية';\n\nreturn [{\n  json: {\n    ...metrics,\n    ollama_advice: advice.trim(),\n    log_entry: `[${metrics.timestamp}] CPU:${metrics.cpu}% MEM:${metrics.memory_mb}MB STATUS:${metrics.status} | ${advice.trim()}`\n  }\n}];"
+      },
+      "id": "build-report",
+      "name": "بناء التقرير",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1180, 380]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "critical-check",
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "defer_tasks",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-action",
+      "name": "هل يجب تأجيل المهام؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1420, 380]
+    },
+    {
+      "parameters": {
+        "jsCode": "// تسجيل قرار التأجيل\nconst data = $input.first().json;\nconsole.log(`🔴 HIGH LOAD - Deferring tasks: CPU=${data.cpu}%`);\nconsole.log(`Ollama advice: ${data.ollama_advice}`);\n\nreturn [{\n  json: {\n    action_taken: 'deferred_heavy_tasks',\n    reason: `CPU مرتفع: ${data.cpu}%`,\n    advice: data.ollama_advice,\n    timestamp: data.timestamp\n  }\n}];"
+      },
+      "id": "defer-action",
+      "name": "تأجيل المهام الثقيلة",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1660, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "// تسجيل الحالة الطبيعية\nconst data = $input.first().json;\nconsole.log(`✅ NORMAL: CPU=${data.cpu}% | ${data.message}`);\n\nreturn [{\n  json: {\n    action_taken: 'monitoring',\n    status: data.status,\n    cpu: data.cpu,\n    memory_mb: data.memory_mb,\n    advice: data.ollama_advice,\n    timestamp: data.timestamp\n  }\n}];"
+      },
+      "id": "normal-action",
+      "name": "مراقبة عادية",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1660, 500]
+    }
+  ],
+  "connections": {
+    "كل 5 دقائق": {
+      "main": [
+        [
+          {"node": "قراءة CPU الكلي", "type": "main", "index": 0},
+          {"node": "قراءة الذاكرة الكلية", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "قراءة CPU الكلي": {
+      "main": [[{"node": "تحليل المقاييس", "type": "main", "index": 0}]]
+    },
+    "قراءة الذاكرة الكلية": {
+      "main": [[{"node": "تحليل المقاييس", "type": "main", "index": 0}]]
+    },
+    "تحليل المقاييس": {
+      "main": [[{"node": "توصية Ollama", "type": "main", "index": 0}]]
+    },
+    "توصية Ollama": {
+      "main": [[{"node": "بناء التقرير", "type": "main", "index": 0}]]
+    },
+    "بناء التقرير": {
+      "main": [[{"node": "هل يجب تأجيل المهام؟", "type": "main", "index": 0}]]
+    },
+    "هل يجب تأجيل المهام؟": {
+      "main": [
+        [{"node": "تأجيل المهام الثقيلة", "type": "main", "index": 0}],
+        [{"node": "مراقبة عادية", "type": "main", "index": 0}]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {"name": "saleh-brain"},
+    {"name": "monitoring"},
+    {"name": "ai-ops"}
+  ]
+}
