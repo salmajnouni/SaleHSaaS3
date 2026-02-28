@@ -1,5 +1,8 @@
 ###############################################################################
 # SaleHSaaS 3.0 - Docker Compose Configuration
+# 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
+# Made with pride in Makkah Al-Mukarramah, Saudi Arabia
+#
 # منصة الذكاء الأعمال السيادية - إعداد Docker Compose
 #
 # جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
@@ -28,6 +31,7 @@ volumes:
   grafana_data:
   prometheus_data:
   dashboard_data:
+  anythingllm_data:
 
 ###############################################################################
 # SERVICES
@@ -297,3 +301,46 @@ services:
     labels:
       - "salehsaas.service=monitoring-ui"
       - "salehsaas.description=لوحة مراقبة الأداء"
+
+  # ── 12. AnythingLLM - Document AI & RAG ────────────────────────────────────
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: salehsaas_anythingllm
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      # LLM Provider - connected to local Ollama
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_PATH=http://ollama:11434
+      - OLLAMA_MODEL_PREF=${DEFAULT_MODEL:-llama3}
+      - OLLAMA_MODEL_TOKEN_LIMIT=4096
+      # Embedding - local via Ollama
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_BASE_PATH=http://ollama:11434
+      - EMBEDDING_MODEL_PREF=nomic-embed-text
+      # Vector Database - local Qdrant
+      - VECTOR_DB=qdrant
+      - QDRANT_ENDPOINT=http://qdrant:6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY:-}
+      # Storage
+      - STORAGE_DIR=/app/server/storage
+      # Security
+      - JWT_SECRET=${ANYTHINGLLM_JWT_SECRET:?ANYTHINGLLM_JWT_SECRET is required}
+      # Disable telemetry
+      - DISABLE_TELEMETRY=true
+      # UI Language
+      - LANG=ar_SA.UTF-8
+    volumes:
+      - anythingllm_data:/app/server/storage
+      - ./data/uploads:/app/server/storage/hotdir
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.90
+    ports:
+      - "${ANYTHINGLLM_PORT:-3002}:3001"
+    labels:
+      - "salehsaas.service=document-ai"
+      - "salehsaas.description=ذكاء الوثائق والـ RAG المحلي"

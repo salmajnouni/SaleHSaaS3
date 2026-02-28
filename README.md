@@ -6,8 +6,11 @@
 ![Local AI](https://img.shields.io/badge/AI-100%25_Local-green?style=for-the-badge)
 ![GRC](https://img.shields.io/badge/GRC-NCA_PDPL_CITC-blue?style=for-the-badge)
 ![Arabic](https://img.shields.io/badge/Language-Arabic_First-red?style=for-the-badge)
+![Made in Makkah](https://img.shields.io/badge/%F0%9F%95%8B%EF%B8%8F_%D8%B5%D9%8F%D9%86%D8%B9_%D9%81%D9%8A-%D9%85%D9%83%D8%A9_%D8%A7%D9%84%D9%85%D9%83%D8%B1%D9%85%D8%A9-darkgreen?style=for-the-badge)
 
 **منصة ذكاء أعمال سيادية متكاملة — تعمل 100% محلياً — لا يوجد إرسال خارجي**
+
+> 🕋 **صُنع بفخر في مكة المكرمة، المملكة العربية السعودية**
 
 </div>
 
@@ -15,7 +18,7 @@
 
 ## 🎯 نظرة عامة
 
-SaleHSaaS 3.0 هي منصة ذكاء أعمال سيادية شاملة مصممة للمؤسسات السعودية، تجمع بين:
+SaleHSaaS 3.0 هي منصة ذكاء أعمال سيادية شاملة **صُنعت في مكة المكرمة** ومصممة للمؤسسات السعودية، تجمع بين:
 
 - **محرك GRC متكامل** يغطي NCA + PDPL + CITC
 - **وكلاء ذكاء اصطناعي متخصصون** (مالي، قانوني، سيبراني، موارد بشرية، تواصل اجتماعي)
@@ -169,5 +172,11 @@ SaleHSaaS3/
 ---
 
 <div align="center">
-<strong>© 2025-2026 SaleHSaaS — جميع البيانات تُعالج محلياً</strong>
+
+🕋 **صُنع بفخر في مكة المكرمة، المملكة العربية السعودية**
+
+**Made with pride in Makkah Al-Mukarramah, Saudi Arabia**
+
+© 2025-2026 SaleHSaaS — جميع البيانات تُعالج محلياً
+
 </div>
