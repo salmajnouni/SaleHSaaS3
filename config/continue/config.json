@@ -4,29 +4,29 @@
       "title": "SaleHSaaS AI - llama3",
       "provider": "ollama",
       "model": "llama3",
-      "apiBase": "http://ollama:11434",
+      "apiBase": "http://172.20.0.20:11434",
       "contextLength": 4096,
       "systemMessage": "أنت مساعد برمجة ذكي متخصص في منصة SaleHSaaS 3.0. تعمل محلياً 100% في مكة المكرمة، المملكة العربية السعودية. ساعد المطور في كتابة وتحسين وشرح الكود. أجب باللغة العربية عند الحاجة."
     },
     {
-      "title": "SaleHSaaS AI - qwen2 (عربي)",
+      "title": "SaleHSaaS AI - llama3 (localhost)",
       "provider": "ollama",
-      "model": "qwen2",
-      "apiBase": "http://ollama:11434",
+      "model": "llama3",
+      "apiBase": "http://host.docker.internal:11434",
       "contextLength": 4096,
-      "systemMessage": "أنت مساعد برمجة ذكي متخصص في منصة SaleHSaaS 3.0. أجب دائماً باللغة العربية."
+      "systemMessage": "أنت مساعد برمجة ذكي متخصص في منصة SaleHSaaS 3.0. أجب باللغة العربية عند الحاجة."
     }
   ],
   "tabAutocompleteModel": {
     "title": "llama3 Autocomplete",
     "provider": "ollama",
     "model": "llama3",
-    "apiBase": "http://ollama:11434"
+    "apiBase": "http://172.20.0.20:11434"
   },
   "embeddingsProvider": {
     "provider": "ollama",
     "model": "nomic-embed-text",
-    "apiBase": "http://ollama:11434"
+    "apiBase": "http://172.20.0.20:11434"
   },
   "slashCommands": [
     {
