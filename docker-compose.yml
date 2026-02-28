@@ -242,14 +242,16 @@ services:
 
   # ── 9. Code Server - Dev Studio ────────────────────────────────────────────
   code_server:
-    image: codercom/code-server:latest
+    build:
+      context: ./docker/code-server
+      dockerfile: Dockerfile
+    image: salehsaas_code_server:latest
     container_name: salehsaas_code_server
     restart: unless-stopped
     environment:
       - PASSWORD=${CODE_SERVER_PASSWORD:?CODE_SERVER_PASSWORD is required}
     volumes:
       - ./:/home/coder/project
-      - ./config/continue:/home/coder/.continue
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.70

@@ -1,0 +1,23 @@
+{
+    "github.copilot.enable": {
+        "*": false
+    },
+    "github.copilot.advanced": {},
+    "github.copilot.inlineSuggest.enable": false,
+    "chat.agent.enabled": false,
+    "workbench.startupEditor": "none",
+    "telemetry.telemetryLevel": "off",
+    "extensions.autoCheckUpdates": false,
+    "extensions.autoUpdate": false,
+    "update.mode": "none",
+    "editor.inlineSuggest.enabled": true,
+    "editor.fontSize": 14,
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "workbench.colorTheme": "Default Dark+",
+    "continue.enableTabAutocomplete": true,
+    "continue.showInlineEditButton": true
+}
