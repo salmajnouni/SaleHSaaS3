@@ -1,7 +1,11 @@
-const { PrismaClient } = require('./node_modules/@prisma/client');
-const bcrypt = require('./node_modules/bcrypt');
+// Script to create admin user in AnythingLLM
+// Run from: /app/server inside the container
 
-const db = new PrismaClient();
+const bcrypt = require('bcrypt');
+const Database = require('better-sqlite3');
+const path = require('path');
+
+const DB_PATH = path.join('/app/server/storage', 'anythingllm.db');
 
 async function createAdmin() {
   const username = 'saleh';
@@ -12,33 +16,31 @@ async function createAdmin() {
   const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+  const db = new Database(DB_PATH);
+
   // Check if user already exists
-  const existing = await db.users.findFirst({ where: { username: username } });
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
   if (existing) {
     console.log('User already exists: ' + username);
-    await db.$disconnect();
+    db.close();
     return;
   }
 
   // Create admin user
-  const user = await db.users.create({
-    data: {
-      username: username,
-      password: hashedPassword,
-      role: role,
-      suspended: 0
-    }
-  });
+  const stmt = db.prepare(
+    'INSERT INTO users (username, password, role, suspended) VALUES (?, ?, ?, ?)'
+  );
+  const result = stmt.run(username, hashedPassword, role, 0);
 
   console.log('=== Admin Created Successfully ===');
   console.log('Username: ' + username);
   console.log('Password: ' + password);
   console.log('Role: ' + role);
-  console.log('ID: ' + user.id);
+  console.log('ID: ' + result.lastInsertRowid);
   console.log('==================================');
   console.log('Login at: http://localhost:3002');
 
-  await db.$disconnect();
+  db.close();
 }
 
 createAdmin().catch(function(err) {
