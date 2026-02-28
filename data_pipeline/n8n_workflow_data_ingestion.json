@@ -1,0 +1,127 @@
+{
+  "name": "SaleH Brain - Data Ingestion Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "/data/incoming",
+        "events": ["add"],
+        "options": {}
+      },
+      "id": "1",
+      "name": "Watch Folder",
+      "type": "n8n-nodes-base.localFileTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://salehsaas_pipeline:8001/process-file/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{ $binary.data }}"
+            },
+            {
+              "name": "collection_name",
+              "value": "salehsaas_knowledge"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Send to Data Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "success"
+            }
+          ]
+        }
+      },
+      "id": "3",
+      "name": "Check Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "message": "✅ تمت معالجة الملف: {{ $('Watch Folder').item.json.name }}\nعدد الـ Chunks: {{ $json.message }}\nالمجموعة: {{ $json.collection_name }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Log Success",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "message": "❌ فشل في معالجة الملف: {{ $('Watch Folder').item.json.name }}\nالخطأ: {{ $json.detail }}",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [900, 400]
+    }
+  ],
+  "connections": {
+    "Watch Folder": {
+      "main": [
+        [
+          {
+            "node": "Send to Data Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Data Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Check Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Success": {
+      "main": [
+        [
+          {
+            "node": "Log Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1"
+}

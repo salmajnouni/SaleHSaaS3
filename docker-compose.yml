@@ -33,6 +33,10 @@ volumes:
   dashboard_data:
   anythingllm_data:
   saleh_brain_logs:
+  chromadb_data:
+  pipeline_incoming:
+  pipeline_lora_queue:
+  pipeline_processed:
 
 ###############################################################################
 # SERVICES
@@ -397,3 +401,57 @@ services:
     labels:
       - "salehsaas.service=ai-brain"
       - "salehsaas.description=العقل الذكي - مراقبة وقرارات تلقائية"
+
+  # ── 16. ChromaDB - Vector Database for RAG ─────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: salehsaas_chromadb
+    restart: unless-stopped
+    environment:
+      - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
+      - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
+      - CHROMA_AUTH_TOKEN_TRANSPORT_HEADER=AUTHORIZATION
+      - CHROMA_SERVER_AUTH_CREDENTIALS=${CHROMA_TOKEN:-salehsaas-chroma-token}
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+    volumes:
+      - chromadb_data:/chroma/chroma
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.94
+    ports:
+      - "${CHROMADB_PORT:-8000}:8000"
+    labels:
+      - "salehsaas.service=vector-db"
+      - "salehsaas.description=قاعدة بيانات متجهية للـ RAG"
+
+  # ── 17. Data Pipeline API ───────────────────────────────────────────────────
+  data_pipeline:
+    build:
+      context: ./data_pipeline
+      dockerfile: Dockerfile
+    container_name: salehsaas_pipeline
+    restart: unless-stopped
+    depends_on:
+      - chromadb
+      - ollama
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - CHROMA_TOKEN=${CHROMA_TOKEN:-salehsaas-chroma-token}
+      - OLLAMA_URL=http://ollama:11434
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
+      - LORA_QUEUE_DIR=/app/lora_queue
+      - INCOMING_DIR=/app/incoming
+    volumes:
+      - pipeline_incoming:/app/incoming
+      - pipeline_lora_queue:/app/lora_queue
+      - pipeline_processed:/app/processed
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.95
+    ports:
+      - "${PIPELINE_PORT:-8001}:8001"
+    labels:
+      - "salehsaas.service=data-pipeline"
+      - "salehsaas.description=معالجة البيانات وتجزئتها للـ RAG وLoRA"
