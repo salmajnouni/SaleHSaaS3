@@ -324,10 +324,8 @@ services:
       - EMBEDDING_ENGINE=ollama
       - EMBEDDING_BASE_PATH=http://ollama:11434
       - EMBEDDING_MODEL_PREF=nomic-embed-text
-      # Vector Database - local Qdrant
-      - VECTOR_DB=qdrant
-      - QDRANT_ENDPOINT=http://qdrant:6333
-      - QDRANT_API_KEY=${QDRANT_API_KEY:-}
+      # Vector Database - LanceDB (built-in, no external service needed)
+      - VECTOR_DB=lancedb
       # Storage
       - STORAGE_DIR=/app/server/storage
       # Security
