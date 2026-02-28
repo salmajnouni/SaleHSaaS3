@@ -3,19 +3,24 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+  # Docker containers metrics via cAdvisor
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    metrics_path: '/metrics'
+
+  # Host system metrics via node_exporter
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']
+
+  # SaleHSaaS Dashboard
   - job_name: 'salehsaas_dashboard'
     static_configs:
       - targets: ['dashboard:5000']
     metrics_path: '/metrics'
 
-  - job_name: 'postgres'
-    static_configs:
-      - targets: ['postgres:5432']
-
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['redis:6379']
-
+  # Ollama LLM
   - job_name: 'ollama'
     static_configs:
       - targets: ['ollama:11434']

@@ -295,7 +295,8 @@ services:
       - GF_ANALYTICS_CHECK_FOR_UPDATES=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.81
@@ -345,3 +346,43 @@ services:
     labels:
       - "salehsaas.service=document-ai"
       - "salehsaas.description=ذكاء الوثائق والـ RAG المحلي"
+
+  # ── 13. cAdvisor - Container Metrics ───────────────────────────────────────
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: salehsaas_cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.91
+    ports:
+      - "${CADVISOR_PORT:-8085}:8080"
+    labels:
+      - "salehsaas.service=container-metrics"
+      - "salehsaas.description=مقاييس الحاويات"
+
+  # ── 14. Node Exporter - Host Metrics ───────────────────────────────────────
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: salehsaas_node_exporter
+    restart: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.92
+    labels:
+      - "salehsaas.service=host-metrics"
+      - "salehsaas.description=مقاييس نظام المضيف"
