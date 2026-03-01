@@ -1,8 +1,10 @@
 fastapi
 uvicorn[standard]
+python-multipart
 python-dotenv
-langchain
 langchain-community
-ollama
+langchain-text-splitters
+langchain-ollama
+langchain-chroma
 chromadb-client
-unstructured[all]
+unstructured[all-docs]
