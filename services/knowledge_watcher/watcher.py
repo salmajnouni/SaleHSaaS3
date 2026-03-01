@@ -10,6 +10,7 @@ import logging
 import requests
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 # إعداد اللوج
@@ -97,7 +98,7 @@ def get_embedding(text: str) -> list:
         response = requests.post(
             f"{OLLAMA_URL}/api/embeddings",
             json={"model": EMBED_MODEL, "prompt": text},
-            timeout=60
+            timeout=300
         )
         if response.status_code == 200:
             return response.json().get("embedding", [])
@@ -170,7 +171,7 @@ def process_file(file_path: Path):
         log.warning(f"  ⚠️ النص قصير جداً أو فارغ - تخطي")
         # نقل للفاشلة
         dest = FAILED_DIR / file_path.name
-        file_path.rename(dest)
+        shutil.move(str(file_path), str(dest))
         return False
     
     log.info(f"  ✅ تم استخراج {len(text)} حرف")
@@ -182,7 +183,7 @@ def process_file(file_path: Path):
     if not chunks:
         log.warning(f"  ⚠️ لا chunks - تخطي")
         dest = FAILED_DIR / file_path.name
-        file_path.rename(dest)
+        shutil.move(str(file_path), str(dest))
         return False
     
     # التأكد من وجود الـ collection
@@ -204,7 +205,7 @@ def process_file(file_path: Path):
     dest = PROCESSED_DIR / file_path.name
     if dest.exists():
         dest = PROCESSED_DIR / f"{file_path.stem}_{int(time.time())}{file_path.suffix}"
-    file_path.rename(dest)
+    shutil.move(str(file_path), str(dest))
     
     log.info(f"  📦 نُقل إلى: {dest.name}")
     return True
@@ -239,7 +240,7 @@ def main():
                         # نقل للفاشلة
                         try:
                             dest = FAILED_DIR / file_path.name
-                            file_path.rename(dest)
+                            shutil.move(str(file_path), str(dest))
                         except:
                             pass
             
