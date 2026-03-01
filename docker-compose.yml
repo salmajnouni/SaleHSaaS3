@@ -455,3 +455,29 @@ services:
     labels:
       - "salehsaas.service=data-pipeline"
       - "salehsaas.description=معالجة البيانات وتجزئتها للـ RAG وLoRA"
+
+  # ── 18. File Watcher - Auto Ingestion Service ──────────────────────────────
+  file_watcher:
+    build:
+      context: ./file_watcher
+      dockerfile: Dockerfile
+    container_name: salehsaas_watcher
+    restart: unless-stopped
+    depends_on:
+      - data_pipeline
+    environment:
+      - INCOMING_DIR=/data/incoming
+      - PROCESSED_DIR=/data/processed
+      - FAILED_DIR=/data/failed
+      - PIPELINE_URL=http://salehsaas_pipeline:8001/process-file/
+      - POLL_INTERVAL=${WATCHER_POLL_INTERVAL:-10}
+    volumes:
+      - ./data/incoming:/data/incoming
+      - ./data/processed:/data/processed
+      - ./data/failed:/data/failed
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.96
+    labels:
+      - "salehsaas.service=file-watcher"
+      - "salehsaas.description=مراقبة المجلد ورفع الملفات تلقائياً للـ Pipeline"
