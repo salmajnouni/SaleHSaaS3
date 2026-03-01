@@ -1,17 +1,19 @@
 ###############################################################################
-# SaleHSaaS 3.0 - Docker Compose Configuration
+# SaleH SaaS 4.0 - Docker Compose Configuration
 # 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
-# Made with pride in Makkah Al-Mukarramah, Saudi Arabia
 #
-# منصة الذكاء الأعمال السيادية - إعداد Docker Compose
+# الهيكل المبسّط - 4 حاويات أساسية:
+#   1. open_webui   - الواجهة الرئيسية + RAG + Pipelines + Code Execution
+#   2. chromadb     - قاعدة البيانات المتجهية (القوانين والوثائق)
+#   3. n8n          - الأتمتة والنشر على الميديا
+#   4. postgres     - قاعدة البيانات الرئيسية
 #
+# Ollama يعمل على Windows مباشرة (host.docker.internal:11434)
 # جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
-# All data processed locally - Zero external transmission
 ###############################################################################
 
 version: "3.9"
 
-# ── Shared Network ────────────────────────────────────────────────────────────
 networks:
   salehsaas_net:
     driver: bridge
@@ -19,48 +21,36 @@ networks:
       config:
         - subnet: 172.20.0.0/16
 
-# ── Persistent Volumes ────────────────────────────────────────────────────────
 volumes:
   postgres_data:
-  ollama_models:
-  qdrant_data:
-  n8n_data:
-  redis_data:
-  open_webui_data:
-  searxng_data:
-  grafana_data:
-  prometheus_data:
-  dashboard_data:
-  anythingllm_data:
-  saleh_brain_logs:
   chromadb_data:
-  pipeline_incoming:
-  pipeline_lora_queue:
-  pipeline_processed:
+  open_webui_data:
+  n8n_data:
+  saleh_uploads:
+  saleh_knowledge:
 
 ###############################################################################
 # SERVICES
 ###############################################################################
 services:
 
-  # ── 1. PostgreSQL - Main Database ──────────────────────────────────────────
+  # ── 1. PostgreSQL - قاعدة البيانات الرئيسية ──────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: salehsaas_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-salehsaas}
-      POSTGRES_USER: ${POSTGRES_USER:-salehsaas_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_USER: ${POSTGRES_USER:-salehsaas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-salehsaas_pass}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.10
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-salehsaas_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-salehsaas}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -68,91 +58,150 @@ services:
       - "salehsaas.service=database"
       - "salehsaas.description=قاعدة البيانات الرئيسية"
 
-  # ── 2. Redis - Cache & Queue ────────────────────────────────────────────────
-  redis:
-    image: redis:7-alpine
-    container_name: salehsaas_redis
+  # ── 2. ChromaDB - قاعدة البيانات المتجهية للقوانين ──────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: salehsaas_chromadb
     restart: unless-stopped
-    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --appendonly yes
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+      - ALLOW_RESET=True
+      - CHROMA_SERVER_AUTH_CREDENTIALS=${CHROMA_TOKEN:-salehsaas-token}
+      - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
+      - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
+      - CHROMA_AUTH_TOKEN_TRANSPORT_HEADER=AUTHORIZATION
     volumes:
-      - redis_data:/data
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.11
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    labels:
-      - "salehsaas.service=cache"
-      - "salehsaas.description=ذاكرة التخزين المؤقت"
-
-  # ── 3. Ollama - Local LLM Engine ───────────────────────────────────────────
-  # ollama-docker: DISABLED - Using Ollama Windows (localhost:11434) instead
-  # All services connect via host.docker.internal:11434
-  # To re-enable: uncomment this block and remove host.docker.internal references
-  ollama:
-    image: ollama/ollama:latest
-    container_name: salehsaas_ollama
-    restart: "no"
-    profiles:
-      - ollama-docker
-    volumes:
-      - ollama_models:/root/.ollama
+      - chromadb_data:/chroma/chroma
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.20
-    environment:
-      - OLLAMA_KEEP_ALIVE=24h
-      - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-2}
+    ports:
+      - "${CHROMADB_PORT:-8010}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     labels:
-      - "salehsaas.service=ai-engine"
-      - "salehsaas.description=محرك الذكاء الاصطناعي المحلي (Docker - معطل)"
+      - "salehsaas.service=vector-db"
+      - "salehsaas.description=قاعدة البيانات المتجهية - ذاكرة القوانين السعودية"
 
-  # ── 4. Open WebUI - AI Chat Interface ──────────────────────────────────────
+  # ── 3. Open WebUI - الواجهة الرئيسية + RAG + Pipelines ──────────────────
   open_webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: salehsaas_open_webui
+    container_name: salehsaas_webui
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
     environment:
+      # ── Ollama على Windows ──
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
-      - WEBUI_NAME=SaleHSaaS AI
+
+      # ── قاعدة البيانات ──
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-salehsaas}:${POSTGRES_PASSWORD:-salehsaas_pass}@postgres:5432/${POSTGRES_DB:-salehsaas}
+
+      # ── RAG - ChromaDB ──
+      - VECTOR_DB=chroma
+      - CHROMA_HTTP_HOST=chromadb
+      - CHROMA_HTTP_PORT=8000
+      - CHROMA_HTTP_HEADERS=Authorization=Bearer ${CHROMA_TOKEN:-salehsaas-token}
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
+      - RAG_OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+      # ── استخراج الوثائق ──
+      - CONTENT_EXTRACTION_ENGINE=tika
+      - TIKA_SERVER_URL=http://tika:9998
+
+      # ── البحث على الإنترنت ──
+      - ENABLE_RAG_WEB_SEARCH=True
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&format=json
+
+      # ── الأمان ──
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-salehsaas-secret-key-change-me}
+      - WEBUI_NAME=SaleH SaaS - نظام المعرفة القانونية
       - DEFAULT_LOCALE=ar
-      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-false}
-      - ENABLE_COMMUNITY_SHARING=false
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
       - WEBUI_AUTH=true
+
+      # ── تعطيل التتبع ──
+      - SCARF_NO_ANALYTICS=true
+      - DO_NOT_TRACK=true
+      - ANONYMIZED_TELEMETRY=false
+
+      # ── Pipelines ──
+      - OPENAI_API_BASE_URL=http://pipelines:9099
+      - OPENAI_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
+
     volumes:
       - open_webui_data:/app/backend/data
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.21
-    ports:
-      - "${OPEN_WEBUI_PORT:-3000}:8080"
-    labels:
-      - "salehsaas.service=ai-chat"
-      - "salehsaas.description=واجهة الدردشة مع الذكاء الاصطناعي"
-
-  # ── 5. Qdrant - Vector Database (RAG) ──────────────────────────────────────
-  qdrant:
-    image: qdrant/qdrant:latest
-    container_name: salehsaas_qdrant
-    restart: unless-stopped
-    volumes:
-      - qdrant_data:/qdrant/storage
+      - saleh_uploads:/app/backend/data/uploads
+      - saleh_knowledge:/app/backend/data/docs
+      - ./saleh_brain/glossary:/app/backend/data/glossary:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.30
     ports:
-      - "${QDRANT_PORT:-6333}:6333"
-    environment:
-      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY:-}
+      - "${WEBUI_PORT:-3000}:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
-      - "salehsaas.service=vector-db"
-      - "salehsaas.description=قاعدة البيانات المتجهية للذاكرة الذكية"
+      - "salehsaas.service=webui"
+      - "salehsaas.description=الواجهة الرئيسية - محادثة + RAG + تحليل + توليد"
 
-  # ── 6. n8n - Automation Workflows ──────────────────────────────────────────
+  # ── 4. Open WebUI Pipelines - المعالج القانوني ──────────────────────────
+  pipelines:
+    image: ghcr.io/open-webui/pipelines:main
+    container_name: salehsaas_pipelines
+    restart: unless-stopped
+    environment:
+      - PIPELINES_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
+    volumes:
+      - ./pipelines:/app/pipelines
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.31
+    ports:
+      - "${PIPELINES_PORT:-9099}:9099"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      - "salehsaas.service=pipelines"
+      - "salehsaas.description=معالج Python المخصص - المعجم القانوني والتقارير"
+
+  # ── 5. Apache Tika - استخراج النصوص من الوثائق ──────────────────────────
+  tika:
+    image: apache/tika:latest
+    container_name: salehsaas_tika
+    restart: unless-stopped
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.32
+    labels:
+      - "salehsaas.service=tika"
+      - "salehsaas.description=استخراج النصوص من PDF وWord وExcel"
+
+  # ── 6. SearXNG - البحث المحلي على الإنترنت ──────────────────────────────
+  searxng:
+    image: searxng/searxng:latest
+    container_name: salehsaas_searxng
+    restart: unless-stopped
+    volumes:
+      - ./config/searxng:/etc/searxng:rw
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.33
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+    labels:
+      - "salehsaas.service=search"
+      - "salehsaas.description=بحث محلي على الإنترنت بدون تتبع"
+
+  # ── 7. n8n - الأتمتة والنشر على الميديا ─────────────────────────────────
   n8n:
     image: n8nio/n8n:latest
     container_name: salehsaas_n8n
@@ -165,344 +214,48 @@ services:
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-salehsaas}
-      - DB_POSTGRESDB_USER=${POSTGRES_USER:-salehsaas_user}
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_POSTGRESDB_USER=${POSTGRES_USER:-salehsaas}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-salehsaas_pass}
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:?N8N_PASSWORD is required}
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?N8N_ENCRYPTION_KEY is required}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-salehsaas-n8n-key-change-me}
       - WEBHOOK_URL=http://localhost:${N8N_PORT:-5678}/
       - N8N_PERSONALIZATION_ENABLED=false
       - N8N_DIAGNOSTICS_ENABLED=false
       - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - GENERIC_TIMEZONE=Asia/Riyadh
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./services/n8n_workflows:/home/node/.n8n/workflows:ro
+      - ./n8n_workflows:/home/node/.n8n/workflows:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
     ports:
       - "${N8N_PORT:-5678}:5678"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
       - "salehsaas.service=automation"
-      - "salehsaas.description=محرك أتمتة سير العمل"
+      - "salehsaas.description=أتمتة النشر على الميديا وإرسال التقارير"
 
-  # ── 7. SearXNG - Local Web Search ──────────────────────────────────────────
-  searxng:
-    image: searxng/searxng:latest
-    container_name: salehsaas_searxng
+  # ── 8. Code Server - بيئة التطوير من المتصفح ───────────────────────────
+  code_server:
+    image: codercom/code-server:latest
+    container_name: salehsaas_code
     restart: unless-stopped
+    environment:
+      - PASSWORD=${CODE_SERVER_PASSWORD:-salehsaas123}
+      - TZ=Asia/Riyadh
     volumes:
-      - searxng_data:/etc/searxng
-      - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - ./:/home/coder/project
+      - ./pipelines:/home/coder/project/pipelines
+      - ./saleh_brain:/home/coder/project/saleh_brain
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.50
     ports:
-      - "${SEARXNG_PORT:-8080}:8080"
-    environment:
-      - SEARXNG_SECRET=${SEARXNG_SECRET:?SEARXNG_SECRET is required}
-    labels:
-      - "salehsaas.service=search"
-      - "salehsaas.description=محرك البحث المحلي"
-
-  # ── 8. Arabic Dashboard - Main UI ──────────────────────────────────────────
-  dashboard:
-    build:
-      context: ./ui/arabic_dashboard
-      dockerfile: Dockerfile
-    container_name: salehsaas_dashboard
-    restart: unless-stopped
-    depends_on:
-      - postgres
-      - redis
-    environment:
-      - POSTGRES_URL=postgresql://${POSTGRES_USER:-salehsaas_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-salehsaas}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - QDRANT_URL=http://qdrant:6333
-      - SECRET_KEY=${DASHBOARD_SECRET_KEY:?DASHBOARD_SECRET_KEY is required}
-      - FLASK_DEBUG=${FLASK_DEBUG:-false}
-      - DASHBOARD_PORT=5000
-    volumes:
-      - dashboard_data:/app/data
-      - ./data/uploads:/app/uploads
-      - ./data/exports:/app/exports
-      - ./logs:/app/logs
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.60
-    ports:
-      - "${DASHBOARD_PORT:-8000}:5000"
-    labels:
-      - "salehsaas.service=dashboard"
-      - "salehsaas.description=لوحة التحكم العربية الرئيسية"
-
-  # ── 9. Code Server - Dev Studio ────────────────────────────────────────────
-  code_server:
-    build:
-      context: ./docker/code-server
-      dockerfile: Dockerfile
-    image: salehsaas_code_server:latest
-    container_name: salehsaas_code_server
-    restart: unless-stopped
-    environment:
-      - PASSWORD=${CODE_SERVER_PASSWORD:?CODE_SERVER_PASSWORD is required}
-    volumes:
-      - ./:/home/coder/project
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.70
-    ports:
       - "${CODE_SERVER_PORT:-8443}:8080"
     labels:
-      - "salehsaas.service=dev-studio"
-      - "salehsaas.description=استوديو التطوير المتكامل"
-
-  # ── 10. Prometheus - Metrics ────────────────────────────────────────────────
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: salehsaas_prometheus
-    restart: unless-stopped
-    volumes:
-      - prometheus_data:/prometheus
-      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.80
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=30d'
-    labels:
-      - "salehsaas.service=monitoring"
-      - "salehsaas.description=مراقبة الأداء"
-
-  # ── 11. Grafana - Monitoring Dashboard ─────────────────────────────────────
-  grafana:
-    image: grafana/grafana:latest
-    container_name: salehsaas_grafana
-    restart: unless-stopped
-    depends_on:
-      - prometheus
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:?GRAFANA_PASSWORD is required}
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_ANALYTICS_REPORTING_ENABLED=false
-      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.81
-    ports:
-      - "${GRAFANA_PORT:-3001}:3000"
-    labels:
-      - "salehsaas.service=monitoring-ui"
-      - "salehsaas.description=لوحة مراقبة الأداء"
-
-  # ── 12. AnythingLLM - Document AI & RAG ────────────────────────────────────
-  anythingllm:
-    image: mintplexlabs/anythingllm:latest
-    container_name: salehsaas_anythingllm
-    restart: unless-stopped
-    cap_add:
-      - SYS_ADMIN
-    environment:
-      # LLM Provider - connected to local Ollama
-      - LLM_PROVIDER=ollama
-      - OLLAMA_BASE_PATH=http://host.docker.internal:11434
-      - OLLAMA_MODEL_PREF=${DEFAULT_MODEL:-llama3}
-      - OLLAMA_MODEL_TOKEN_LIMIT=4096
-      # Embedding - local via Ollama
-      - EMBEDDING_ENGINE=ollama
-      - EMBEDDING_BASE_PATH=http://host.docker.internal:11434
-      - EMBEDDING_MODEL_PREF=nomic-embed-text
-      # Vector Database - LanceDB (built-in, no external service needed)
-      - VECTOR_DB=lancedb
-      # Storage
-      - STORAGE_DIR=/app/server/storage
-      # Security
-      - JWT_SECRET=${ANYTHINGLLM_JWT_SECRET:?ANYTHINGLLM_JWT_SECRET is required}
-      # Disable telemetry
-      - DISABLE_TELEMETRY=true
-      # UI Language
-      - LANG=ar_SA.UTF-8
-    volumes:
-      - anythingllm_data:/app/server/storage
-      - ./data/uploads:/app/server/storage/hotdir
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.90
-    ports:
-      - "${ANYTHINGLLM_PORT:-3002}:3001"
-    labels:
-      - "salehsaas.service=document-ai"
-      - "salehsaas.description=ذكاء الوثائق والـ RAG المحلي"
-
-  # ── 13. cAdvisor - Container Metrics (Windows-compatible) ─────────────────
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: salehsaas_cadvisor
-    restart: unless-stopped
-    privileged: true
-    volumes:
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.91
-    ports:
-      - "${CADVISOR_PORT:-8085}:8080"
-    labels:
-      - "salehsaas.service=container-metrics"
-      - "salehsaas.description=مقاييس الحاويات"
-
-  # ── 15. SaleH Brain - AI Operations Agent ──────────────────────────────────
-  saleh_brain:
-    build:
-      context: ./saleh_brain
-      dockerfile: Dockerfile
-    container_name: salehsaas_brain
-    restart: unless-stopped
-    depends_on:
-      - prometheus
-      - n8n
-    environment:
-      - PROMETHEUS_URL=http://prometheus:9090
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - N8N_URL=http://n8n:5678
-      - N8N_API_KEY=${N8N_API_KEY:-}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3:latest}
-      - CHECK_INTERVAL=${BRAIN_CHECK_INTERVAL:-300}
-      - CPU_HIGH_THRESHOLD=${CPU_HIGH_THRESHOLD:-80}
-      - CPU_LOW_THRESHOLD=${CPU_LOW_THRESHOLD:-20}
-      - MEMORY_HIGH_THRESHOLD=${MEMORY_HIGH_THRESHOLD:-85}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - saleh_brain_logs:/app/logs
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.93
-    labels:
-      - "salehsaas.service=ai-brain"
-      - "salehsaas.description=العقل الذكي - مراقبة وقرارات تلقائية"
-
-  # ── 16. ChromaDB - Vector Database for RAG ─────────────────────────────────
-  chromadb:
-    image: chromadb/chroma:latest
-    container_name: salehsaas_chromadb
-    restart: unless-stopped
-    environment:
-      - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
-      - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
-      - CHROMA_AUTH_TOKEN_TRANSPORT_HEADER=AUTHORIZATION
-      - CHROMA_SERVER_AUTH_CREDENTIALS=${CHROMA_TOKEN:-salehsaas-chroma-token}
-      - ANONYMIZED_TELEMETRY=False
-      - ALLOW_RESET=True
-    volumes:
-      - chromadb_data:/chroma/chroma
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.94
-    ports:
-      - "${CHROMADB_PORT:-8010}:8000"
-    labels:
-      - "salehsaas.service=vector-db"
-      - "salehsaas.description=قاعدة بيانات متجهية للـ RAG"
-
-  # ── 17. Data Pipeline API ───────────────────────────────────────────────────
-  data_pipeline:
-    build:
-      context: ./data_pipeline
-      dockerfile: Dockerfile
-    container_name: salehsaas_pipeline
-    restart: unless-stopped
-    depends_on:
-      - chromadb
-    environment:
-      - CHROMA_HOST=chromadb
-      - CHROMA_PORT=8000
-      - CHROMA_TOKEN=${CHROMA_TOKEN:-salehsaas-chroma-token}
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
-      - LORA_QUEUE_DIR=/app/lora_queue
-      - INCOMING_DIR=/app/incoming
-    volumes:
-      - pipeline_incoming:/app/incoming
-      - pipeline_lora_queue:/app/lora_queue
-      - pipeline_processed:/app/processed
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.95
-    ports:
-      - "${PIPELINE_PORT:-8001}:8001"
-    labels:
-      - "salehsaas.service=data-pipeline"
-      - "salehsaas.description=معالجة البيانات وتجزئتها للـ RAG وLoRA"
-
-  # ── 18. File Watcher - Auto Ingestion Service ──────────────────────────────
-  file_watcher:
-    build:
-      context: ./file_watcher
-      dockerfile: Dockerfile
-    container_name: salehsaas_watcher
-    restart: unless-stopped
-    depends_on:
-      - data_pipeline
-    environment:
-      - INCOMING_DIR=/data/incoming
-      - PROCESSED_DIR=/data/processed
-      - FAILED_DIR=/data/failed
-      - PIPELINE_URL=http://salehsaas_pipeline:8001/process-file/
-      - POLL_INTERVAL=${WATCHER_POLL_INTERVAL:-10}
-    volumes:
-      - ./data/incoming:/data/incoming
-      - ./data/processed:/data/processed
-      - ./data/failed:/data/failed
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.96
-    labels:
-      - "salehsaas.service=file-watcher"
-      - "salehsaas.description=مراقبة المجلد ورفع الملفات تلقائياً للـ Pipeline"
-
-  # ── 19. SaleH Dashboard - لوحة المراقبة ─────────────────────────────────
-  saleh_dashboard:
-    build:
-      context: ./saleh_dashboard
-      dockerfile: Dockerfile
-    container_name: salehsaas_dashboard
-    restart: unless-stopped
-    depends_on:
-      - chromadb
-      - data_pipeline
-    environment:
-      - CHROMA_HOST=chromadb
-      - CHROMA_PORT=8000
-      - CHROMA_TOKEN=${CHROMA_TOKEN:-salehsaas-chroma-token}
-      - PIPELINE_URL=http://salehsaas_pipeline:8001
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - ANYTHINGLLM_URL=http://anythingllm:3001
-      - PROCESSED_DIR=/data/processed
-      - INCOMING_DIR=/data/incoming
-      - FAILED_DIR=/data/failed
-      - LORA_QUEUE_DIR=/data/lora_queue
-    volumes:
-      - ./data/incoming:/data/incoming:ro
-      - ./data/processed:/data/processed:ro
-      - ./data/failed:/data/failed:ro
-      - pipeline_lora_queue:/data/lora_queue:ro
-      - ./saleh_brain/glossary:/app/glossary
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.97
-    ports:
-      - "${DASHBOARD_PORT:-8000}:8080"
-    labels:
-      - "salehsaas.service=dashboard"
-      - "salehsaas.description=لوحة مراقبة النظام الذكي"
+      - "salehsaas.service=code-server"
+      - "salehsaas.description=بيئة تطوير متكاملة من المتصفح - تعديل Pipelines والمعجم"

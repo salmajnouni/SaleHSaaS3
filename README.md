@@ -1,67 +1,84 @@
-# SaleH SaaS - Local AI Brain 🧠
+> **Note**
+> هذا المستودع قيد إعادة بناء كاملة للانتقال إلى الإصدار 4.0. قد تكون بعض الميزات غير مستقرة.
 
-**SaleH Smart Autonomous Agent System** is a complete, 100% private, local-first AI ecosystem designed for knowledge management, intelligent search, and automated fine-tuning. It runs entirely on your local machine using Docker, ensuring no data ever leaves your device.
+# SaleH SaaS 4.0 - نظام المعرفة القانونية السعودي
 
----
+🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
 
-### 🕋 النسخة العربية
+**SaleH SaaS** هو نظام ذكاء اصطناعي محلي بالكامل، مصمم لإدارة المعرفة القانونية والتشريعية السعودية. يعمل النظام على Windows باستخدام Docker وOllama، ويوفر واجهة محادثة ذكية معززة بالاسترجاع (RAG) لفهم القوانين والأنظمة واللوائح السعودية بدقة.
 
-**SaleH SaaS (نظام العميل الذكي)** هو نظام ذكاء اصطناعي متكامل يعمل بالكامل على جهازك المحلي، مصمم لإدارة المعرفة، البحث الذكي، وأتمتة الضبط الدقيق (Fine-Tuning) للنماذج اللغوية. النظام يضمن خصوصية 100% حيث أن جميع بياناتك لا تغادر جهازك أبداً.
+![Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v4_ar.png) <!-- TODO: Add new screenshot -->
 
-[![SaleH SaaS Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v2_ar.png)](#)
+## ✨ الميزات الرئيسية (الإصدار 4.0)
 
-## ✨ الميزات الرئيسية
+- **محادثة ذكية معززة (RAG):** اسأل عن أي مادة قانونية واحصل على إجابة دقيقة من القوانين الفعلية، وليس من ذاكرة النموذج العامة.
+- **معالج قانوني ذكي (Pipeline):** يفهم المصطلحات القانونية السعودية، ويكشف التعارضات بين الأنظمة، ويحقن السياق تلقائياً في المحادثة.
+- **دعم كامل للوثائق:** ارفع ملفات PDF, Word, Excel, PowerPoint مباشرة من الواجهة لتحليلها.
+- **بحث متقدم:** ابحث في الإنترنت محلياً باستخدام SearXNG، أو في الوثائق المرفوعة.
+- **أتمتة ونشر:** استخدم n8n لنشر المحتوى على وسائل التواصل الاجتماعي أو إرسال تقارير مجدولة.
+- **بيئة تطوير مدمجة:** عدّل الـ Pipelines والمعاجم مباشرة من المتصفح باستخدام Code Server.
+- **محلي 100% وآمن:** جميع البيانات تُعالج محلياً على جهازك. لا يوجد أي اتصال خارجي.
 
-- **🧠 ذكاء اصطناعي محلي 100%**: يستخدم Ollama لتشغيل نماذج لغوية كبيرة (مثل Llama 3) ونماذج embeddings (مثل nomic-embed-text) مباشرة على جهازك.
-- **📚 قاعدة معرفة متكاملة**: حوّل مستنداتك (PDF, Word, TXT, MD) إلى قاعدة معرفة قابلة للبحث باستخدام ChromaDB.
-- **📂 مراقبة تلقائية للمجلدات**: ضع ملفاتك في مجلد `incoming` وسيقوم النظام بمعالجتها وتخزينها تلقائياً.
-- **💬 واجهة محادثة ذكية (RAG)**: اسأل النموذج أسئلة بلغتك الطبيعية وسيجيب بناءً على محتوى مستنداتك المخزنة.
-- **🤖 ضبط دقيق (LoRA)**: يجمع أمثلة التدريب تلقائياً في قائمة انتظار، وعند الوصول إلى 500 مثال، يمكن بدء عملية الضبط الدقيق (Fine-Tuning) لتعليم النموذج أسلوبك ومصطلحاتك الخاصة.
-- **📊 لوحة مراقبة شاملة**: واجهة ويب احترافية لمراقبة حالة جميع الخدمات، عرض إحصاءات ChromaDB، تتبع الملفات، والبحث في قاعدة المعرفة.
-- **🌐 مبني على Docker**: النظام بأكمله يعمل داخل حاويات Docker معزولة، مما يسهل عملية التثبيت والتشغيل والإدارة.
+## 🚀 الهيكل التقني (4.0)
 
-## 🚀 ابدأ الآن (Quick Start)
+يعتمد النظام على هيكل مبسّط وقوي من 8 حاويات Docker أساسية:
 
-1.  **المتطلبات**: Docker Desktop, Git.
-2.  **استنساخ المستودع**:
-    ```bash
-    git clone https://github.com/salmajnouni/SaleHSaaS3.git
-    cd SaleHSaaS3
-    ```
-3.  **تشغيل النظام**:
-    ```bash
-    docker-compose up -d --build
-    ```
-4.  **افتح لوحة المراقبة**: **http://localhost:8000**
-5.  **ابدأ بإضافة الملفات**: ضع مستنداتك في المجلد `D:\SaleHSaaS3\data\incoming`.
+| # | الخدمة | المنفذ | الوظيفة |
+|---|---|---|---|
+| 1 | **Open WebUI** | 3000 | الواجهة الرئيسية + RAG + محادثة |
+| 2 | **Pipelines** | 9099 | المعجم القانوني + تقارير |
+| 3 | **ChromaDB** | 8010 | ذاكرة القوانين |
+| 4 | **Apache Tika** | - | استخراج PDF/Word/Excel |
+| 5 | **SearXNG** | - | بحث الإنترنت المحلي |
+| 6 | **n8n** | 5678 | نشر على الميديا + أتمتة |
+| 7 | **PostgreSQL** | - | قاعدة البيانات |
+| 8 | **Code Server** | 8443 | تطوير من المتصفح |
 
----
+بالإضافة إلى **Ollama** الذي يعمل على Windows مباشرة لتشغيل نماذج الذكاء الاصطناعي.
 
-### English Version
+## 🛠️ الإعداد والتشغيل
 
-[![SaleH SaaS Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v2_en.png)](#)
+### المتطلبات
 
-## ✨ Key Features
+1. **Docker Desktop**
+2. **Ollama for Windows**
+3. **Git**
 
-- **🧠 100% Local AI**: Utilizes Ollama to run large language models (like Llama 3) and embedding models (like nomic-embed-text) directly on your machine.
-- **📚 Integrated Knowledge Base**: Transform your documents (PDF, Word, TXT, MD) into a searchable knowledge base using ChromaDB.
-- **📂 Automated Folder Watching**: Simply drop your files into the `incoming` folder, and the system will automatically process and store them.
-- **💬 Smart Chat Interface (RAG)**: Ask the model questions in your natural language, and it will answer based on the content of your stored documents.
-- **🤖 Automated Fine-Tuning (LoRA)**: Automatically collects training examples in a queue. Once 500 examples are reached, you can initiate the fine-tuning process to teach the model your specific style and terminology.
-- **📊 Comprehensive Dashboard**: A professional web interface to monitor the status of all services, view ChromaDB stats, track files, and search the knowledge base.
-- **🌐 Docker-Powered**: The entire system runs inside isolated Docker containers, making installation, operation, and management seamless.
+### خطوات الإعداد
 
-## 🚀 Quick Start
+1. **تحميل المشروع:**
+   ```powershell
+   git clone https://github.com/salmajnouni/SaleHSaaS3.git
+   cd SaleHSaaS3
+   ```
 
-1.  **Prerequisites**: Docker Desktop, Git.
-2.  **Clone the Repository**:
-    ```bash
-    git clone https://github.com/salmajnouni/SaleHSaaS3.git
-    cd SaleHSaaS3
-    ```
-3.  **Run the System**:
-    ```bash
-    docker-compose up -d --build
-    ```
-4.  **Open the Dashboard**: Navigate to **http://localhost:8000**
-5.  **Start Adding Files**: Place your documents in the `D:\SaleHSaaS3\data\incoming` directory.
+2. **تشغيل سكريبت الإعداد:**
+   افتح PowerShell **كمسؤول (Run as Administrator)** وشغّل:
+   ```powershell
+   .\setup.ps1
+   ```
+   - سيقوم السكريبت بالتحقق من Docker وOllama، وإعداد ملف `.env`، وسحب الصور، وتشغيل كل شيء.
+   - **هام:** عند تشغيل السكريبت لأول مرة، سيطلب منك تعديل ملف `.env` لوضع كلمات المرور والمفاتيح السرية.
+
+3. **الوصول للخدمات:**
+   - **Open WebUI (الواجهة الرئيسية):** [http://localhost:3000](http://localhost:3000)
+   - **n8n (الأتمتة):** [http://localhost:5678](http://localhost:5678)
+   - **Code Server (التطوير):** [http://localhost:8443](http://localhost:8443)
+
+## 📖 كيفية الاستخدام
+
+1. **أنشئ حساب:** افتح Open WebUI على [http://localhost:3000](http://localhost:3000) وأنشئ حساب المدير.
+2. **ارفع الوثائق:** اذهب إلى `Documents` من القائمة الجانبية وارفع القوانين والأنظمة التي تريد أن يتعلمها النموذج.
+3. **ابدأ المحادثة:** ابدأ محادثة جديدة. يمكنك الآن سؤال النموذج عن أي شيء في الوثائق المرفوعة.
+4. **استخدام المعالج القانوني:** سيقوم المعالج تلقائياً بحقن تعريفات المصطلحات القانونية في محادثاتك.
+
+## 🛣️ خارطة الطريق
+
+- [ ] تحسين واجهة رفع الملفات.
+- [ ] إضافة دعم لتوليد التقارير بصيغة Word/PDF.
+- [ ] ربط أعمق مع n8n لإنشاء تقارير دورية.
+- [ ] تطوير واجهة لإدارة المعجم القانوني.
+
+## 🤝 المساهمة
+
+نرحب بجميع المساهمات. يرجى فتح Issue لمناقشة الأفكار أو Pull Request لإضافة تحسينات.
