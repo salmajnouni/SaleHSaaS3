@@ -1,10 +1,8 @@
 FROM ghcr.io/open-webui/mcpo:main
 
-# تثبيت requests باستخدام uv (المدير الافتراضي في الصورة)
-# أو pip مباشرة مع --break-system-packages
-RUN pip install --break-system-packages --no-cache-dir requests || \
-    uv pip install --system requests || \
-    python3 -m pip install --no-cache-dir requests
+# تثبيت requests في venv الخاص بـ MCPO باستخدام uv
+# uv هو مدير الحزم المستخدم في بناء الصورة الأصلية
+RUN uv pip install --system requests
 
 # نسخ أدوات MCP
 COPY tools/mcp/ /tools/mcp/
