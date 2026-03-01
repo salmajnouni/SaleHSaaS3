@@ -1,0 +1,278 @@
+{
+  "name": "🧠 هضم المعرفة التلقائي - SaleH SaaS",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "⏰ مراقبة كل دقيقة",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "path": "/knowledge_inbox",
+        "options": {
+          "recursive": false
+        }
+      },
+      "id": "read-folder",
+      "name": "📂 قراءة مجلد المعرفة",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-files",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "check-new-files",
+      "name": "🔍 هل توجد ملفات جديدة؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "path": "={{ '/knowledge_inbox/' + $json.name }}",
+        "options": {
+          "encoding": "base64"
+        }
+      },
+      "id": "read-file",
+      "name": "📄 قراءة الملف",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://tika:9998/tika",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/octet-stream"
+            },
+            {
+              "name": "Accept",
+              "value": "text/plain"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "extract-text-tika",
+      "name": "📝 استخراج النص - Tika",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// تقسيم النص إلى chunks بحجم 500 كلمة مع تداخل 50 كلمة\nconst text = $input.first().json.body || $input.first().json.data || '';\nconst fileName = $('📄 قراءة الملف').first().json.name || 'unknown';\nconst fileExt = fileName.split('.').pop().toLowerCase();\n\nif (!text || text.trim().length < 50) {\n  return [{ json: { skip: true, reason: 'النص قصير جداً أو فارغ', file: fileName } }];\n}\n\n// تنظيف النص\nconst cleanText = text\n  .replace(/\\s+/g, ' ')\n  .replace(/[\\x00-\\x1F\\x7F]/g, '')\n  .trim();\n\n// تقسيم إلى chunks\nconst words = cleanText.split(' ');\nconst chunkSize = 500;\nconst overlap = 50;\nconst chunks = [];\n\nfor (let i = 0; i < words.length; i += (chunkSize - overlap)) {\n  const chunk = words.slice(i, i + chunkSize).join(' ');\n  if (chunk.trim().length > 100) {\n    chunks.push({\n      json: {\n        text: chunk,\n        metadata: {\n          source: fileName,\n          chunk_index: chunks.length,\n          file_type: fileExt,\n          ingested_at: new Date().toISOString()\n        }\n      }\n    });\n  }\n}\n\nreturn chunks.length > 0 ? chunks : [{ json: { skip: true, reason: 'لا توجد chunks كافية', file: fileName } }];"
+      },
+      "id": "split-chunks",
+      "name": "✂️ تقسيم إلى Chunks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "skip-check",
+      "name": "⏭️ تخطي الفارغة",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/embeddings",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"model\": \"nomic-embed-text:latest\",\n  \"prompt\": \"{{ $json.text }}\"\n}",
+        "options": {}
+      },
+      "id": "generate-embedding",
+      "name": "🔢 توليد Embedding - Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "// دمج النص مع الـ embedding\nconst embedding = $input.first().json.embedding;\nconst chunkData = $('✂️ تقسيم إلى Chunks').first().json;\n\nif (!embedding || embedding.length === 0) {\n  return [{ json: { error: 'فشل في توليد embedding', chunk: chunkData.text?.substring(0, 50) } }];\n}\n\n// توليد ID فريد\nconst id = `${chunkData.metadata.source}_chunk_${chunkData.metadata.chunk_index}_${Date.now()}`;\n\nreturn [{\n  json: {\n    id: id,\n    embedding: embedding,\n    document: chunkData.text,\n    metadata: chunkData.metadata\n  }\n}];"
+      },
+      "id": "prepare-chromadb",
+      "name": "🔧 تحضير بيانات ChromaDB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/add",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"ids\": [\"{{ $json.id }}\"],\n  \"embeddings\": [{{ JSON.stringify($json.embedding) }}],\n  \"documents\": [\"{{ $json.document.replace(/\"/g, '\\\\\"') }}\"],\n  \"metadatas\": [{{ JSON.stringify($json.metadata) }}]\n}",
+        "options": {}
+      },
+      "id": "save-chromadb",
+      "name": "💾 حفظ في ChromaDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 160]
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "sourcePath": "={{ '/knowledge_inbox/' + $('📄 قراءة الملف').first().json.name }}",
+        "destinationPath": "={{ '/knowledge_processed/' + $('📄 قراءة الملف').first().json.name }}"
+      },
+      "id": "move-processed",
+      "name": "✅ نقل للمجلد المعالج",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [2440, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileName = $('📄 قراءة الملف').first().json.name;\nconst chunksCount = $('✂️ تقسيم إلى Chunks').all().length;\nconsole.log(`✅ تم هضم الملف: ${fileName} - ${chunksCount} chunk`);\nreturn [{ json: { status: 'success', file: fileName, chunks: chunksCount, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "log-success",
+      "name": "📊 تسجيل النجاح",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2660, 160]
+    }
+  ],
+  "connections": {
+    "⏰ مراقبة كل دقيقة": {
+      "main": [
+        [{ "node": "📂 قراءة مجلد المعرفة", "type": "main", "index": 0 }]
+      ]
+    },
+    "📂 قراءة مجلد المعرفة": {
+      "main": [
+        [{ "node": "🔍 هل توجد ملفات جديدة؟", "type": "main", "index": 0 }]
+      ]
+    },
+    "🔍 هل توجد ملفات جديدة؟": {
+      "main": [
+        [{ "node": "📄 قراءة الملف", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "📄 قراءة الملف": {
+      "main": [
+        [{ "node": "📝 استخراج النص - Tika", "type": "main", "index": 0 }]
+      ]
+    },
+    "📝 استخراج النص - Tika": {
+      "main": [
+        [{ "node": "✂️ تقسيم إلى Chunks", "type": "main", "index": 0 }]
+      ]
+    },
+    "✂️ تقسيم إلى Chunks": {
+      "main": [
+        [{ "node": "⏭️ تخطي الفارغة", "type": "main", "index": 0 }]
+      ]
+    },
+    "⏭️ تخطي الفارغة": {
+      "main": [
+        [{ "node": "🔢 توليد Embedding - Ollama", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "🔢 توليد Embedding - Ollama": {
+      "main": [
+        [{ "node": "🔧 تحضير بيانات ChromaDB", "type": "main", "index": 0 }]
+      ]
+    },
+    "🔧 تحضير بيانات ChromaDB": {
+      "main": [
+        [{ "node": "💾 حفظ في ChromaDB", "type": "main", "index": 0 }]
+      ]
+    },
+    "💾 حفظ في ChromaDB": {
+      "main": [
+        [{ "node": "✅ نقل للمجلد المعالج", "type": "main", "index": 0 }]
+      ]
+    },
+    "✅ نقل للمجلد المعالج": {
+      "main": [
+        [{ "node": "📊 تسجيل النجاح", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": ["salehsaas", "knowledge", "rag", "chromadb"],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-02T00:00:00.000Z",
+  "versionId": "1"
+}
