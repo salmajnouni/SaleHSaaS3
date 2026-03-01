@@ -52,8 +52,8 @@ def upload_file(filepath: Path) -> bool:
             result = response.json()
             log.info(
                 f"[OK] {filepath.name} → "
-                f"{result.get('chunks_stored', '?')} chunks stored, "
-                f"collection: {result.get('collection', '?')}"
+                f"{result.get('chunks_count', result.get('chunks_stored', '?'))} chunks stored, "
+                f"collection: {result.get('collection_name', result.get('collection', '?'))}"
             )
             return True
         else:
