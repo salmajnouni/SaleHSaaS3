@@ -309,7 +309,6 @@ services:
     image: mintplexlabs/anythingllm:latest
     container_name: salehsaas_anythingllm
     restart: unless-stopped
-    depends_on:
     cap_add:
       - SYS_ADMIN
     environment:
