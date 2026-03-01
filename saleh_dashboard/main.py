@@ -587,3 +587,95 @@ async def add_lexicon_term(new_term: NewLegalTerm):
         lexicon["_metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d")
     save_lexicon(lexicon)
     return {"success": True, "message": message}
+
+
+# ─── Translation Layer API (طبقة الترجمة الذكية) ──────────────────────────────
+
+import sys
+sys.path.insert(0, "/app/glossary")
+
+try:
+    from translation_layer import translate_term, get_all_terms, get_categories, OFFICIAL_TERMS, MULTI_CONTEXT_TERMS
+    TRANSLATION_LAYER_AVAILABLE = True
+except ImportError:
+    TRANSLATION_LAYER_AVAILABLE = False
+
+
+class TranslateRequest(BaseModel):
+    term: str
+    context: str = None
+
+
+@app.post("/api/translate")
+async def translate_arabic_term(req: TranslateRequest):
+    """
+    ترجمة مصطلح عربي إلى الإنجليزية مع مراعاة السياق.
+    المصادر: هيئة الخبراء → معجم وزارة العدل → llama3
+    """
+    if not TRANSLATION_LAYER_AVAILABLE:
+        return JSONResponse({"error": "Translation layer not available"}, status_code=503)
+    result = translate_term(req.term, req.context)
+    return result
+
+
+@app.get("/api/translate/all")
+async def get_all_official_terms(category: str = None):
+    """الحصول على جميع المصطلحات الرسمية مع إمكانية الفلترة بالفئة."""
+    if not TRANSLATION_LAYER_AVAILABLE:
+        return JSONResponse({"error": "Translation layer not available"}, status_code=503)
+    terms = get_all_terms(category)
+    return {
+        "count": len(terms),
+        "category_filter": category,
+        "terms": terms
+    }
+
+
+@app.get("/api/translate/categories")
+async def get_translation_categories():
+    """الحصول على قائمة الفئات المتاحة في طبقة الترجمة."""
+    if not TRANSLATION_LAYER_AVAILABLE:
+        return JSONResponse({"error": "Translation layer not available"}, status_code=503)
+    cats = get_categories()
+    return {"categories": cats}
+
+
+@app.get("/api/translate/conflicts")
+async def get_multi_context_terms():
+    """الحصول على المصطلحات التي لها ترجمات متعددة حسب السياق."""
+    if not TRANSLATION_LAYER_AVAILABLE:
+        return JSONResponse({"error": "Translation layer not available"}, status_code=503)
+    result = []
+    for term_ar, data in MULTI_CONTEXT_TERMS.items():
+        result.append({
+            "term_ar": term_ar,
+            "default_en": data["default"],
+            "contexts": data["contexts"],
+            "note": data.get("note", ""),
+            "source": data["source"]
+        })
+    return {
+        "count": len(result),
+        "message": "هذه المصطلحات لها ترجمات مختلفة حسب السياق القانوني",
+        "terms": result
+    }
+
+
+@app.get("/api/translate/stats")
+async def get_translation_stats():
+    """إحصاءات طبقة الترجمة."""
+    if not TRANSLATION_LAYER_AVAILABLE:
+        return {"available": False}
+    cats = {}
+    for data in OFFICIAL_TERMS.values():
+        cat = data.get("context", "عام")
+        cats[cat] = cats.get(cat, 0) + 1
+    return {
+        "available": True,
+        "total_official_terms": len(OFFICIAL_TERMS),
+        "multi_context_terms": len(MULTI_CONTEXT_TERMS),
+        "total_terms": len(OFFICIAL_TERMS) + len(MULTI_CONTEXT_TERMS),
+        "primary_source": "هيئة الخبراء بمجلس الوزراء",
+        "fallback": "llama3.1 (AI)",
+        "categories": cats
+    }

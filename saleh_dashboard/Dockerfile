@@ -10,6 +10,9 @@ COPY . .
 # إنشاء المجلدات الافتراضية
 RUN mkdir -p /data/incoming /data/processed /data/failed /data/lora_queue static /app/glossary
 
+# نسخ ملفات المعجم وطبقة الترجمة
+COPY ../saleh_brain/glossary/ /app/glossary/ 2>/dev/null || true
+
 EXPOSE 8080
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
