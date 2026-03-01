@@ -112,7 +112,12 @@ INSERT INTO data_connections (name, connection_type, host, port, database_name, 
 VALUES ('قاعدة البيانات المحلية', 'postgresql', 'postgres', 5432, 'salehsaas', 'salehsaas_user', true)
 ON CONFLICT DO NOTHING;
 
+-- ── n8n Database ────────────────────────────────────────────────────────────
+
+SELECT 'CREATE DATABASE n8n'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'n8n')\gexec
+
 -- Completion message
 DO $$ BEGIN
-    RAISE NOTICE 'SaleHSaaS 3.0 database initialized successfully';
+    RAISE NOTICE 'SaleHSaaS database initialized successfully';
 END $$;

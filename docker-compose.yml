@@ -46,6 +46,7 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.10
@@ -114,7 +115,7 @@ services:
 
       # ── الأمان ──
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-salehsaas-secret-key-change-me}
-      - WEBUI_NAME=SaleH SaaS - نظام المعرفة القانونية
+      - WEBUI_NAME=SaleH SaaS
       - DEFAULT_LOCALE=ar
       - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
       - WEBUI_AUTH=true
@@ -204,7 +205,7 @@ services:
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB:-salehsaas}
+      - DB_POSTGRESDB_DATABASE=n8n
       - DB_POSTGRESDB_USER=${POSTGRES_USER:-salehsaas}
       - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-salehsaas_pass}
       - N8N_BASIC_AUTH_ACTIVE=true
