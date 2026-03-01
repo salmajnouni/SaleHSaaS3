@@ -66,10 +66,8 @@ services:
     environment:
       - ANONYMIZED_TELEMETRY=False
       - ALLOW_RESET=True
-      - CHROMA_SERVER_AUTH_CREDENTIALS=${CHROMA_TOKEN:-salehsaas-token}
-      - CHROMA_SERVER_AUTH_CREDENTIALS_PROVIDER=chromadb.auth.token.TokenConfigServerAuthCredentialsProvider
-      - CHROMA_SERVER_AUTH_PROVIDER=chromadb.auth.token.TokenAuthServerProvider
-      - CHROMA_AUTH_TOKEN_TRANSPORT_HEADER=AUTHORIZATION
+      - IS_PERSISTENT=TRUE
+      - CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"]
     volumes:
       - chromadb_data:/chroma/chroma
     networks:
@@ -78,10 +76,11 @@ services:
     ports:
       - "${CHROMADB_PORT:-8010}:8000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
-      interval: 30s
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/api/v1/heartbeat || exit 1"]
+      interval: 20s
       timeout: 10s
-      retries: 3
+      retries: 5
+      start_period: 30s
     labels:
       - "salehsaas.service=vector-db"
       - "salehsaas.description=قاعدة البيانات المتجهية - ذاكرة القوانين السعودية"
@@ -107,7 +106,6 @@ services:
       - VECTOR_DB=chroma
       - CHROMA_HTTP_HOST=chromadb
       - CHROMA_HTTP_PORT=8000
-      - CHROMA_HTTP_HEADERS=Authorization=Bearer ${CHROMA_TOKEN:-salehsaas-token}
       - RAG_EMBEDDING_ENGINE=ollama
       - RAG_EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
       - RAG_OLLAMA_BASE_URL=http://host.docker.internal:11434
