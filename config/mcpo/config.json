@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ollama_model_builder": {
+      "command": "python3",
+      "args": ["/home/ubuntu/SaleHSaaS3/tools/mcp/ollama_model_builder.py"]
+    },
+    "saleh_legal_rag": {
+      "command": "python3",
+      "args": ["/home/ubuntu/SaleHSaaS3/pipelines/saleh_legal_rag.py"]
+    }
+  }
+}

@@ -2,11 +2,16 @@
 # SaleH SaaS 4.0 - Docker Compose Configuration
 # 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
 #
-# الهيكل المبسّط - 4 حاويات أساسية:
-#   1. open_webui   - الواجهة الرئيسية + RAG + Pipelines + Code Execution
-#   2. chromadb     - قاعدة البيانات المتجهية (القوانين والوثائق)
-#   3. n8n          - الأتمتة والنشر على الميديا
-#   4. postgres     - قاعدة البيانات الرئيسية
+# الهيكل المبسّط - 9 حاويات:
+#   1. postgres      - قاعدة البيانات الرئيسية
+#   2. chromadb      - قاعدة البيانات المتجهية (القوانين والوثائق)
+#   3. open_webui    - الواجهة الرئيسية + RAG + Pipelines + Code Execution
+#   4. pipelines     - المعالج القانوني المخصص
+#   5. tika          - استخراج النصوص من الوثائق
+#   6. searxng       - البحث المحلي على الإنترنت
+#   7. n8n           - الأتمتة والنشر على الميديا
+#   8. code_server   - بيئة التطوير من المتصفح
+#   9. mcpo          - MCP-to-OpenAPI Proxy (Ollama Model Builder + Legal RAG)
 #
 # Ollama يعمل على Windows مباشرة (host.docker.internal:11434)
 # جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
@@ -91,6 +96,8 @@ services:
       postgres:
         condition: service_healthy
       chromadb:
+        condition: service_started
+      mcpo:
         condition: service_started
     environment:
       # ── Ollama على Windows ──
@@ -250,3 +257,31 @@ services:
     labels:
       - "salehsaas.service=code-server"
       - "salehsaas.description=بيئة تطوير متكاملة من المتصفح - تعديل Pipelines والمعجم"
+
+  # ── 9. MCPO - MCP-to-OpenAPI Proxy ──────────────────────────────────────
+  # يحوّل أدوات MCP إلى OpenAPI REST endpoints
+  # يتيح لـ Open WebUI استخدام:
+  #   - Ollama Model Builder: إدارة النماذج (تحميل، عرض، معلومات)
+  #   - Legal RAG Tool: بحث قانوني متقدم في الوثائق السعودية
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    container_name: salehsaas_mcpo
+    restart: unless-stopped
+    command: >
+      --port 8000
+      --api-key "${MCPO_API_KEY:-salehsaas-mcpo-key}"
+      --config /config/config.json
+    volumes:
+      - ./config/mcpo:/config:ro
+      - ./tools/mcp:/tools/mcp:ro
+      - ./pipelines:/pipelines:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.60
+    ports:
+      - "${MCPO_PORT:-8020}:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      - "salehsaas.service=mcpo"
+      - "salehsaas.description=MCP-to-OpenAPI Proxy - Ollama Model Builder + Legal RAG"
