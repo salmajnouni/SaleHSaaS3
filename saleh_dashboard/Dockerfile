@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # إنشاء المجلدات الافتراضية
-RUN mkdir -p /data/incoming /data/processed /data/failed /data/lora_queue static
+RUN mkdir -p /data/incoming /data/processed /data/failed /data/lora_queue static /app/glossary
 
 EXPOSE 8080
 

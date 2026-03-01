@@ -1,182 +1,67 @@
-# ⚡ SaleHSaaS 3.0 — منصة الذكاء الأعمال السيادية
+# SaleH SaaS - Local AI Brain 🧠
 
-<div align="center">
-
-![SaleHSaaS](https://img.shields.io/badge/SaleHSaaS-3.0-gold?style=for-the-badge)
-![Local AI](https://img.shields.io/badge/AI-100%25_Local-green?style=for-the-badge)
-![GRC](https://img.shields.io/badge/GRC-NCA_PDPL_CITC-blue?style=for-the-badge)
-![Arabic](https://img.shields.io/badge/Language-Arabic_First-red?style=for-the-badge)
-![Made in Makkah](https://img.shields.io/badge/%F0%9F%95%8B%EF%B8%8F_%D8%B5%D9%8F%D9%86%D8%B9_%D9%81%D9%8A-%D9%85%D9%83%D8%A9_%D8%A7%D9%84%D9%85%D9%83%D8%B1%D9%85%D8%A9-darkgreen?style=for-the-badge)
-
-**منصة ذكاء أعمال سيادية متكاملة — تعمل 100% محلياً — لا يوجد إرسال خارجي**
-
-> 🕋 **صُنع بفخر في مكة المكرمة، المملكة العربية السعودية**
-
-</div>
+**SaleH Smart Autonomous Agent System** is a complete, 100% private, local-first AI ecosystem designed for knowledge management, intelligent search, and automated fine-tuning. It runs entirely on your local machine using Docker, ensuring no data ever leaves your device.
 
 ---
 
-## 🎯 نظرة عامة
+### 🕋 النسخة العربية
 
-SaleHSaaS 3.0 هي منصة ذكاء أعمال سيادية شاملة **صُنعت في مكة المكرمة** ومصممة للمؤسسات السعودية، تجمع بين:
+**SaleH SaaS (نظام العميل الذكي)** هو نظام ذكاء اصطناعي متكامل يعمل بالكامل على جهازك المحلي، مصمم لإدارة المعرفة، البحث الذكي، وأتمتة الضبط الدقيق (Fine-Tuning) للنماذج اللغوية. النظام يضمن خصوصية 100% حيث أن جميع بياناتك لا تغادر جهازك أبداً.
 
-- **محرك GRC متكامل** يغطي NCA + PDPL + CITC
-- **وكلاء ذكاء اصطناعي متخصصون** (مالي، قانوني، سيبراني، موارد بشرية، تواصل اجتماعي)
-- **موصل بيانات شامل** يدعم SQL Server، MySQL، Oracle، SAP، Excel، PDF، REST APIs
-- **واجهة عربية كاملة** مع دعم RTL
-- **معالجة محلية 100%** — لا يغادر أي بيانات الشبكة المحلية
+[![SaleH SaaS Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v2_ar.png)](#)
 
----
+## ✨ الميزات الرئيسية
 
-## 🏗️ المكونات الرئيسية
+- **🧠 ذكاء اصطناعي محلي 100%**: يستخدم Ollama لتشغيل نماذج لغوية كبيرة (مثل Llama 3) ونماذج embeddings (مثل nomic-embed-text) مباشرة على جهازك.
+- **📚 قاعدة معرفة متكاملة**: حوّل مستنداتك (PDF, Word, TXT, MD) إلى قاعدة معرفة قابلة للبحث باستخدام ChromaDB.
+- **📂 مراقبة تلقائية للمجلدات**: ضع ملفاتك في مجلد `incoming` وسيقوم النظام بمعالجتها وتخزينها تلقائياً.
+- **💬 واجهة محادثة ذكية (RAG)**: اسأل النموذج أسئلة بلغتك الطبيعية وسيجيب بناءً على محتوى مستنداتك المخزنة.
+- **🤖 ضبط دقيق (LoRA)**: يجمع أمثلة التدريب تلقائياً في قائمة انتظار، وعند الوصول إلى 500 مثال، يمكن بدء عملية الضبط الدقيق (Fine-Tuning) لتعليم النموذج أسلوبك ومصطلحاتك الخاصة.
+- **📊 لوحة مراقبة شاملة**: واجهة ويب احترافية لمراقبة حالة جميع الخدمات، عرض إحصاءات ChromaDB، تتبع الملفات، والبحث في قاعدة المعرفة.
+- **🌐 مبني على Docker**: النظام بأكمله يعمل داخل حاويات Docker معزولة، مما يسهل عملية التثبيت والتشغيل والإدارة.
 
-| الخدمة | الوصف | المنفذ |
-|--------|-------|--------|
-| **لوحة التحكم** | الواجهة العربية الرئيسية | 8000 |
-| **Open WebUI** | واجهة الدردشة مع الذكاء الاصطناعي | 3000 |
-| **Ollama** | محرك النماذج المحلية | 11434 |
-| **n8n** | أتمتة سير العمل | 5678 |
-| **Qdrant** | قاعدة البيانات المتجهية (RAG) | 6333 |
-| **SearXNG** | محرك البحث المحلي | 8080 |
-| **Code Server** | استوديو التطوير | 8443 |
-| **Grafana** | مراقبة الأداء | 3001 |
-| **PostgreSQL** | قاعدة البيانات الرئيسية | 5432 |
+## 🚀 ابدأ الآن (Quick Start)
 
----
-
-## 🚀 التثبيت السريع
-
-### المتطلبات
-
-- Windows 10/11 (64-bit)
-- Docker Desktop مع WSL2
-- 16GB RAM كحد أدنى (32GB موصى به)
-- 100GB مساحة تخزين حرة
-- NVIDIA GPU (اختياري، لتسريع الذكاء الاصطناعي)
-
-### خطوات التثبيت
-
-```batch
-# 1. استنساخ المستودع
-git clone https://github.com/salmajnouni/SaleHSaaS.git
-cd SaleHSaaS
-
-# 2. تشغيل المثبت التلقائي
-scripts\windows\INSTALL_SALEHSAAS.bat
-```
-
-أو يدوياً:
-
-```batch
-# نسخ ملف البيئة
-copy .env.example .env
-
-# تعديل كلمات المرور في .env
-notepad .env
-
-# تشغيل المنصة
-docker compose up -d
-```
+1.  **المتطلبات**: Docker Desktop, Git.
+2.  **استنساخ المستودع**:
+    ```bash
+    git clone https://github.com/salmajnouni/SaleHSaaS3.git
+    cd SaleHSaaS3
+    ```
+3.  **تشغيل النظام**:
+    ```bash
+    docker-compose up -d --build
+    ```
+4.  **افتح لوحة المراقبة**: **http://localhost:8000**
+5.  **ابدأ بإضافة الملفات**: ضع مستنداتك في المجلد `D:\SaleHSaaS3\data\incoming`.
 
 ---
 
-## 🛡️ الامتثال التنظيمي
+### English Version
 
-### NCA — الأمن السيبراني
-- ✅ حوكمة الأمن السيبراني (1-1)
-- ✅ إدارة الهويات والصلاحيات (2-2)
-- ✅ أمن البيانات والتشفير (2-7)
-- ✅ الاستمرارية التشغيلية والنسخ الاحتياطي (2-8)
-- ✅ الاستجابة للحوادث (3-1)
+[![SaleH SaaS Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v2_en.png)](#)
 
-### PDPL — حماية البيانات الشخصية
-- ✅ تصنيف البيانات الشخصية
-- ✅ إدارة الموافقة
-- ✅ حقوق أصحاب البيانات
-- ✅ سياسات الاحتفاظ والحذف
-- ✅ تقييم أثر الخصوصية (DPIA)
+## ✨ Key Features
 
-### CITC — الاتصالات وتقنية المعلومات
-- ✅ متطلبات تخزين البيانات محلياً
-- ✅ ضوابط الوصول والمراقبة
-- ✅ متطلبات الإفصاح والشفافية
+- **🧠 100% Local AI**: Utilizes Ollama to run large language models (like Llama 3) and embedding models (like nomic-embed-text) directly on your machine.
+- **📚 Integrated Knowledge Base**: Transform your documents (PDF, Word, TXT, MD) into a searchable knowledge base using ChromaDB.
+- **📂 Automated Folder Watching**: Simply drop your files into the `incoming` folder, and the system will automatically process and store them.
+- **💬 Smart Chat Interface (RAG)**: Ask the model questions in your natural language, and it will answer based on the content of your stored documents.
+- **🤖 Automated Fine-Tuning (LoRA)**: Automatically collects training examples in a queue. Once 500 examples are reached, you can initiate the fine-tuning process to teach the model your specific style and terminology.
+- **📊 Comprehensive Dashboard**: A professional web interface to monitor the status of all services, view ChromaDB stats, track files, and search the knowledge base.
+- **🌐 Docker-Powered**: The entire system runs inside isolated Docker containers, making installation, operation, and management seamless.
 
----
+## 🚀 Quick Start
 
-## 🤖 الوكلاء المتخصصون
-
-| الوكيل | المهام |
-|--------|--------|
-| **وكيل الذكاء المالي** | تحليل البيانات المالية، كشف الاحتيال، التقارير |
-| **وكيل الامتثال القانوني** | مراجعة العقود، فحص السياسات، التوصيات |
-| **وكيل الأمن السيبراني** | فحص الإعدادات، تقييم NCA، تقارير الأمن |
-| **وكيل الموارد البشرية** | مكافأة نهاية الخدمة، السعودة، تحليل HR |
-| **وكيل التواصل الاجتماعي** | توليد المحتوى العربي، جدولة النشر |
-
----
-
-## 📊 موصل البيانات
-
-يدعم الاتصال بـ:
-
-- **قواعد البيانات:** PostgreSQL، MySQL، SQL Server، Oracle، SQLite
-- **أنظمة ERP:** SAP (OData)، Oracle ERP، Microsoft Dynamics، Odoo
-- **الملفات:** Excel، CSV، PDF، Word، JSON، TXT
-- **APIs:** REST APIs مع دعم OAuth وAPI Keys
-
----
-
-## 🔒 الأمان والخصوصية
-
-- **معالجة محلية 100%** — لا يغادر أي بيانات الخادم
-- **تشفير AES-256** لجميع البيانات الحساسة
-- **سجل مراجعة شامل** لجميع العمليات
-- **مصادقة متعددة العوامل** (MFA)
-- **عزل الشبكة** عبر Docker networks
-
----
-
-## 📁 هيكل المشروع
-
-```
-SaleHSaaS3/
-├── agents/                    # الوكلاء المتخصصون
-│   ├── financial/             # وكيل الذكاء المالي
-│   ├── legal/                 # وكيل الامتثال القانوني
-│   ├── cybersecurity/         # وكيل الأمن السيبراني
-│   ├── hr/                    # وكيل الموارد البشرية
-│   └── social_media/          # وكيل التواصل الاجتماعي
-├── core/                      # المكونات الأساسية
-│   ├── grc_engine/            # محرك GRC
-│   └── data_connector/        # موصل البيانات
-├── ui/                        # الواجهات
-│   └── arabic_dashboard/      # لوحة التحكم العربية
-├── services/                  # الخدمات المساعدة
-│   ├── mcp_server/            # خادم MCP
-│   └── n8n_workflows/         # سير عمل n8n
-├── config/                    # ملفات الإعداد
-├── scripts/                   # سكريبتات التثبيت والإدارة
-│   └── windows/               # سكريبتات Windows
-├── docs/                      # التوثيق
-├── docker-compose.yml         # إعداد Docker الرئيسي
-└── .env.example               # قالب متغيرات البيئة
-```
-
----
-
-## 📞 الدعم والتواصل
-
-- **GitHub:** [github.com/salmajnouni/SaleHSaaS](https://github.com/salmajnouni/SaleHSaaS)
-- **التوثيق:** راجع مجلد `docs/`
-
----
-
-<div align="center">
-
-🕋 **صُنع بفخر في مكة المكرمة، المملكة العربية السعودية**
-
-**Made with pride in Makkah Al-Mukarramah, Saudi Arabia**
-
-© 2025-2026 SaleHSaaS — جميع البيانات تُعالج محلياً
-
-</div>
+1.  **Prerequisites**: Docker Desktop, Git.
+2.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/salmajnouni/SaleHSaaS3.git
+    cd SaleHSaaS3
+    ```
+3.  **Run the System**:
+    ```bash
+    docker-compose up -d --build
+    ```
+4.  **Open the Dashboard**: Navigate to **http://localhost:8000**
+5.  **Start Adding Files**: Place your documents in the `D:\SaleHSaaS3\data\incoming` directory.

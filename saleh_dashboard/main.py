@@ -281,3 +281,105 @@ async def chat(req: ChatRequest):
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "service": "SaleH Dashboard v2.0"}
+
+# ─── Glossary API ─────────────────────────────────────────────────────────────
+
+GLOSSARY_PATH = Path("/app/glossary/glossary.json")
+
+
+def load_glossary() -> dict:
+    if not GLOSSARY_PATH.exists():
+        return {"categories": {}, "metadata": {"total_terms": 0}}
+    with open(GLOSSARY_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_glossary(data: dict):
+    GLOSSARY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(GLOSSARY_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+class NewTerm(BaseModel):
+    category: str
+    term_ar: str
+    term_en: str
+    definition_ar: str
+    definition_en: str
+    source: str = "مُضاف يدوياً"
+
+
+@app.get("/api/glossary")
+async def get_glossary():
+    """Get all glossary terms organized by category."""
+    return load_glossary()
+
+
+@app.get("/api/glossary/search")
+async def search_glossary(q: str):
+    """Search for a term in the glossary (Arabic or English)."""
+    glossary = load_glossary()
+    results = []
+    q_lower = q.lower()
+    for cat_key, category in glossary.get("categories", {}).items():
+        for term in category.get("terms", []):
+            if (q_lower in term.get("term_ar", "").lower() or
+                    q_lower in term.get("term_en", "").lower() or
+                    q_lower in term.get("definition_ar", "").lower() or
+                    q_lower in term.get("definition_en", "").lower()):
+                results.append({
+                    "category_key": cat_key,
+                    "category_ar": category.get("name_ar"),
+                    "category_en": category.get("name_en"),
+                    **term
+                })
+    return {"query": q, "count": len(results), "results": results}
+
+
+@app.get("/api/glossary/categories")
+async def get_glossary_categories():
+    """Get all categories with their names and term counts."""
+    glossary = load_glossary()
+    categories = []
+    for key, cat in glossary.get("categories", {}).items():
+        categories.append({
+            "key": key,
+            "name_ar": cat.get("name_ar"),
+            "name_en": cat.get("name_en"),
+            "term_count": len(cat.get("terms", []))
+        })
+    return categories
+
+
+@app.post("/api/glossary/add")
+async def add_glossary_term(new_term: NewTerm):
+    """Add a new term to the glossary."""
+    glossary = load_glossary()
+    categories = glossary.get("categories", {})
+
+    if new_term.category not in categories:
+        return JSONResponse(
+            {"error": f"Category '{new_term.category}' not found."},
+            status_code=404
+        )
+
+    existing_terms = categories[new_term.category].get("terms", [])
+    prefix = new_term.category[:2]
+    new_id = f"{prefix}_{str(len(existing_terms) + 1).zfill(3)}"
+
+    term_obj = {
+        "id": new_id,
+        "term_ar": new_term.term_ar,
+        "term_en": new_term.term_en,
+        "definition_ar": new_term.definition_ar,
+        "definition_en": new_term.definition_en,
+        "related_terms": [],
+        "source": new_term.source
+    }
+
+    categories[new_term.category]["terms"].append(term_obj)
+    glossary["metadata"]["total_terms"] = sum(
+        len(cat.get("terms", [])) for cat in categories.values()
+    )
+    save_glossary(glossary)
+    return {"message": "تم إضافة المصطلح بنجاح", "term": term_obj}
