@@ -10,8 +10,8 @@ COPY . .
 # إنشاء المجلدات الافتراضية
 RUN mkdir -p /data/incoming /data/processed /data/failed /data/lora_queue static /app/glossary
 
-# نسخ ملفات المعجم وطبقة الترجمة
-COPY ../saleh_brain/glossary/ /app/glossary/ 2>/dev/null || true
+# نسخ ملفات المعجم وطبقة الترجمة (موجودة داخل مجلد saleh_dashboard/glossary)
+RUN if [ -d /app/glossary ] && [ "$(ls -A /app/glossary 2>/dev/null)" ]; then echo "Glossary files found"; else echo "No glossary files"; fi
 
 EXPOSE 8080
 

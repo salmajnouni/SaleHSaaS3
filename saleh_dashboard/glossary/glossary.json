@@ -1,0 +1,275 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2026-03-01",
+    "author": "SaleH Al-Majnouni",
+    "description": "القاموس الشامل لنظام SaleH SaaS - يحتوي على المصطلحات المتخصصة في مجالات القيادة والحوكمة والبناء والذكاء الاصطناعي",
+    "total_terms": 60
+  },
+  "categories": {
+    "leadership_management": {
+      "name_ar": "القيادة والإدارة",
+      "name_en": "Leadership & Management",
+      "terms": [
+        {
+          "id": "lm_001",
+          "term_ar": "الثقة الملكية",
+          "term_en": "Royal Trust",
+          "definition_ar": "أعلى مستويات الثقة التي يمنحها القائد لمرؤوسيه، مبنية على الإخلاص والكفاءة والنزاهة، وهي أساس العلاقة بين القادة الكبار وفرقهم.",
+          "definition_en": "The highest level of trust a leader grants to subordinates, built on loyalty, competence, and integrity. It is the foundation of the relationship between great leaders and their teams.",
+          "related_terms": ["lm_002", "lm_005"],
+          "source": "مقالات صالح المجنوني"
+        },
+        {
+          "id": "lm_002",
+          "term_ar": "القيادة التحويلية",
+          "term_en": "Transformational Leadership",
+          "definition_ar": "نمط قيادي يركز على إلهام الفريق وتحفيزه نحو تحقيق رؤية مشتركة، وتطوير قدراتهم الفردية، وإحداث تغيير إيجابي مستدام في المنظمة.",
+          "definition_en": "A leadership style focused on inspiring and motivating the team toward a shared vision, developing their individual capabilities, and creating sustainable positive change in the organization.",
+          "related_terms": ["lm_001", "lm_003"],
+          "source": "عام"
+        },
+        {
+          "id": "lm_003",
+          "term_ar": "الذكاء العاطفي",
+          "term_en": "Emotional Intelligence (EQ)",
+          "definition_ar": "القدرة على إدراك المشاعر وفهمها وإدارتها، سواء مشاعر الشخص نفسه أو مشاعر الآخرين، وهي مهارة أساسية للقادة الفعّالين.",
+          "definition_en": "The ability to perceive, understand, and manage emotions, both one's own and those of others. It is a core skill for effective leaders.",
+          "related_terms": ["lm_002"],
+          "source": "عام"
+        },
+        {
+          "id": "lm_004",
+          "term_ar": "إدارة التغيير",
+          "term_en": "Change Management",
+          "definition_ar": "منهجية منظمة لتحويل الأفراد والفرق والمنظمات من الحالة الراهنة إلى الحالة المستقبلية المرغوبة، مع تقليل المقاومة وتعظيم الفوائد.",
+          "definition_en": "A structured methodology for transitioning individuals, teams, and organizations from a current state to a desired future state, minimizing resistance and maximizing benefits.",
+          "related_terms": ["lm_002", "lm_005"],
+          "source": "عام"
+        },
+        {
+          "id": "lm_005",
+          "term_ar": "التفويض الفعّال",
+          "term_en": "Effective Delegation",
+          "definition_ar": "عملية إسناد المهام والصلاحيات والمسؤوليات إلى الأشخاص المناسبين مع توفير الدعم اللازم، مما يُحرر القائد للتركيز على المهام الاستراتيجية.",
+          "definition_en": "The process of assigning tasks, authority, and responsibilities to the right people while providing necessary support, freeing the leader to focus on strategic tasks.",
+          "related_terms": ["lm_001", "lm_002"],
+          "source": "عام"
+        }
+      ]
+    },
+    "grc": {
+      "name_ar": "الحوكمة والمخاطر والامتثال",
+      "name_en": "Governance, Risk & Compliance (GRC)",
+      "terms": [
+        {
+          "id": "grc_001",
+          "term_ar": "الحوكمة المؤسسية",
+          "term_en": "Corporate Governance",
+          "definition_ar": "منظومة القواعد والأنظمة والإجراءات التي تحدد كيفية إدارة الشركة والرقابة عليها، وتوازن مصالح أصحاب المصلحة المختلفين.",
+          "definition_en": "The system of rules, regulations, and procedures that determines how a company is managed and controlled, balancing the interests of various stakeholders.",
+          "related_terms": ["grc_002", "grc_003"],
+          "source": "مقالات صالح المجنوني"
+        },
+        {
+          "id": "grc_002",
+          "term_ar": "إدارة المخاطر",
+          "term_en": "Risk Management",
+          "definition_ar": "عملية تحديد المخاطر وتقييمها والتحكم فيها والتخفيف من آثارها لحماية أصول المنظمة وتحقيق أهدافها الاستراتيجية.",
+          "definition_en": "The process of identifying, assessing, controlling, and mitigating risks to protect an organization's assets and achieve its strategic objectives.",
+          "related_terms": ["grc_001", "grc_004"],
+          "source": "عام"
+        },
+        {
+          "id": "grc_003",
+          "term_ar": "الامتثال التنظيمي",
+          "term_en": "Regulatory Compliance",
+          "definition_ar": "التزام المنظمة بالقوانين واللوائح والمعايير والسياسات المعمول بها في مجال عملها، سواء كانت محلية أو دولية.",
+          "definition_en": "An organization's adherence to applicable laws, regulations, standards, and policies in its field of operation, whether local or international.",
+          "related_terms": ["grc_001", "grc_005"],
+          "source": "عام"
+        },
+        {
+          "id": "grc_004",
+          "term_ar": "الرقابة الداخلية",
+          "term_en": "Internal Control",
+          "definition_ar": "مجموعة من الإجراءات والسياسات المصممة لضمان دقة البيانات المالية، وحماية الأصول، ومنع الاحتيال، وضمان الامتثال للقوانين.",
+          "definition_en": "A set of procedures and policies designed to ensure the accuracy of financial data, protect assets, prevent fraud, and ensure compliance with laws.",
+          "related_terms": ["grc_002", "grc_003"],
+          "source": "عام"
+        },
+        {
+          "id": "grc_005",
+          "term_ar": "مكافحة الفساد",
+          "term_en": "Anti-Corruption",
+          "definition_ar": "مجموعة من السياسات والإجراءات والضوابط التي تهدف إلى منع الرشوة والفساد وإساءة استخدام السلطة داخل المنظمة.",
+          "definition_en": "A set of policies, procedures, and controls aimed at preventing bribery, corruption, and abuse of power within an organization.",
+          "related_terms": ["grc_001", "grc_003"],
+          "source": "مقالات صالح المجنوني"
+        },
+        {
+          "id": "grc_006",
+          "term_ar": "معيار NCA",
+          "term_en": "NCA Standard",
+          "definition_ar": "إطار الأمن السيبراني الصادر عن الهيئة الوطنية للأمن السيبراني في المملكة العربية السعودية، ويُلزم الجهات الحكومية والحيوية بتطبيق ضوابط أمنية محددة.",
+          "definition_en": "The cybersecurity framework issued by the National Cybersecurity Authority (NCA) in Saudi Arabia, requiring government and critical entities to implement specific security controls.",
+          "related_terms": ["grc_003", "grc_007"],
+          "source": "المملكة العربية السعودية"
+        },
+        {
+          "id": "grc_007",
+          "term_ar": "نظام PDPL",
+          "term_en": "PDPL (Personal Data Protection Law)",
+          "definition_ar": "نظام حماية البيانات الشخصية في المملكة العربية السعودية، الذي يُنظّم كيفية جمع البيانات الشخصية ومعالجتها وحفظها والإفصاح عنها.",
+          "definition_en": "Saudi Arabia's Personal Data Protection Law, which regulates how personal data is collected, processed, stored, and disclosed.",
+          "related_terms": ["grc_003", "grc_006"],
+          "source": "المملكة العربية السعودية"
+        }
+      ]
+    },
+    "construction_engineering": {
+      "name_ar": "البناء والهندسة",
+      "name_en": "Construction & Engineering",
+      "terms": [
+        {
+          "id": "ce_001",
+          "term_ar": "إدارة المشاريع الهندسية",
+          "term_en": "Engineering Project Management",
+          "definition_ar": "تطبيق المعرفة والمهارات والأدوات والتقنيات على أنشطة المشروع الهندسي لتحقيق متطلباته، ضمن قيود الوقت والتكلفة والجودة.",
+          "definition_en": "The application of knowledge, skills, tools, and techniques to engineering project activities to meet its requirements within constraints of time, cost, and quality.",
+          "related_terms": ["ce_002", "ce_003"],
+          "source": "مجموعة بن السعودي"
+        },
+        {
+          "id": "ce_002",
+          "term_ar": "ضبط الجودة",
+          "term_en": "Quality Control (QC)",
+          "definition_ar": "مجموعة من الأنشطة التشغيلية المستخدمة للوفاء بمتطلبات الجودة، وتشمل الفحص والاختبار والتحقق من مطابقة المنتج أو الخدمة للمواصفات المحددة.",
+          "definition_en": "A set of operational activities used to fulfill quality requirements, including inspection, testing, and verification that a product or service conforms to specified requirements.",
+          "related_terms": ["ce_001", "ce_003"],
+          "source": "مجموعة بن السعودي"
+        },
+        {
+          "id": "ce_003",
+          "term_ar": "ضمان الجودة",
+          "term_en": "Quality Assurance (QA)",
+          "definition_ar": "نشاط منهجي ومخطط يهدف إلى توفير الثقة بأن المتطلبات المحددة للجودة سيتم تحقيقها، ويركز على العمليات وليس المنتجات.",
+          "definition_en": "A systematic and planned activity aimed at providing confidence that specified quality requirements will be achieved, focusing on processes rather than products.",
+          "related_terms": ["ce_001", "ce_002"],
+          "source": "مجموعة بن السعودي"
+        },
+        {
+          "id": "ce_004",
+          "term_ar": "جدول الأعمال (برنامج المشروع)",
+          "term_en": "Project Schedule",
+          "definition_ar": "وثيقة تحدد تسلسل الأنشطة ومدتها وتواريخ البدء والانتهاء المخططة لكل منها، وتُستخدم لمراقبة تقدم المشروع.",
+          "definition_en": "A document that defines the sequence of activities, their durations, and planned start and finish dates, used to monitor project progress.",
+          "related_terms": ["ce_001", "ce_005"],
+          "source": "عام"
+        },
+        {
+          "id": "ce_005",
+          "term_ar": "المستخلص",
+          "term_en": "Payment Certificate / IPC",
+          "definition_ar": "وثيقة رسمية تُصدرها جهة الإشراف على المشروع لتوثيق الأعمال المنجزة وتحديد المبالغ المستحقة للمقاول خلال فترة زمنية محددة.",
+          "definition_en": "An official document issued by the project supervision authority to document completed works and determine amounts due to the contractor during a specific period.",
+          "related_terms": ["ce_001", "ce_004"],
+          "source": "مجموعة بن السعودي"
+        }
+      ]
+    },
+    "ai_technology": {
+      "name_ar": "الذكاء الاصطناعي والتقنية",
+      "name_en": "AI & Technology",
+      "terms": [
+        {
+          "id": "ai_001",
+          "term_ar": "النموذج اللغوي الكبير (LLM)",
+          "term_en": "Large Language Model (LLM)",
+          "definition_ar": "نموذج ذكاء اصطناعي مُدرَّب على كميات ضخمة من النصوص، قادر على فهم اللغة الطبيعية وتوليدها، وتنفيذ مهام متنوعة كالترجمة والتلخيص والإجابة على الأسئلة.",
+          "definition_en": "An AI model trained on massive amounts of text, capable of understanding and generating natural language, and performing diverse tasks like translation, summarization, and question answering.",
+          "related_terms": ["ai_002", "ai_003"],
+          "source": "عام"
+        },
+        {
+          "id": "ai_002",
+          "term_ar": "التوليد المعزز بالاسترجاع (RAG)",
+          "term_en": "Retrieval-Augmented Generation (RAG)",
+          "definition_ar": "تقنية تجمع بين قدرات البحث الدلالي وقدرات النماذج اللغوية الكبيرة، حيث يُسترجع السياق ذو الصلة من قاعدة معرفة قبل توليد الإجابة، مما يُحسّن الدقة ويُقلل الهلوسة.",
+          "definition_en": "A technique combining semantic search capabilities with large language models, where relevant context is retrieved from a knowledge base before generating an answer, improving accuracy and reducing hallucination.",
+          "related_terms": ["ai_001", "ai_004"],
+          "source": "SaleH SaaS"
+        },
+        {
+          "id": "ai_003",
+          "term_ar": "الضبط الدقيق (Fine-Tuning)",
+          "term_en": "Fine-Tuning",
+          "definition_ar": "عملية إعادة تدريب نموذج لغوي مُدرَّب مسبقاً على مجموعة بيانات متخصصة أصغر، بهدف تكييفه لمهمة محددة أو أسلوب معين أو مجال متخصص.",
+          "definition_en": "The process of retraining a pre-trained language model on a smaller, specialized dataset to adapt it for a specific task, style, or domain.",
+          "related_terms": ["ai_001", "ai_005"],
+          "source": "SaleH SaaS"
+        },
+        {
+          "id": "ai_004",
+          "term_ar": "قاعدة البيانات المتجهية",
+          "term_en": "Vector Database",
+          "definition_ar": "نوع متخصص من قواعد البيانات مُصمَّم لتخزين واسترجاع البيانات المُمثَّلة كمتجهات رياضية (embeddings)، مما يُتيح البحث الدلالي بدلاً من البحث بالكلمات المفتاحية.",
+          "definition_en": "A specialized type of database designed to store and retrieve data represented as mathematical vectors (embeddings), enabling semantic search rather than keyword-based search.",
+          "related_terms": ["ai_002", "ai_006"],
+          "source": "SaleH SaaS"
+        },
+        {
+          "id": "ai_005",
+          "term_ar": "LoRA (التكيف منخفض الرتبة)",
+          "term_en": "LoRA (Low-Rank Adaptation)",
+          "definition_ar": "تقنية ضبط دقيق فعّالة تُضيف مصفوفات صغيرة قابلة للتدريب إلى طبقات النموذج الأصلي بدلاً من إعادة تدريب جميع المعاملات، مما يُقلل التكلفة الحسابية بشكل كبير.",
+          "definition_en": "An efficient fine-tuning technique that adds small trainable matrices to the original model's layers instead of retraining all parameters, significantly reducing computational cost.",
+          "related_terms": ["ai_003"],
+          "source": "SaleH SaaS"
+        },
+        {
+          "id": "ai_006",
+          "term_ar": "التضمينات (Embeddings)",
+          "term_en": "Embeddings",
+          "definition_ar": "تمثيلات رياضية (متجهات) للنصوص أو الصور أو البيانات الأخرى في فضاء متعدد الأبعاد، بحيث تكون العناصر المتشابهة في المعنى قريبة من بعضها.",
+          "definition_en": "Mathematical representations (vectors) of texts, images, or other data in a multi-dimensional space, such that semantically similar items are close to each other.",
+          "related_terms": ["ai_004", "ai_002"],
+          "source": "SaleH SaaS"
+        },
+        {
+          "id": "ai_007",
+          "term_ar": "الهلوسة (Hallucination)",
+          "term_en": "Hallucination",
+          "definition_ar": "ظاهرة في النماذج اللغوية الكبيرة حيث يُولّد النموذج معلومات تبدو واثقة ومنطقية ولكنها خاطئة أو مُختلَقة، وهي تحدٍّ رئيسي في تطبيقات الذكاء الاصطناعي.",
+          "definition_en": "A phenomenon in large language models where the model generates information that appears confident and logical but is factually incorrect or fabricated. It is a major challenge in AI applications.",
+          "related_terms": ["ai_001", "ai_002"],
+          "source": "عام"
+        }
+      ]
+    },
+    "personal_concepts": {
+      "name_ar": "المفاهيم الشخصية والمبتكرة",
+      "name_en": "Personal & Innovative Concepts",
+      "terms": [
+        {
+          "id": "pc_001",
+          "term_ar": "الذكاء السيادي",
+          "term_en": "Sovereign Intelligence",
+          "definition_ar": "مفهوم يشير إلى امتلاك المنظمة أو الفرد لقدرات ذكاء اصطناعي تعمل بشكل مستقل وآمن دون الاعتماد على خدمات خارجية، مما يضمن السيادة الكاملة على البيانات والقرارات.",
+          "definition_en": "A concept referring to an organization or individual possessing AI capabilities that operate independently and securely without relying on external services, ensuring complete sovereignty over data and decisions.",
+          "related_terms": ["ai_001", "pc_002"],
+          "source": "صالح المجنوني - SaleH SaaS"
+        },
+        {
+          "id": "pc_002",
+          "term_ar": "الدماغ الرقمي",
+          "term_en": "Digital Brain",
+          "definition_ar": "استعارة تصف نظام إدارة المعرفة الذكي الذي يتعلم ويتذكر ويُحلّل المعلومات بطريقة مشابهة للدماغ البشري، مُدعوماً بتقنيات RAG وLoRA.",
+          "definition_en": "A metaphor describing an intelligent knowledge management system that learns, remembers, and analyzes information in a manner similar to the human brain, powered by RAG and LoRA technologies.",
+          "related_terms": ["ai_002", "ai_003", "pc_001"],
+          "source": "صالح المجنوني - SaleH SaaS"
+        }
+      ]
+    }
+  }
+}
