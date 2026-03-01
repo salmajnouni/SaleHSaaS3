@@ -95,9 +95,6 @@ services:
       # ── Ollama على Windows ──
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
 
-      # ── قاعدة البيانات ──
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-salehsaas}:${POSTGRES_PASSWORD:-salehsaas_pass}@postgres:5432/${POSTGRES_DB:-salehsaas}
-
       # ── RAG - ChromaDB ──
       - VECTOR_DB=chroma
       - CHROMA_HTTP_HOST=chromadb
@@ -213,7 +210,7 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-salehsaas-n8n-key-change-me}
+      - N8N_ENCRYPTION_KEY=salehsaas-n8n-fixed-key-32chars!!
       - WEBHOOK_URL=http://localhost:${N8N_PORT:-5678}/
       - N8N_PERSONALIZATION_ENABLED=false
       - N8N_DIAGNOSTICS_ENABLED=false
@@ -221,7 +218,6 @@ services:
       - GENERIC_TIMEZONE=Asia/Riyadh
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./n8n_workflows:/home/node/.n8n/workflows:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
