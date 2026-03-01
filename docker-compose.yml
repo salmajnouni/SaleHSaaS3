@@ -512,7 +512,7 @@ services:
       salehsaas_net:
         ipv4_address: 172.20.0.97
     ports:
-      - "${DASHBOARD_PORT:-8080}:8080"
+      - "${DASHBOARD_PORT:-8088}:8080"
     labels:
       - "salehsaas.service=dashboard"
       - "salehsaas.description=لوحة مراقبة النظام الذكي"
