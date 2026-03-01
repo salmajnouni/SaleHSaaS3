@@ -12,7 +12,7 @@
           ]
         }
       },
-      "id": "trigger-schedule",
+      "id": "a1b2c3d4-0001-0001-0001-000000000001",
       "name": "⏰ مراقبة كل دقيقة",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
@@ -20,75 +20,55 @@
     },
     {
       "parameters": {
-        "operation": "list",
-        "path": "/knowledge_inbox",
-        "options": {
-          "recursive": false
-        }
+        "command": "ls /knowledge_inbox/ 2>/dev/null | grep -E '\\.(pdf|docx|doc|txt|xlsx|xls|pptx|ppt|md)$' || echo 'EMPTY'"
       },
-      "id": "read-folder",
+      "id": "a1b2c3d4-0002-0002-0002-000000000002",
       "name": "📂 قراءة مجلد المعرفة",
-      "type": "n8n-nodes-base.readWriteFile",
+      "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [460, 300]
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "check-files",
-              "leftValue": "={{ $json.length }}",
-              "rightValue": 0,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
+        "jsCode": "const output = $input.first().json.stdout || '';\nconst files = output.split('\\n').filter(f => f.trim() && f.trim() !== 'EMPTY');\nif (files.length === 0) {\n  return [{ json: { hasFiles: false, files: [] } }];\n}\nreturn files.map(f => ({ json: { hasFiles: true, fileName: f.trim() } }));"
       },
-      "id": "check-new-files",
-      "name": "🔍 هل توجد ملفات جديدة؟",
-      "type": "n8n-nodes-base.if",
+      "id": "a1b2c3d4-0003-0003-0003-000000000003",
+      "name": "🔍 تحليل الملفات",
+      "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [680, 300]
     },
     {
       "parameters": {
-        "operation": "read",
-        "path": "={{ '/knowledge_inbox/' + $json.name }}",
-        "options": {
-          "encoding": "base64"
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.hasFiles }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
         }
       },
-      "id": "read-file",
-      "name": "📄 قراءة الملف",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [900, 200]
+      "id": "a1b2c3d4-0004-0004-0004-000000000004",
+      "name": "⚡ هل توجد ملفات؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
     },
     {
       "parameters": {
         "method": "PUT",
-        "url": "http://tika:9998/tika",
+        "url": "=http://tika:9998/tika",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/octet-stream"
-            },
-            {
-              "name": "Accept",
-              "value": "text/plain"
-            }
+            { "name": "Content-Type", "value": "application/octet-stream" },
+            { "name": "Accept", "value": "text/plain" },
+            { "name": "X-Tika-OCRLanguage", "value": "ara+eng" }
           ]
         },
         "sendBody": true,
@@ -96,42 +76,60 @@
         "inputDataFieldName": "data",
         "options": {}
       },
-      "id": "extract-text-tika",
-      "name": "📝 استخراج النص - Tika",
+      "id": "a1b2c3d4-0005-0005-0005-000000000005",
+      "name": "📤 رفع لـ Tika",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "command": "=cat /knowledge_inbox/{{ $json.fileName }} | base64 -w 0"
+      },
+      "id": "a1b2c3d4-0006-0006-0006-000000000006",
+      "name": "📄 قراءة محتوى الملف",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
       "position": [1120, 200]
     },
     {
       "parameters": {
-        "jsCode": "// تقسيم النص إلى chunks بحجم 500 كلمة مع تداخل 50 كلمة\nconst text = $input.first().json.body || $input.first().json.data || '';\nconst fileName = $('📄 قراءة الملف').first().json.name || 'unknown';\nconst fileExt = fileName.split('.').pop().toLowerCase();\n\nif (!text || text.trim().length < 50) {\n  return [{ json: { skip: true, reason: 'النص قصير جداً أو فارغ', file: fileName } }];\n}\n\n// تنظيف النص\nconst cleanText = text\n  .replace(/\\s+/g, ' ')\n  .replace(/[\\x00-\\x1F\\x7F]/g, '')\n  .trim();\n\n// تقسيم إلى chunks\nconst words = cleanText.split(' ');\nconst chunkSize = 500;\nconst overlap = 50;\nconst chunks = [];\n\nfor (let i = 0; i < words.length; i += (chunkSize - overlap)) {\n  const chunk = words.slice(i, i + chunkSize).join(' ');\n  if (chunk.trim().length > 100) {\n    chunks.push({\n      json: {\n        text: chunk,\n        metadata: {\n          source: fileName,\n          chunk_index: chunks.length,\n          file_type: fileExt,\n          ingested_at: new Date().toISOString()\n        }\n      }\n    });\n  }\n}\n\nreturn chunks.length > 0 ? chunks : [{ json: { skip: true, reason: 'لا توجد chunks كافية', file: fileName } }];"
+        "jsCode": "// تحويل base64 إلى binary للإرسال لـ Tika\nconst base64Content = $input.first().json.stdout || '';\nconst fileName = $('🔍 تحليل الملفات').first().json.fileName;\n\nif (!base64Content.trim()) {\n  return [{ json: { skip: true, reason: 'ملف فارغ', file: fileName } }];\n}\n\nconst buffer = Buffer.from(base64Content.trim(), 'base64');\n\nreturn [{\n  json: { fileName: fileName },\n  binary: {\n    data: {\n      data: base64Content.trim(),\n      mimeType: 'application/octet-stream',\n      fileName: fileName\n    }\n  }\n}];"
       },
-      "id": "split-chunks",
+      "id": "a1b2c3d4-0007-0007-0007-000000000007",
+      "name": "🔄 تحويل لـ Binary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1230, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.body || $input.first().json.data || '';\nconst fileName = $('🔍 تحليل الملفات').first().json.fileName || 'unknown';\nconst fileExt = fileName.split('.').pop().toLowerCase();\n\nif (!text || text.trim().length < 50) {\n  return [{ json: { skip: true, reason: 'النص قصير جداً', file: fileName } }];\n}\n\nconst cleanText = text.replace(/\\s+/g, ' ').replace(/[\\x00-\\x1F\\x7F]/g, '').trim();\nconst words = cleanText.split(' ');\nconst chunkSize = 400;\nconst overlap = 40;\nconst chunks = [];\n\nfor (let i = 0; i < words.length; i += (chunkSize - overlap)) {\n  const chunk = words.slice(i, i + chunkSize).join(' ');\n  if (chunk.trim().length > 80) {\n    chunks.push({\n      json: {\n        text: chunk,\n        metadata: {\n          source: fileName,\n          chunk_index: chunks.length,\n          file_type: fileExt,\n          ingested_at: new Date().toISOString()\n        }\n      }\n    });\n  }\n}\n\nreturn chunks.length > 0 ? chunks : [{ json: { skip: true, reason: 'لا chunks كافية', file: fileName } }];"
+      },
+      "id": "a1b2c3d4-0008-0008-0008-000000000008",
       "name": "✂️ تقسيم إلى Chunks",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1340, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
         "conditions": {
           "conditions": [
             {
+              "id": "skip1",
               "leftValue": "={{ $json.skip }}",
               "rightValue": true,
-              "operator": {
-                "type": "boolean",
-                "operation": "notEquals"
-              }
+              "operator": { "type": "boolean", "operation": "notEquals" }
             }
           ]
         }
       },
-      "id": "skip-check",
+      "id": "a1b2c3d4-0009-0009-0009-000000000009",
       "name": "⏭️ تخطي الفارغة",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1560, 200]
+      "position": [1780, 200]
     },
     {
       "parameters": {
@@ -139,24 +137,24 @@
         "url": "http://host.docker.internal:11434/api/embeddings",
         "sendBody": true,
         "contentType": "json",
-        "body": "={\n  \"model\": \"nomic-embed-text:latest\",\n  \"prompt\": \"{{ $json.text }}\"\n}",
+        "body": "={{ JSON.stringify({ model: 'nomic-embed-text:latest', prompt: $json.text }) }}",
         "options": {}
       },
-      "id": "generate-embedding",
-      "name": "🔢 توليد Embedding - Ollama",
+      "id": "a1b2c3d4-0010-0010-0010-000000000010",
+      "name": "🔢 Embedding - Ollama",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1780, 160]
+      "position": [2000, 160]
     },
     {
       "parameters": {
-        "jsCode": "// دمج النص مع الـ embedding\nconst embedding = $input.first().json.embedding;\nconst chunkData = $('✂️ تقسيم إلى Chunks').first().json;\n\nif (!embedding || embedding.length === 0) {\n  return [{ json: { error: 'فشل في توليد embedding', chunk: chunkData.text?.substring(0, 50) } }];\n}\n\n// توليد ID فريد\nconst id = `${chunkData.metadata.source}_chunk_${chunkData.metadata.chunk_index}_${Date.now()}`;\n\nreturn [{\n  json: {\n    id: id,\n    embedding: embedding,\n    document: chunkData.text,\n    metadata: chunkData.metadata\n  }\n}];"
+        "jsCode": "const embedding = $input.first().json.embedding;\nconst chunkData = $('✂️ تقسيم إلى Chunks').first().json;\n\nif (!embedding || embedding.length === 0) {\n  return [{ json: { error: 'فشل embedding', chunk: chunkData.text?.substring(0, 50) } }];\n}\n\nconst id = `${chunkData.metadata.source}_${chunkData.metadata.chunk_index}_${Date.now()}`;\n\nreturn [{\n  json: {\n    ids: [id],\n    embeddings: [embedding],\n    documents: [chunkData.text],\n    metadatas: [chunkData.metadata]\n  }\n}];"
       },
-      "id": "prepare-chromadb",
-      "name": "🔧 تحضير بيانات ChromaDB",
+      "id": "a1b2c3d4-0011-0011-0011-000000000011",
+      "name": "🔧 تحضير ChromaDB",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2000, 160]
+      "position": [2220, 160]
     },
     {
       "parameters": {
@@ -164,115 +162,94 @@
         "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/add",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
         },
         "sendBody": true,
         "contentType": "json",
-        "body": "={\n  \"ids\": [\"{{ $json.id }}\"],\n  \"embeddings\": [{{ JSON.stringify($json.embedding) }}],\n  \"documents\": [\"{{ $json.document.replace(/\"/g, '\\\\\"') }}\"],\n  \"metadatas\": [{{ JSON.stringify($json.metadata) }}]\n}",
+        "body": "={{ JSON.stringify($json) }}",
         "options": {}
       },
-      "id": "save-chromadb",
+      "id": "a1b2c3d4-0012-0012-0012-000000000012",
       "name": "💾 حفظ في ChromaDB",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2220, 160]
-    },
-    {
-      "parameters": {
-        "operation": "move",
-        "sourcePath": "={{ '/knowledge_inbox/' + $('📄 قراءة الملف').first().json.name }}",
-        "destinationPath": "={{ '/knowledge_processed/' + $('📄 قراءة الملف').first().json.name }}"
-      },
-      "id": "move-processed",
-      "name": "✅ نقل للمجلد المعالج",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
       "position": [2440, 160]
     },
     {
       "parameters": {
-        "jsCode": "const fileName = $('📄 قراءة الملف').first().json.name;\nconst chunksCount = $('✂️ تقسيم إلى Chunks').all().length;\nconsole.log(`✅ تم هضم الملف: ${fileName} - ${chunksCount} chunk`);\nreturn [{ json: { status: 'success', file: fileName, chunks: chunksCount, timestamp: new Date().toISOString() } }];"
+        "command": "=mv /knowledge_inbox/{{ $('🔍 تحليل الملفات').first().json.fileName }} /knowledge_processed/ && echo 'moved'"
       },
-      "id": "log-success",
+      "id": "a1b2c3d4-0013-0013-0013-000000000013",
+      "name": "✅ نقل للمعالج",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [2660, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileName = $('🔍 تحليل الملفات').first().json.fileName;\nconst chunks = $('✂️ تقسيم إلى Chunks').all().length;\nconsole.log(`✅ تم هضم: ${fileName} - ${chunks} chunk`);\nreturn [{ json: { status: 'success', file: fileName, chunks, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "a1b2c3d4-0014-0014-0014-000000000014",
       "name": "📊 تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2660, 160]
+      "position": [2880, 160]
     }
   ],
   "connections": {
     "⏰ مراقبة كل دقيقة": {
-      "main": [
-        [{ "node": "📂 قراءة مجلد المعرفة", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "📂 قراءة مجلد المعرفة", "type": "main", "index": 0 }]]
     },
     "📂 قراءة مجلد المعرفة": {
-      "main": [
-        [{ "node": "🔍 هل توجد ملفات جديدة؟", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "🔍 تحليل الملفات", "type": "main", "index": 0 }]]
     },
-    "🔍 هل توجد ملفات جديدة؟": {
+    "🔍 تحليل الملفات": {
+      "main": [[{ "node": "⚡ هل توجد ملفات؟", "type": "main", "index": 0 }]]
+    },
+    "⚡ هل توجد ملفات؟": {
       "main": [
-        [{ "node": "📄 قراءة الملف", "type": "main", "index": 0 }],
+        [{ "node": "📄 قراءة محتوى الملف", "type": "main", "index": 0 }],
         []
       ]
     },
-    "📄 قراءة الملف": {
-      "main": [
-        [{ "node": "📝 استخراج النص - Tika", "type": "main", "index": 0 }]
-      ]
+    "📄 قراءة محتوى الملف": {
+      "main": [[{ "node": "🔄 تحويل لـ Binary", "type": "main", "index": 0 }]]
     },
-    "📝 استخراج النص - Tika": {
-      "main": [
-        [{ "node": "✂️ تقسيم إلى Chunks", "type": "main", "index": 0 }]
-      ]
+    "🔄 تحويل لـ Binary": {
+      "main": [[{ "node": "📤 رفع لـ Tika", "type": "main", "index": 0 }]]
+    },
+    "📤 رفع لـ Tika": {
+      "main": [[{ "node": "✂️ تقسيم إلى Chunks", "type": "main", "index": 0 }]]
     },
     "✂️ تقسيم إلى Chunks": {
-      "main": [
-        [{ "node": "⏭️ تخطي الفارغة", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "⏭️ تخطي الفارغة", "type": "main", "index": 0 }]]
     },
     "⏭️ تخطي الفارغة": {
       "main": [
-        [{ "node": "🔢 توليد Embedding - Ollama", "type": "main", "index": 0 }],
+        [{ "node": "🔢 Embedding - Ollama", "type": "main", "index": 0 }],
         []
       ]
     },
-    "🔢 توليد Embedding - Ollama": {
-      "main": [
-        [{ "node": "🔧 تحضير بيانات ChromaDB", "type": "main", "index": 0 }]
-      ]
+    "🔢 Embedding - Ollama": {
+      "main": [[{ "node": "🔧 تحضير ChromaDB", "type": "main", "index": 0 }]]
     },
-    "🔧 تحضير بيانات ChromaDB": {
-      "main": [
-        [{ "node": "💾 حفظ في ChromaDB", "type": "main", "index": 0 }]
-      ]
+    "🔧 تحضير ChromaDB": {
+      "main": [[{ "node": "💾 حفظ في ChromaDB", "type": "main", "index": 0 }]]
     },
     "💾 حفظ في ChromaDB": {
-      "main": [
-        [{ "node": "✅ نقل للمجلد المعالج", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "✅ نقل للمعالج", "type": "main", "index": 0 }]]
     },
-    "✅ نقل للمجلد المعالج": {
-      "main": [
-        [{ "node": "📊 تسجيل النجاح", "type": "main", "index": 0 }]
-      ]
+    "✅ نقل للمعالج": {
+      "main": [[{ "node": "📊 تسجيل النجاح", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "callerPolicy": "workflowsFromSameOwner"
   },
   "staticData": null,
-  "tags": ["salehsaas", "knowledge", "rag", "chromadb"],
+  "tags": ["salehsaas", "knowledge", "rag"],
   "triggerCount": 1,
-  "updatedAt": "2026-03-02T00:00:00.000Z",
-  "versionId": "1"
+  "versionId": "2"
 }
