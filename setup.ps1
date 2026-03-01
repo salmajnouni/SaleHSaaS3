@@ -1,92 +1,80 @@
-# SaleH SaaS 4.0 - سكريبت الإعداد الأولي
-# 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
+# SaleH SaaS 4.0 - Setup Script
+# Run as Administrator in PowerShell
 
-# دالة لطباعة الرسائل الملونة
-function Write-Host-Color {
-    param(
-        [string]$Message,
-        [string]$Color
-    )
-    Write-Host $Message -ForegroundColor $Color
-}
+$ErrorActionPreference = "Stop"
 
-# ----------------------------------------------------------------------------
-# 1. التحقق من Docker
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-[1/5] 🐳 التحقق من تشغيل Docker..." "Cyan"
-if (-not (docker info 2>$null)) {
-    Write-Host-Color "❌ خطأ: Docker لا يعمل. يرجى تشغيل Docker Desktop والمحاولة مرة أخرى." "Red"
+Write-Host ""
+Write-Host "=============================================" -ForegroundColor Cyan
+Write-Host "   SaleH SaaS 4.0 - Setup Script" -ForegroundColor Cyan
+Write-Host "=============================================" -ForegroundColor Cyan
+Write-Host ""
+
+# --- Step 1: Check Docker ---
+Write-Host "[1/5] Checking Docker..." -ForegroundColor Yellow
+try {
+    docker info 2>&1 | Out-Null
+    Write-Host "  OK: Docker is running." -ForegroundColor Green
+} catch {
+    Write-Host "  ERROR: Docker is not running. Please start Docker Desktop." -ForegroundColor Red
     exit 1
 }
-Write-Host-Color "✅ Docker يعمل بنجاح." "Green"
 
-# ----------------------------------------------------------------------------
-# 2. التحقق من Ollama والنماذج
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-[2/5] 🧠 التحقق من Ollama والنماذج المطلوبة..." "Cyan"
-if (-not (ollama list 2>$null | Select-String -Pattern "nomic-embed-text")) {
-    Write-Host-Color "⚠️ نموذج nomic-embed-text غير موجود. جاري التحميل..." "Yellow"
+# --- Step 2: Check Ollama ---
+Write-Host "[2/5] Checking Ollama models..." -ForegroundColor Yellow
+$ollamaList = ollama list 2>&1
+if ($ollamaList -notmatch "nomic-embed-text") {
+    Write-Host "  Downloading nomic-embed-text (required for embeddings)..." -ForegroundColor Yellow
     ollama pull nomic-embed-text
-    Write-Host-Color "✅ تم تحميل nomic-embed-text بنجاح." "Green"
+    Write-Host "  OK: nomic-embed-text downloaded." -ForegroundColor Green
 } else {
-    Write-Host-Color "✅ نموذج nomic-embed-text موجود." "Green"
+    Write-Host "  OK: nomic-embed-text found." -ForegroundColor Green
 }
 
-if (-not (ollama list 2>$null | Select-String -Pattern "llama3.1")) {
-    Write-Host-Color "⚠️ نموذج llama3.1 غير موجود. جاري التحميل..." "Yellow"
+if ($ollamaList -notmatch "llama3") {
+    Write-Host "  INFO: No llama3 model found. Downloading llama3.1..." -ForegroundColor Yellow
     ollama pull llama3.1
-    Write-Host-Color "✅ تم تحميل llama3.1 بنجاح." "Green"
+    Write-Host "  OK: llama3.1 downloaded." -ForegroundColor Green
 } else {
-    Write-Host-Color "✅ نموذج llama3.1 موجود." "Green"
+    Write-Host "  OK: LLM model found." -ForegroundColor Green
 }
 
-# ----------------------------------------------------------------------------
-# 3. إعداد ملف .env
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-[3/5] ⚙️ إعداد ملف البيئة (.env)..." "Cyan"
+# --- Step 3: Setup .env file ---
+Write-Host "[3/5] Setting up .env file..." -ForegroundColor Yellow
 if (-not (Test-Path ".\.env")) {
-    Write-Host-Color "⚠️ ملف .env غير موجود. سيتم نسخه من .env.example." "Yellow"
     Copy-Item -Path ".\.env.example" -Destination ".\.env"
-    Write-Host-Color "🛑 هام جداً: تم إنشاء ملف .env. يرجى فتحه الآن وتغيير كلمات المرور والمفاتيح السرية قبل المتابعة." "Red"
-    Read-Host -Prompt "اضغط Enter بعد تعديل ملف .env للمتابعة..."
+    Write-Host ""
+    Write-Host "  IMPORTANT: .env file created from .env.example" -ForegroundColor Red
+    Write-Host "  Please open .env and change all passwords before continuing!" -ForegroundColor Red
+    Write-Host ""
+    Read-Host "  Press Enter after editing .env to continue..."
+} else {
+    Write-Host "  OK: .env file exists." -ForegroundColor Green
 }
-Write-Host-Color "✅ ملف .env موجود." "Green"
 
-# ----------------------------------------------------------------------------
-# 4. سحب أحدث الصور
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-[4/5] 📥 سحب أحدث صور Docker..." "Cyan"
+# --- Step 4: Pull latest images ---
+Write-Host "[4/5] Pulling latest Docker images..." -ForegroundColor Yellow
 docker-compose pull
+Write-Host "  OK: Images pulled." -ForegroundColor Green
 
-# ----------------------------------------------------------------------------
-# 5. بناء وتشغيل الحاويات
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-[5/5] 🚀 بناء وتشغيل الحاويات..." "Cyan"
+# --- Step 5: Build and start containers ---
+Write-Host "[5/5] Building and starting containers..." -ForegroundColor Yellow
 docker-compose up -d --build --remove-orphans
+Write-Host "  OK: Containers started." -ForegroundColor Green
 
-# ----------------------------------------------------------------------------
-# --- انتهى --- 
-# ----------------------------------------------------------------------------
-Write-Host-Color "
-
---- ✅ اكتمل الإعداد بنجاح! --- 
-" "White"
-
-Write-Host-Color "الخدمات الأساسية تعمل الآن:
-" "White"
-Write-Host-Color "- 💬 Open WebUI (الواجهة الرئيسية): http://localhost:3000" "Green"
-Write-Host-Color "- 🤖 n8n (الأتمتة والنشر):        http://localhost:5678" "Green"
-Write-Host-Color "- 💻 Code Server (بيئة التطوير):   http://localhost:8443" "Green"
-Write-Host-Color "- 🧠 ChromaDB (ذاكرة القوانين):    http://localhost:8010" "Green"
-
-Write-Host-Color "
-ملاحظات هامة:
-- عند تشغيل Open WebUI لأول مرة، أنشئ حساب المدير.
-- كلمة مرور Code Server موجودة في ملف .env.
-- ابدأ برفع الوثائق القانونية من تبويب 'Documents' في Open WebUI.
-" "Yellow"
+# --- Done ---
+Write-Host ""
+Write-Host "=============================================" -ForegroundColor Green
+Write-Host "   SaleH SaaS 4.0 is ready!" -ForegroundColor Green
+Write-Host "=============================================" -ForegroundColor Green
+Write-Host ""
+Write-Host "Services:" -ForegroundColor White
+Write-Host "  Open WebUI  (main interface) : http://localhost:3000" -ForegroundColor Cyan
+Write-Host "  n8n         (automation)     : http://localhost:5678" -ForegroundColor Cyan
+Write-Host "  Code Server (dev environment): http://localhost:8443" -ForegroundColor Cyan
+Write-Host "  ChromaDB    (vector database): http://localhost:8010" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Notes:" -ForegroundColor Yellow
+Write-Host "  - First time: Create admin account in Open WebUI." -ForegroundColor Yellow
+Write-Host "  - Upload legal documents from the 'Documents' tab." -ForegroundColor Yellow
+Write-Host "  - Code Server password is in your .env file." -ForegroundColor Yellow
+Write-Host ""
