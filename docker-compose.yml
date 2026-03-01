@@ -114,7 +114,6 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     container_name: salehsaas_open_webui
     restart: unless-stopped
-    depends_on:
     environment:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
