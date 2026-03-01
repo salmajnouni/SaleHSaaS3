@@ -155,6 +155,7 @@
   <div class="tab" onclick="switchTab('search')">🔍 بحث في المعرفة</div>
   <div class="tab" onclick="switchTab('files')">📁 الملفات</div>
   <div class="tab" onclick="switchTab('glossary')">📖 القاموس</div>
+  <div class="tab" onclick="switchTab('lexicon')">⚖️ المعجم القانوني</div>
 </div>
 
 <!-- ══ Overview Tab ══════════════════════════════════════════════════════════ -->
@@ -354,12 +355,78 @@
   </div>
 </div>
 
+<!-- ══ Glossary Tab ═══════════════════════════════════════════════════════════ -->
+<div id="tab-glossary" class="content">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:20px;font-weight:700;color:#fff;">📖 القاموس الشامل</div>
+      <div style="font-size:13px;color:#8892a4;margin-top:4px;">مصطلحات القيادة والحوكمة والذكاء الاصطناعي والبناء</div>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('addTermForm').style.display=document.getElementById('addTermForm').style.display==='none'?'block':'none'">+ إضافة مصطلح</button>
+  </div>
+  <div id="addTermForm" style="display:none;background:#1a1d2e;border-radius:12px;padding:20px;border:1px solid #2a2d3e;margin-bottom:20px;">
+    <div style="font-size:15px;font-weight:600;color:#4f8ef7;margin-bottom:16px;">إضافة مصطلح جديد</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <input id="newTerm" class="search-input" placeholder="المصطلح *" style="background:#0f1117;">
+      <input id="newCategory" class="search-input" placeholder="الفئة (قيادة/حوكمة/بناء/ذكاء اصطناعي)" style="background:#0f1117;">
+    </div>
+    <textarea id="newDefinition" class="search-input" placeholder="التعريف *" rows="3" style="background:#0f1117;width:100%;margin-bottom:12px;resize:vertical;"></textarea>
+    <input id="newSource" class="search-input" placeholder="المصدر" style="background:#0f1117;width:100%;margin-bottom:12px;">
+    <button class="btn btn-primary" onclick="addTerm()">حفظ المصطلح</button>
+  </div>
+  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+    <input id="glossarySearch" class="search-input" placeholder="🔍 ابحث في القاموس..." style="flex:1;min-width:200px;" oninput="filterGlossary()">
+    <select id="glossaryCat" class="search-input" style="background:#1a1d2e;" onchange="filterGlossary()">
+      <option value="">جميع الفئات</option>
+      <option value="قيادة">القيادة والإدارة</option>
+      <option value="حوكمة">الحوكمة والامتثال</option>
+      <option value="بناء">البناء والمقاولات</option>
+      <option value="ذكاء اصطناعي">الذكاء الاصطناعي</option>
+    </select>
+  </div>
+  <div id="glossaryContent"><div class="empty-state">جاري تحميل القاموس...</div></div>
+</div>
+
+<!-- ══ Legal Lexicon Tab ═══════════════════════════════════════════════════════ -->
+<div id="tab-lexicon" class="content">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:20px;font-weight:700;color:#fff;">⚖️ المعجم القانوني</div>
+      <div style="font-size:13px;color:#8892a4;margin-top:4px;">مصطلحات الأنظمة السعودية — تعريفات متعددة حسب السياق القانوني</div>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('addLexForm').style.display=document.getElementById('addLexForm').style.display==='none'?'block':'none'">+ إضافة مصطلح قانوني</button>
+  </div>
+  <div id="addLexForm" style="display:none;background:#1a1d2e;border-radius:12px;padding:20px;border:1px solid #2a2d3e;margin-bottom:20px;">
+    <div style="font-size:15px;font-weight:600;color:#4f8ef7;margin-bottom:16px;">إضافة مصطلح قانوني جديد</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+      <input id="newLexTerm" class="search-input" placeholder="المصطلح *" style="background:#0f1117;">
+      <input id="newLexContext" class="search-input" placeholder="السياق (نظام العمل / المشتريات...)" style="background:#0f1117;">
+      <input id="newLexCat" class="search-input" placeholder="الفئة" style="background:#0f1117;">
+    </div>
+    <textarea id="newLexDef" class="search-input" placeholder="نص التعريف *" rows="3" style="background:#0f1117;width:100%;margin-bottom:12px;resize:vertical;"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <input id="newLexLaw" class="search-input" placeholder="المصدر القانوني * (مثل: نظام العمل)" style="background:#0f1117;">
+      <input id="newLexArticle" class="search-input" placeholder="المادة (مثل: المادة الأولى)" style="background:#0f1117;">
+    </div>
+    <button class="btn btn-primary" onclick="addLexiconTerm()">حفظ المصطلح القانوني</button>
+  </div>
+  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+    <input id="lexiconSearch" class="search-input" placeholder="🔍 ابحث في المعجم..." style="flex:1;min-width:200px;">
+    <select id="lexiconCatFilter" class="search-input" style="background:#1a1d2e;"></select>
+    <label style="display:flex;align-items:center;gap:6px;color:#8892a4;font-size:13px;cursor:pointer;">
+      <input type="checkbox" id="lexiconConflicts" style="cursor:pointer;"> عرض المتعارضة فقط
+    </label>
+    <button class="btn btn-primary" onclick="searchLexicon()">بحث</button>
+  </div>
+  <div id="lexiconContent"><div class="empty-state">جاري تحميل المعجم القانوني...</div></div>
+</div>
+
 <script>
 // ─── Tab switching ────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
   document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-  const tabs = ['overview','chat','search','files'];
+  const tabs = ['overview','chat','search','files','glossary','lexicon'];
   const idx = tabs.indexOf(name);
   document.querySelectorAll('.tab')[idx].classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
@@ -619,17 +686,117 @@ async function addGlossaryTerm() {
   } catch(e) { alert('خطأ: ' + e.message); }
 }
 
-// Update switchTab to include glossary
+// Update switchTab to include glossary and lexicon
 const _origSwitchTab = switchTab;
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-  const tabs = ['overview','chat','search','files','glossary'];
+  const tabs = ['overview','chat','search','files','glossary','lexicon'];
   const idx = tabs.indexOf(name);
   if (idx >= 0) document.querySelectorAll('.tab')[idx].classList.add('active');
   const el = document.getElementById('tab-' + name);
   if (el) el.classList.add('active');
   if (name === 'glossary') loadGlossary();
+  if (name === 'lexicon') loadLexicon();
+}
+
+// ─── Legal Lexicon ───────────────────────────────────────────────────────────
+let lexiconData = null;
+
+async function loadLexicon() {
+  if (lexiconData) { renderLexicon(); return; }
+  try {
+    const res = await fetch('/api/lexicon');
+    lexiconData = await res.json();
+    renderLexicon();
+    populateLexiconFilters();
+  } catch(e) {
+    document.getElementById('lexiconContent').innerHTML = `<div class="error-msg">❌ خطأ: ${e.message}</div>`;
+  }
+}
+
+function populateLexiconFilters() {
+  if (!lexiconData) return;
+  const cats = lexiconData.stats?.categories || {};
+  const sel = document.getElementById('lexiconCatFilter');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">جميع الفئات</option>';
+  Object.keys(cats).forEach(c => {
+    sel.innerHTML += `<option value="${c}">${c} (${cats[c]})</option>`;
+  });
+}
+
+function renderLexicon(filter = '', catFilter = '', showConflicts = false) {
+  if (!lexiconData) return;
+  const container = document.getElementById('lexiconContent');
+  const terms = lexiconData.terms || {};
+  let html = '';
+  let count = 0;
+  for (const [termName, termData] of Object.entries(terms)) {
+    if (showConflicts && !termData.has_conflict) continue;
+    if (catFilter && termData.category !== catFilter) continue;
+    if (filter && !termName.includes(filter) &&
+        !JSON.stringify(termData).includes(filter)) continue;
+    count++;
+    const conflictBadge = termData.has_conflict
+      ? `<span style="background:#ef4444;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-right:8px">⚠️ تعارض</span>`
+      : `<span style="background:#22c55e;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;margin-right:8px">✔ متسق</span>`;
+    const defs = termData.definitions || [];
+    const defsHtml = defs.map((d, i) => `
+      <div style="background:#0f1117;border-radius:8px;padding:14px;margin-top:10px;border-right:3px solid #4f8ef7">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="color:#4f8ef7;font-size:12px;font-weight:700">📌 ${d.context}</span>
+          <span style="color:#8892a4;font-size:11px">${d.source_law} • ${d.article || ''}</span>
+        </div>
+        <p style="color:#e0e0e0;font-size:13px;line-height:1.7">${d.text}</p>
+        ${d.decree ? `<div style="color:#8892a4;font-size:11px;margin-top:6px">📜 ${d.decree} • ${d.year || ''}</div>` : ''}
+      </div>
+    `).join('');
+    const tags = (termData.tags || []).map(t => `<span style="background:#1a1d2e;border:1px solid #2a2d3e;color:#8892a4;font-size:11px;padding:2px 8px;border-radius:10px">${t}</span>`).join(' ');
+    html += `
+      <div style="background:#1a1d2e;border-radius:12px;padding:20px;margin-bottom:16px;border:1px solid #2a2d3e">
+        <div style="display:flex;align-items:center;margin-bottom:8px">
+          ${conflictBadge}
+          <span style="font-size:18px;font-weight:700;color:#fff">${termName}</span>
+          <span style="margin-right:auto;color:#8892a4;font-size:12px">${termData.category} • ${defs.length} تعريف</span>
+        </div>
+        ${termData.has_conflict ? `<div style="background:#2d1b1b;border:1px solid #ef4444;border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:#fca5a5">⚠️ ${termData.conflict_note}</div>` : ''}
+        ${defsHtml}
+        ${tags ? `<div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">${tags}</div>` : ''}
+      </div>
+    `;
+  }
+  if (!html) html = '<div style="text-align:center;color:#8892a4;padding:40px">لا توجد نتائج</div>';
+  container.innerHTML = `<div style="color:#8892a4;font-size:12px;margin-bottom:16px">تم عرض ${count} مصطلح</div>` + html;
+}
+
+async function searchLexicon() {
+  const q = document.getElementById('lexiconSearch').value.trim();
+  const cat = document.getElementById('lexiconCatFilter').value;
+  const conflicts = document.getElementById('lexiconConflicts').checked;
+  if (!lexiconData) await loadLexicon();
+  renderLexicon(q, cat, conflicts);
+}
+
+async function addLexiconTerm() {
+  const term = document.getElementById('newLexTerm').value.trim();
+  const context = document.getElementById('newLexContext').value.trim();
+  const def = document.getElementById('newLexDef').value.trim();
+  const law = document.getElementById('newLexLaw').value.trim();
+  const article = document.getElementById('newLexArticle').value.trim();
+  const cat = document.getElementById('newLexCat').value.trim();
+  if (!term || !def || !law) { alert('يرجى ملء حقول المصطلح والتعريف والنظام'); return; }
+  try {
+    const res = await fetch('/api/lexicon/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ term, context, definition: def, source_law: law, article, category: cat || 'عام', related_terms: [], tags: [] })
+    });
+    const data = await res.json();
+    alert(data.message);
+    lexiconData = null;
+    loadLexicon();
+  } catch(e) { alert('خطأ: ' + e.message); }
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

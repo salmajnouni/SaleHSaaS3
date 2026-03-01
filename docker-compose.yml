@@ -89,30 +89,25 @@ services:
       - "salehsaas.description=ذاكرة التخزين المؤقت"
 
   # ── 3. Ollama - Local LLM Engine ───────────────────────────────────────────
+  # ollama-docker: DISABLED - Using Ollama Windows (localhost:11434) instead
+  # All services connect via host.docker.internal:11434
+  # To re-enable: uncomment this block and remove host.docker.internal references
   ollama:
     image: ollama/ollama:latest
     container_name: salehsaas_ollama
-    restart: unless-stopped
+    restart: "no"
+    profiles:
+      - ollama-docker
     volumes:
-      - ollama_models:/root/.ollama
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.20
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
     environment:
       - OLLAMA_KEEP_ALIVE=24h
       - OLLAMA_NUM_PARALLEL=${OLLAMA_NUM_PARALLEL:-2}
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
     labels:
       - "salehsaas.service=ai-engine"
-      - "salehsaas.description=محرك الذكاء الاصطناعي المحلي"
+      - "salehsaas.description=محرك الذكاء الاصطناعي المحلي (Docker - معطل)"
 
   # ── 4. Open WebUI - AI Chat Interface ──────────────────────────────────────
   open_webui:
@@ -120,7 +115,6 @@ services:
     container_name: salehsaas_open_webui
     restart: unless-stopped
     depends_on:
-      - ollama
     environment:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:?WEBUI_SECRET_KEY is required}
@@ -222,7 +216,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - ollama
     environment:
       - POSTGRES_URL=postgresql://${POSTGRES_USER:-salehsaas_user}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-salehsaas}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
@@ -317,7 +310,6 @@ services:
     container_name: salehsaas_anythingllm
     restart: unless-stopped
     depends_on:
-      - ollama
     cap_add:
       - SYS_ADMIN
     environment:
@@ -380,7 +372,6 @@ services:
     restart: unless-stopped
     depends_on:
       - prometheus
-      - ollama
       - n8n
     environment:
       - PROMETHEUS_URL=http://prometheus:9090
@@ -434,7 +425,6 @@ services:
     restart: unless-stopped
     depends_on:
       - chromadb
-      - ollama
     environment:
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000

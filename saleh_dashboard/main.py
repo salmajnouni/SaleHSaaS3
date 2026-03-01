@@ -383,3 +383,207 @@ async def add_glossary_term(new_term: NewTerm):
     )
     save_glossary(glossary)
     return {"message": "تم إضافة المصطلح بنجاح", "term": term_obj}
+
+
+# ─── Legal Lexicon API (المعجم القانوني متعدد السياقات) ────────────────────────
+
+LEXICON_PATH = Path("/app/glossary/legal_lexicon.json")
+
+
+def load_lexicon() -> dict:
+    """تحميل المعجم القانوني."""
+    if not LEXICON_PATH.exists():
+        return {"_metadata": {}, "terms": {}}
+    with open(LEXICON_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_lexicon(data: dict):
+    """حفظ المعجم القانوني."""
+    LEXICON_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(LEXICON_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+class NewLegalTerm(BaseModel):
+    term: str
+    category: str
+    context: str
+    definition: str
+    source_law: str
+    article: str = ""
+    decree: str = ""
+    year: str = ""
+    related_terms: list = []
+    tags: list = []
+
+
+@app.get("/api/lexicon")
+async def get_lexicon():
+    """الحصول على المعجم القانوني الكامل."""
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+    # إحصاءات
+    total = len(terms)
+    conflicts = sum(1 for t in terms.values() if t.get("has_conflict", False))
+    categories = {}
+    for t in terms.values():
+        cat = t.get("category", "عام")
+        categories[cat] = categories.get(cat, 0) + 1
+    return {
+        "metadata": lexicon.get("_metadata", {}),
+        "stats": {
+            "total_terms": total,
+            "conflict_terms": conflicts,
+            "categories": categories
+        },
+        "terms": terms
+    }
+
+
+@app.get("/api/lexicon/term/{term_name}")
+async def get_lexicon_term(term_name: str):
+    """البحث عن مصطلح محدد مع جميع تعريفاته."""
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+    if term_name in terms:
+        return {"found": True, "term": term_name, "data": terms[term_name]}
+    # بحث جزئي
+    matches = {k: v for k, v in terms.items() if term_name in k}
+    if matches:
+        return {"found": True, "partial_match": True, "results": matches}
+    return JSONResponse({"found": False, "message": f"المصطلح '{term_name}' غير موجود في المعجم"}, status_code=404)
+
+
+@app.get("/api/lexicon/search")
+async def search_lexicon(q: str, law: str = None, category: str = None):
+    """
+    البحث في المعجم القانوني.
+    - q: نص البحث
+    - law: تصفية حسب النظام (اختياري)
+    - category: تصفية حسب الفئة (اختياري)
+    """
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+    results = []
+    q_lower = q.strip()
+
+    for term_name, term_data in terms.items():
+        # تصفية حسب الفئة
+        if category and term_data.get("category", "") != category:
+            continue
+
+        # البحث في اسم المصطلح
+        name_match = q_lower in term_name
+
+        # البحث في التعريفات
+        defs = term_data.get("definitions", [])
+        matching_defs = []
+        for d in defs:
+            # تصفية حسب النظام
+            if law and law not in d.get("source_law", ""):
+                continue
+            if (q_lower in d.get("text", "") or
+                    q_lower in d.get("context", "") or
+                    q_lower in d.get("source_law", "")):
+                matching_defs.append(d)
+
+        if name_match or matching_defs:
+            results.append({
+                "term": term_name,
+                "category": term_data.get("category"),
+                "has_conflict": term_data.get("has_conflict", False),
+                "conflict_note": term_data.get("conflict_note", ""),
+                "definitions_count": len(defs),
+                "matching_definitions": matching_defs if matching_defs else defs,
+                "tags": term_data.get("tags", [])
+            })
+
+    return {
+        "query": q,
+        "law_filter": law,
+        "category_filter": category,
+        "count": len(results),
+        "results": results
+    }
+
+
+@app.get("/api/lexicon/conflicts")
+async def get_conflict_terms():
+    """الحصول على جميع المصطلحات ذات التعريفات المتعارضة."""
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+    conflicts = {
+        k: v for k, v in terms.items()
+        if v.get("has_conflict", False)
+    }
+    return {
+        "count": len(conflicts),
+        "message": "هذه المصطلحات لها تعريفات مختلفة في أنظمة متعددة",
+        "terms": conflicts
+    }
+
+
+@app.get("/api/lexicon/by-law/{law_name}")
+async def get_terms_by_law(law_name: str):
+    """الحصول على جميع المصطلحات المرتبطة بنظام معين."""
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+    results = {}
+    for term_name, term_data in terms.items():
+        matching_defs = [
+            d for d in term_data.get("definitions", [])
+            if law_name in d.get("source_law", "")
+        ]
+        if matching_defs:
+            results[term_name] = {
+                **term_data,
+                "definitions": matching_defs
+            }
+    return {
+        "law": law_name,
+        "count": len(results),
+        "terms": results
+    }
+
+
+@app.post("/api/lexicon/add")
+async def add_lexicon_term(new_term: NewLegalTerm):
+    """إضافة مصطلح جديد أو تعريف جديد لمصطلح موجود."""
+    lexicon = load_lexicon()
+    terms = lexicon.get("terms", {})
+
+    new_def = {
+        "context": new_term.context,
+        "text": new_term.definition,
+        "source_law": new_term.source_law,
+        "article": new_term.article,
+        "decree": new_term.decree,
+        "year": new_term.year
+    }
+
+    if new_term.term in terms:
+        # إضافة تعريف جديد لمصطلح موجود
+        terms[new_term.term]["definitions"].append(new_def)
+        if len(terms[new_term.term]["definitions"]) > 1:
+            terms[new_term.term]["has_conflict"] = True
+        message = f"تم إضافة تعريف جديد للمصطلح '{new_term.term}'"
+    else:
+        # إضافة مصطلح جديد
+        term_id = f"T{str(len(terms) + 1).zfill(3)}"
+        terms[new_term.term] = {
+            "id": term_id,
+            "category": new_term.category,
+            "has_conflict": False,
+            "definitions": [new_def],
+            "related_terms": new_term.related_terms,
+            "tags": new_term.tags
+        }
+        message = f"تم إضافة المصطلح الجديد '{new_term.term}'"
+
+    lexicon["terms"] = terms
+    if "_metadata" in lexicon:
+        lexicon["_metadata"]["total_terms"] = len(terms)
+        lexicon["_metadata"]["last_updated"] = datetime.now().strftime("%Y-%m-%d")
+    save_lexicon(lexicon)
+    return {"success": True, "message": message}
