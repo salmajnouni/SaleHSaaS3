@@ -420,7 +420,7 @@ services:
       salehsaas_net:
         ipv4_address: 172.20.0.94
     ports:
-      - "${CHROMADB_PORT:-8000}:8000"
+      - "${CHROMADB_PORT:-8010}:8000"
     labels:
       - "salehsaas.service=vector-db"
       - "salehsaas.description=قاعدة بيانات متجهية للـ RAG"
