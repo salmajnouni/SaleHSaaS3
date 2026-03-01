@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaleH SaaS — لوحة المراقبة</title>
+  <style>
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --accent:    #1f6feb;
+      --green:     #3fb950;
+      --red:       #f85149;
+      --yellow:    #d29922;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --gold:      #c9a227;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Tahoma', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      direction: rtl;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--gold), #8b6914);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .logo h1 { font-size: 20px; font-weight: 700; }
+    .logo span { font-size: 12px; color: var(--muted); }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    #last-update { font-size: 12px; color: var(--muted); }
+    .refresh-btn {
+      background: var(--accent);
+      border: none; color: white;
+      padding: 8px 16px; border-radius: 6px;
+      cursor: pointer; font-size: 13px;
+      transition: opacity 0.2s;
+    }
+    .refresh-btn:hover { opacity: 0.85; }
+
+    /* ── Main Layout ── */
+    main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Section Title ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      margin-top: 28px;
+    }
+
+    /* ── Stats Grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 4px; height: 100%;
+      background: var(--accent);
+      border-radius: 0 10px 10px 0;
+    }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.yellow::before { background: var(--yellow); }
+    .stat-card.red::before { background: var(--red); }
+    .stat-card.gold::before { background: var(--gold); }
+    .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* ── Services Status ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-dot.online  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .status-dot.offline { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+    .service-name { font-size: 14px; font-weight: 600; }
+    .service-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Collections Table ── */
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-card table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table-card th {
+      background: rgba(255,255,255,0.03);
+      padding: 12px 16px;
+      text-align: right;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-card td {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+    }
+    .table-card tr:last-child td { border-bottom: none; }
+    .table-card tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-blue   { background: rgba(31,111,235,0.2); color: #58a6ff; }
+    .badge-green  { background: rgba(63,185,80,0.2);  color: var(--green); }
+    .badge-yellow { background: rgba(210,153,34,0.2); color: var(--yellow); }
+
+    /* ── Progress Bar ── */
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 2px;
+      transition: width 0.5s ease;
+    }
+
+    /* ── Search Box ── */
+    .search-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      direction: rtl;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+    .search-btn {
+      background: var(--accent);
+      border: none; color: white;
+      padding: 10px 20px; border-radius: 6px;
+      cursor: pointer; font-size: 13px;
+      white-space: nowrap;
+    }
+    .search-results { display: flex; flex-direction: column; gap: 10px; }
+    .result-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+    .result-text { font-size: 13px; line-height: 1.6; }
+    .result-meta { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    /* ── Files List ── */
+    .files-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) { .files-grid { grid-template-columns: 1fr; } }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(48,54,61,0.5);
+    }
+    .file-item:last-child { border-bottom: none; }
+    .file-icon { font-size: 18px; flex-shrink: 0; }
+    .file-name { font-size: 12px; word-break: break-all; flex: 1; }
+    .file-size { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Lora Progress ── */
+    .lora-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .lora-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .lora-title { font-size: 15px; font-weight: 600; }
+    .lora-count { font-size: 24px; font-weight: 700; color: var(--gold); }
+    .lora-target { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🕋</div>
+    <div>
+      <h1>SaleH SaaS</h1>
+      <span>لوحة مراقبة النظام الذكي</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="last-update">جاري التحميل...</span>
+    <button class="refresh-btn" onclick="loadStats()">↻ تحديث</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Stats Cards ── -->
+  <div class="section-title">نظرة عامة</div>
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="stat-label">إجمالي الـ Chunks في ChromaDB</div>
+      <div class="stat-value" id="total-chunks">—</div>
+      <div class="stat-sub" id="collections-count">جاري التحميل...</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">الملفات المعالجة</div>
+      <div class="stat-value" id="processed-count">—</div>
+      <div class="stat-sub">نُقلت إلى processed/</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">في الانتظار</div>
+      <div class="stat-value" id="incoming-count">—</div>
+      <div class="stat-sub">في مجلد incoming/</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">فشل المعالجة</div>
+      <div class="stat-value" id="failed-count">—</div>
+      <div class="stat-sub">في مجلد failed/</div>
+    </div>
+  </div>
+
+  <!-- ── LoRA Progress ── -->
+  <div class="section-title">تقدم LoRA Fine-Tuning</div>
+  <div class="lora-card">
+    <div class="lora-header">
+      <div>
+        <div class="lora-title">قاعدة بيانات التدريب</div>
+        <div class="lora-target">الهدف: 500 مثال لبدء الـ Fine-Tuning</div>
+      </div>
+      <div style="text-align:center">
+        <div class="lora-count" id="lora-examples">—</div>
+        <div class="lora-target" id="lora-files">ملفات JSONL</div>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="lora-progress" style="width:0%"></div>
+    </div>
+    <div style="font-size:11px; color:var(--muted); margin-top:6px; text-align:left" id="lora-pct">0% من الهدف</div>
+  </div>
+
+  <!-- ── Services Status ── -->
+  <div class="section-title">حالة الخدمات</div>
+  <div class="services-grid" id="services-grid">
+    <div class="loading"><div class="spinner"></div> جاري الفحص...</div>
+  </div>
+
+  <!-- ── ChromaDB Collections ── -->
+  <div class="section-title">مجموعات ChromaDB</div>
+  <div class="table-card" id="collections-table">
+    <div class="loading"><div class="spinner"></div> جاري التحميل...</div>
+  </div>
+
+  <!-- ── Files ── -->
+  <div class="section-title">الملفات المعالجة مؤخراً</div>
+  <div class="files-grid">
+    <div class="table-card" id="processed-files">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+    <div class="table-card" id="incoming-files">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- ── Search ── -->
+  <div class="section-title">بحث في قاعدة المعرفة (ChromaDB)</div>
+  <div class="search-section">
+    <div class="search-row">
+      <input type="text" class="search-input" id="search-input"
+             placeholder="ابحث في المحتوى المخزن... مثال: الثقة في القيادة"
+             onkeydown="if(event.key==='Enter') doSearch()" />
+      <button class="search-btn" onclick="doSearch()">🔍 بحث</button>
+    </div>
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+</main>
+
+<script>
+const API = '';
+
+async function loadStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const d = await res.json();
+
+    // ── Timestamp ──
+    document.getElementById('last-update').textContent = `آخر تحديث: ${d.timestamp}`;
+
+    // ── ChromaDB ──
+    document.getElementById('total-chunks').textContent = d.chromadb.total_chunks.toLocaleString('ar');
+    document.getElementById('collections-count').textContent =
+      `${d.chromadb.collection_count} مجموعة في ChromaDB`;
+
+    // ── Files ──
+    document.getElementById('processed-count').textContent = d.files.processed.count;
+    document.getElementById('incoming-count').textContent  = d.files.incoming.count;
+    document.getElementById('failed-count').textContent    = d.files.failed.count;
+
+    // ── LoRA ──
+    const examples = d.lora_queue.total_examples;
+    const target   = 500;
+    const pct      = Math.min(100, Math.round(examples / target * 100));
+    document.getElementById('lora-examples').textContent = examples.toLocaleString('ar');
+    document.getElementById('lora-files').textContent    = `${d.lora_queue.total_files} ملف JSONL`;
+    document.getElementById('lora-progress').style.width = `${pct}%`;
+    document.getElementById('lora-pct').textContent      = `${pct}% من الهدف (${examples}/${target})`;
+
+    // ── Services ──
+    const svcGrid = document.getElementById('services-grid');
+    const svcs = [
+      { key: 'pipeline',    name: 'Data Pipeline',  icon: '⚙️',  port: '8001' },
+      { key: 'ollama',      name: 'Ollama LLM',     icon: '🤖',  port: '11434' },
+      { key: 'chromadb',    name: 'ChromaDB',        icon: '🗄️',  port: '8010' },
+      { key: 'anythingllm', name: 'AnythingLLM',    icon: '💬',  port: '3002' },
+    ];
+    svcGrid.innerHTML = svcs.map(s => {
+      const svc    = d.services[s.key];
+      const online = svc?.online;
+      const models = s.key === 'ollama' && svc?.models?.length
+        ? svc.models.slice(0,2).join(', ')
+        : `port ${s.port}`;
+      return `
+        <div class="service-card">
+          <div class="status-dot ${online ? 'online' : 'offline'}"></div>
+          <div>
+            <div class="service-name">${s.icon} ${s.name}</div>
+            <div class="service-detail">${online ? '● يعمل — ' + models : '✕ غير متاح'}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // ── Collections Table ──
+    const colTable = document.getElementById('collections-table');
+    if (d.chromadb.collections.length === 0) {
+      colTable.innerHTML = '<div class="empty-state">لا توجد مجموعات بعد — ضع ملفاً في incoming/ لبدء الفهرسة</div>';
+    } else {
+      colTable.innerHTML = `
+        <table>
+          <thead><tr>
+            <th>اسم المجموعة</th>
+            <th>عدد الـ Chunks</th>
+            <th>الحالة</th>
+          </tr></thead>
+          <tbody>
+            ${d.chromadb.collections.map(c => `
+              <tr>
+                <td><span class="badge badge-blue">${c.name}</span></td>
+                <td><strong>${c.chunks.toLocaleString('ar')}</strong></td>
+                <td><span class="badge badge-green">✓ نشط</span></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    // ── Processed Files ──
+    const procDiv = document.getElementById('processed-files');
+    procDiv.innerHTML = `
+      <div style="padding:12px 16px; font-size:12px; color:var(--muted); border-bottom:1px solid var(--border)">
+        ✅ الملفات المعالجة (${d.files.processed.count})
+      </div>
+      ${d.files.processed.items.length === 0
+        ? '<div class="empty-state">لا توجد ملفات معالجة بعد</div>'
+        : d.files.processed.items.map(f => `
+            <div class="file-item">
+              <div class="file-icon">${getFileIcon(f.name)}</div>
+              <div class="file-name">${f.name}</div>
+              <div class="file-size">${f.size_kb} KB</div>
+            </div>`).join('')}`;
+
+    // ── Incoming Files ──
+    const incDiv = document.getElementById('incoming-files');
+    incDiv.innerHTML = `
+      <div style="padding:12px 16px; font-size:12px; color:var(--muted); border-bottom:1px solid var(--border)">
+        ⏳ في الانتظار (${d.files.incoming.count})
+      </div>
+      ${d.files.incoming.items.length === 0
+        ? '<div class="empty-state">المجلد فارغ — ضع ملفاً هنا لمعالجته تلقائياً</div>'
+        : d.files.incoming.items.map(f => `
+            <div class="file-item">
+              <div class="file-icon">${getFileIcon(f.name)}</div>
+              <div class="file-name">${f.name}</div>
+              <div class="file-size">${f.size_kb} KB</div>
+            </div>`).join('')}`;
+
+  } catch (e) {
+    console.error('Failed to load stats:', e);
+  }
+}
+
+function getFileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const icons = { pdf:'📄', docx:'📝', doc:'📝', txt:'📃', md:'📋', csv:'📊', xlsx:'📊', pptx:'📑' };
+  return icons[ext] || '📁';
+}
+
+async function doSearch() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  const resultsDiv = document.getElementById('search-results');
+  resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div> جاري البحث...</div>';
+  try {
+    const res = await fetch(`${API}/api/chromadb/search?q=${encodeURIComponent(q)}&n=5`);
+    const d = await res.json();
+    if (d.error) {
+      resultsDiv.innerHTML = `<div class="empty-state">خطأ: ${d.error}</div>`;
+      return;
+    }
+    if (!d.results || d.results.length === 0) {
+      resultsDiv.innerHTML = '<div class="empty-state">لا توجد نتائج</div>';
+      return;
+    }
+    resultsDiv.innerHTML = d.results.map((r, i) => `
+      <div class="result-item">
+        <div class="result-text">${r.text.replace(/\n/g, '<br>')}</div>
+        <div class="result-meta">
+          تشابه: ${((1 - r.distance) * 100).toFixed(1)}% &nbsp;|&nbsp;
+          ${r.metadata?.source ? 'المصدر: ' + r.metadata.source.split(/[\\/]/).pop() : 'النتيجة ' + (i+1)}
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    resultsDiv.innerHTML = `<div class="empty-state">تعذر الاتصال بـ ChromaDB</div>`;
+  }
+}
+
+// تحميل أولي وتحديث تلقائي كل 30 ثانية
+loadStats();
+setInterval(loadStats, 30000);
+</script>
+</body>
+</html>

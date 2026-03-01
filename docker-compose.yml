@@ -481,3 +481,38 @@ services:
     labels:
       - "salehsaas.service=file-watcher"
       - "salehsaas.description=مراقبة المجلد ورفع الملفات تلقائياً للـ Pipeline"
+
+  # ── 19. SaleH Dashboard - لوحة المراقبة ─────────────────────────────────
+  saleh_dashboard:
+    build:
+      context: ./saleh_dashboard
+      dockerfile: Dockerfile
+    container_name: salehsaas_dashboard
+    restart: unless-stopped
+    depends_on:
+      - chromadb
+      - data_pipeline
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - CHROMA_TOKEN=${CHROMA_TOKEN:-salehsaas-chroma-token}
+      - PIPELINE_URL=http://salehsaas_pipeline:8001
+      - OLLAMA_URL=http://ollama:11434
+      - ANYTHINGLLM_URL=http://anythingllm:3001
+      - PROCESSED_DIR=/data/processed
+      - INCOMING_DIR=/data/incoming
+      - FAILED_DIR=/data/failed
+      - LORA_QUEUE_DIR=/data/lora_queue
+    volumes:
+      - ./data/incoming:/data/incoming:ro
+      - ./data/processed:/data/processed:ro
+      - ./data/failed:/data/failed:ro
+      - pipeline_lora_queue:/data/lora_queue:ro
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.97
+    ports:
+      - "${DASHBOARD_PORT:-8080}:8080"
+    labels:
+      - "salehsaas.service=dashboard"
+      - "salehsaas.description=لوحة مراقبة النظام الذكي"
