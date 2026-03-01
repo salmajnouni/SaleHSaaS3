@@ -1,177 +1,119 @@
+#!/usr/bin/env python3
+"""
+Ollama Model Builder - MCP Tool Server
+أداة إدارة نماذج Ollama عبر بروتوكول MCP
+"""
 
-import sys
+import asyncio
 import json
 import requests
-from typing import Dict, Any, List
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp import types
 
-# عنوان Ollama API - يتم الوصول إليه من داخل حاوية Docker
+# عنوان Ollama API
 OLLAMA_API_URL = "http://host.docker.internal:11434/api"
 
-def send_response(response: Dict[str, Any]):
-    """إرسال استجابة JSON إلى stdout"""
-    print(json.dumps(response), flush=True)
+app = Server("ollama-model-builder")
 
-def get_tools():
-    """تعريف الأدوات التي توفرها هذه الخدمة"""
-    return {
-        "type": "get_tools_response",
-        "tools": [
-            {
-                "name": "list_local_models",
-                "description": "الحصول على قائمة بجميع النماذج المحلية المتاحة في Ollama.",
-                "input_schema": {"type": "object", "properties": {}},
+
+@app.list_tools()
+async def list_tools() -> list[types.Tool]:
+    return [
+        types.Tool(
+            name="list_local_models",
+            description="عرض قائمة بجميع النماذج المحلية المتاحة في Ollama مع أحجامها",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "required": [],
             },
-            {
-                "name": "get_model_info",
-                "description": "الحصول على معلومات تفصيلية حول نموذج معين.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "model_name": {"type": "string", "description": "اسم النموذج (e.g., 'llama3.1')"}
-                    },
-                    "required": ["model_name"],
+        ),
+        types.Tool(
+            name="get_model_info",
+            description="الحصول على معلومات تفصيلية حول نموذج معين في Ollama",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "model_name": {
+                        "type": "string",
+                        "description": "اسم النموذج مثل: llama3.1 أو qwen2:7b",
+                    }
                 },
+                "required": ["model_name"],
             },
-            {
-                "name": "pull_model",
-                "description": "تحميل نموذج جديد من Ollama Hub.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "model_name": {"type": "string", "description": "اسم النموذج المراد تحميله (e.g., 'mistral')"}
-                    },
-                    "required": ["model_name"],
+        ),
+        types.Tool(
+            name="pull_model",
+            description="تحميل نموذج جديد من Ollama Hub",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "model_name": {
+                        "type": "string",
+                        "description": "اسم النموذج للتحميل مثل: mistral أو llama3.2",
+                    }
                 },
+                "required": ["model_name"],
             },
-        ],
-    }
+        ),
+    ]
 
-def list_local_models(invocation_id: str):
-    """استدعاء Ollama API للحصول على قائمة النماذج"""
-    try:
-        response = requests.get(f"{OLLAMA_API_URL}/tags")
-        response.raise_for_status()
-        models = response.json().get("models", [])
-        # تنسيق المخرجات لتكون أكثر قابلية للقراءة
-        formatted_models = [f"{m['name']} (Size: {m['size']/(1024**3):.2f} GB, Modified: {m['modified_at']})" for m in models]
-        send_response({
-            "type": "invoke_tool_response",
-            "invocation_id": invocation_id,
-            "tool_name": "list_local_models",
-            "output": json.dumps(formatted_models, indent=2, ensure_ascii=False),
-            "is_last": True,
-        })
-    except requests.RequestException as e:
-        send_response({
-            "type": "error",
-            "invocation_id": invocation_id,
-            "error": f"Failed to connect to Ollama: {e}",
-        })
 
-def get_model_info(invocation_id: str, inputs: Dict[str, Any]):
-    """الحصول على معلومات تفصيلية لنموذج معين"""
-    model_name = inputs.get("model_name")
-    if not model_name:
-        send_response({"type": "error", "invocation_id": invocation_id, "error": "Missing model_name"})
-        return
+@app.call_tool()
+async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
 
-    try:
-        response = requests.post(f"{OLLAMA_API_URL}/show", json={"name": model_name})
-        response.raise_for_status()
-        send_response({
-            "type": "invoke_tool_response",
-            "invocation_id": invocation_id,
-            "tool_name": "get_model_info",
-            "output": json.dumps(response.json(), indent=2, ensure_ascii=False),
-            "is_last": True,
-        })
-    except requests.RequestException as e:
-        send_response({
-            "type": "error",
-            "invocation_id": invocation_id,
-            "error": f"Failed to get info for model {model_name}: {e}",
-        })
-
-def pull_model(invocation_id: str, inputs: Dict[str, Any]):
-    """تحميل نموذج من Ollama Hub"""
-    model_name = inputs.get("model_name")
-    if not model_name:
-        send_response({"type": "error", "invocation_id": invocation_id, "error": "Missing model_name"})
-        return
-
-    try:
-        # إرسال استجابة أولية بأن العملية بدأت
-        send_response({
-            "type": "invoke_tool_response",
-            "invocation_id": invocation_id,
-            "tool_name": "pull_model",
-            "output": f"بدء تحميل النموذج {model_name}... هذه العملية قد تستغرق بعض الوقت.",
-            "is_last": False, # المزيد من المخرجات قادمة
-        })
-        
-        # استدعاء API مع stream=True
-        with requests.post(f"{OLLAMA_API_URL}/pull", json={"name": model_name, "stream": True}, stream=True) as r:
-            r.raise_for_status()
-            for line in r.iter_lines():
-                if line:
-                    progress = json.loads(line)
-                    if "total" in progress and "completed" in progress:
-                        percentage = (progress["completed"] / progress["total"]) * 100
-                        status = f"{progress['status']} - {percentage:.1f}%"
-                    else:
-                        status = progress.get('status', 'loading...')
-                    
-                    # إرسال تحديثات الحالة
-                    send_response({
-                        "type": "invoke_tool_response",
-                        "invocation_id": invocation_id,
-                        "tool_name": "pull_model",
-                        "output": status,
-                        "is_last": False,
-                    })
-
-        # إرسال رسالة الإكمال النهائية
-        send_response({
-            "type": "invoke_tool_response",
-            "invocation_id": invocation_id,
-            "tool_name": "pull_model",
-            "output": f"اكتمل تحميل النموذج {model_name} بنجاح.",
-            "is_last": True,
-        })
-
-    except requests.RequestException as e:
-        send_response({
-            "type": "error",
-            "invocation_id": invocation_id,
-            "error": f"Failed to pull model {model_name}: {e}",
-        })
-
-def main():
-    """الحلقة الرئيسية لقراءة الطلبات من stdin"""
-    for line in sys.stdin:
+    if name == "list_local_models":
         try:
-            request = json.loads(line)
-            request_type = request.get("type")
-
-            if request_type == "get_tools_request":
-                send_response(get_tools())
-            elif request_type == "invoke_tool_request":
-                tool_name = request.get("tool_name")
-                invocation_id = request.get("invocation_id")
-                inputs = request.get("inputs", {})
-
-                if tool_name == "list_local_models":
-                    list_local_models(invocation_id)
-                elif tool_name == "get_model_info":
-                    get_model_info(invocation_id, inputs)
-                elif tool_name == "pull_model":
-                    pull_model(invocation_id, inputs)
-                else:
-                    send_response({"type": "error", "invocation_id": invocation_id, "error": f"Unknown tool: {tool_name}"})
-        except json.JSONDecodeError:
-            send_response({"type": "error", "error": "Invalid JSON input"})
+            resp = requests.get(f"{OLLAMA_API_URL}/tags", timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+            models = data.get("models", [])
+            if not models:
+                return [types.TextContent(type="text", text="لا توجد نماذج محلية في Ollama حالياً.")]
+            lines = ["**النماذج المتاحة في Ollama:**\n"]
+            for m in models:
+                size_gb = m.get("size", 0) / (1024 ** 3)
+                lines.append(f"- **{m['name']}** ({size_gb:.1f} GB)")
+            return [types.TextContent(type="text", text="\n".join(lines))]
         except Exception as e:
-            send_response({"type": "error", "error": str(e)})
+            return [types.TextContent(type="text", text=f"خطأ في الاتصال بـ Ollama: {str(e)}")]
+
+    elif name == "get_model_info":
+        model_name = arguments.get("model_name", "")
+        try:
+            resp = requests.post(
+                f"{OLLAMA_API_URL}/show",
+                json={"name": model_name},
+                timeout=10,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            info = json.dumps(data, ensure_ascii=False, indent=2)
+            return [types.TextContent(type="text", text=f"**معلومات نموذج {model_name}:**\n```json\n{info}\n```")]
+        except Exception as e:
+            return [types.TextContent(type="text", text=f"خطأ: {str(e)}")]
+
+    elif name == "pull_model":
+        model_name = arguments.get("model_name", "")
+        try:
+            resp = requests.post(
+                f"{OLLAMA_API_URL}/pull",
+                json={"name": model_name, "stream": False},
+                timeout=300,
+            )
+            resp.raise_for_status()
+            return [types.TextContent(type="text", text=f"تم تحميل نموذج **{model_name}** بنجاح!")]
+        except Exception as e:
+            return [types.TextContent(type="text", text=f"خطأ في تحميل النموذج: {str(e)}")]
+
+    return [types.TextContent(type="text", text=f"أداة غير معروفة: {name}")]
+
+
+async def main():
+    async with stdio_server() as (read_stream, write_stream):
+        await app.run(read_stream, write_stream, app.create_initialization_options())
+
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
