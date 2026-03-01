@@ -266,7 +266,42 @@ services:
       - "salehsaas.service=code-server"
       - "salehsaas.description=بيئة تطوير متكاملة من المتصفح - تعديل Pipelines والمعجم"
 
-  # ── 9. MCPO - MCP-to-OpenAPI Proxy ──────────────────────────────────────
+  # ── 9. Knowledge Watcher - هضم المعرفة التلقائي ───────────────────────────
+  # ضع أي ملف في مجلد knowledge_inbox وسيُهضم تلقائياً في ChromaDB
+  # يدعم: PDF, Word, Excel, TXT, Markdown, وأكثر
+  knowledge_watcher:
+    build:
+      context: ./services/knowledge_watcher
+      dockerfile: Dockerfile
+    container_name: salehsaas_watcher
+    restart: unless-stopped
+    depends_on:
+      - chromadb
+      - tika
+    environment:
+      - INBOX_DIR=/knowledge_inbox
+      - PROCESSED_DIR=/knowledge_processed
+      - FAILED_DIR=/knowledge_failed
+      - TIKA_URL=http://tika:9998/tika
+      - CHROMADB_URL=http://chromadb:8000
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - EMBED_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
+      - COLLECTION_NAME=saleh_legal_knowledge
+      - SCAN_INTERVAL=10
+    volumes:
+      - ./knowledge_inbox:/knowledge_inbox
+      - ./knowledge_processed:/knowledge_processed
+      - ./knowledge_failed:/knowledge_failed
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.61
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    labels:
+      - "salehsaas.service=knowledge-watcher"
+      - "salehsaas.description=هضم المعرفة التلقائي - ضع ملف في knowledge_inbox وسيُحفظ في ChromaDB"
+
+  # ── 10. MCPO - MCP-to-OpenAPI Proxy ──────────────────────────────────────
   # يحوّل أدوات MCP إلى OpenAPI REST endpoints
   # يتيح لـ Open WebUI استخدام:
   #   - Ollama Model Builder: إدارة النماذج (تحميل، عرض، معلومات)
