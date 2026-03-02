@@ -82,7 +82,11 @@ services:
     ports:
       - "${CHROMADB_PORT:-8010}:8000"
     healthcheck:
-      disable: true
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     labels:
       - "salehsaas.service=vector-db"
       - "salehsaas.description=قاعدة البيانات المتجهية - ذاكرة القوانين السعودية"
@@ -161,6 +165,7 @@ services:
       - PIPELINES_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
     volumes:
       - ./pipelines:/app/pipelines
+      - ./pipelines/backend:/app/backend
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.31
@@ -276,8 +281,10 @@ services:
     container_name: salehsaas_watcher
     restart: unless-stopped
     depends_on:
-      - chromadb
-      - tika
+      chromadb:
+        condition: service_healthy
+      tika:
+        condition: service_started
     environment:
       - INBOX_DIR=/knowledge_inbox
       - PROCESSING_DIR=/knowledge_processing

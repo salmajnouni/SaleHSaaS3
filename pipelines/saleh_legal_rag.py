@@ -109,9 +109,9 @@ class Pipeline:
             for chunk in chunks:
                 article = chunk.get("article_ref", "")
                 if article:
-                    context_parts.append(f"**{article}:**\n{chunk["text"]}\n")
+                    context_parts.append(f"**{article}:**\n{chunk.get('text', '')}\n")
                 else:
-                    context_parts.append(f"{chunk["text"]}\n")
+                    context_parts.append(f"{chunk.get('text', '')}\n")
 
         return "\n".join(context_parts)
 
