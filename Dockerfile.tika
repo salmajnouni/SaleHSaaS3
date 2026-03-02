@@ -1,0 +1,29 @@
+# ============================================================
+# SaleH SaaS - Apache Tika with Microsoft Core Fonts
+# Eliminates PDFBox font fallback warnings for Arial,
+# Helvetica, Times New Roman, Courier New, etc.
+# ============================================================
+FROM apache/tika:latest-full
+
+USER root
+
+# Install Microsoft TrueType core fonts + supporting packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        fontconfig \
+        fonts-liberation \
+        fonts-liberation2 \
+        fonts-freefont-ttf \
+        fonts-dejavu-core \
+        wget \
+        cabextract && \
+    # Accept EULA and install MS core fonts (Arial, Times New Roman, Courier New, etc.)
+    echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections && \
+    apt-get install -y --no-install-recommends ttf-mscorefonts-installer && \
+    # Rebuild font cache
+    fc-cache -f -v && \
+    # Cleanup
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+USER 35002

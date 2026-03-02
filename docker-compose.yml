@@ -173,7 +173,10 @@ services:
 
   # ── 5. Apache Tika - استخراج النصوص من الوثائق ──────────────────────────
   tika:
-    image: apache/tika:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.tika
+    image: salehsaas-tika-fonts:latest
     container_name: salehsaas_tika
     restart: unless-stopped
     networks:
@@ -181,7 +184,7 @@ services:
         ipv4_address: 172.20.0.32
     labels:
       - "salehsaas.service=tika"
-      - "salehsaas.description=استخراج النصوص من PDF وWord وExcel"
+      - "salehsaas.description=استخراج النصوص من PDF وWord وExcel - مع خطوط Arial وHelvetica وTimes New Roman"
 
   # ── 6. SearXNG - البحث المحلي على الإنترنت ──────────────────────────────
   searxng:
