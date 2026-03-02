@@ -60,12 +60,6 @@ SUPPORTED_EXTENSIONS = {
     '.pptx', '.ppt', '.rtf', '.odt', '.csv'
 }
 
-# Files to always ignore (exact uppercase match)
-IGNORE_FILENAMES = {
-    'README.MD', 'README.TXT', 'README',
-    '.GITKEEP', '.GITIGNORE', '.GITKEEP',
-    'LICENSE.MD', 'CHANGELOG.MD', 'CONTRIBUTING.MD'
-}
 
 # ─── Directory Setup ──────────────────────────────────────────────────────────
 def ensure_dirs():
@@ -371,7 +365,6 @@ def scan_inbox() -> list:
             if f.is_file()
             and f.suffix.lower() in SUPPORTED_EXTENSIONS
             and not f.name.startswith('.')
-            and f.name.upper() not in IGNORE_FILENAMES
         ]
         return sorted(files, key=lambda f: f.stat().st_mtime)  # oldest first
     except Exception as e:
@@ -402,7 +395,6 @@ def main():
         if f.is_file()
         and f.suffix.lower() in SUPPORTED_EXTENSIONS
         and not f.name.startswith('.')
-        and f.name.upper() not in IGNORE_FILENAMES
     ]
     if processable_leftover:
         log.warning(f"Found {len(processable_leftover)} leftover file(s) in processing/ from previous run")
