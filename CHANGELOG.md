@@ -8,6 +8,12 @@
 
 # Changelog
 
+## [4.3.1] - 2026-03-03
+
+### إصلاح mcpo - إضافة n8n_builder
+- تحديث تعليقات docker-compose.yml لتشمل n8n_builder في قائمة أدوات mcpo
+- تحديث label salehsaas.description لـ mcpo
+
 ## [4.3.0] - 2026-03-03
 
 ### توحيد البنية (Structure Unification)

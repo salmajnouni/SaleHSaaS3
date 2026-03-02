@@ -326,6 +326,7 @@ services:
   # يتيح لـ Open WebUI استخدام:
   #   - Ollama Model Builder: إدارة النماذج (تحميل، عرض، معلومات)
   #   - Legal RAG Tool: بحث قانوني متقدم في الوثائق السعودية
+  #   - n8n Builder: إنشاء وتشغيل وإدارة workflows في n8n
   mcpo:
     build:
       context: .
@@ -348,4 +349,4 @@ services:
       - "host.docker.internal:host-gateway"
     labels:
       - "salehsaas.service=mcpo"
-      - "salehsaas.description=MCP-to-OpenAPI Proxy - Ollama Model Builder + Legal RAG"
+      - "salehsaas.description=MCP-to-OpenAPI Proxy - Ollama Model Builder + Legal RAG + n8n Builder"
