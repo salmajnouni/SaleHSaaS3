@@ -56,12 +56,16 @@ CHUNK_OVERLAP   = int(os.getenv("CHUNK_OVERLAP",     "40"))
 
 # Supported file types
 SUPPORTED_EXTENSIONS = {
-    '.pdf', '.docx', '.doc', '.txt', '.xlsx', '.xls',
+    '.pdf', '.docx', '.doc', '.txt', '.md', '.xlsx', '.xls',
     '.pptx', '.ppt', '.rtf', '.odt', '.csv'
 }
 
-# Files to always ignore
-IGNORE_FILENAMES = {'README.MD', 'README.TXT', 'README', '.GITKEEP', '.GITIGNORE'}
+# Files to always ignore (exact uppercase match)
+IGNORE_FILENAMES = {
+    'README.MD', 'README.TXT', 'README',
+    '.GITKEEP', '.GITIGNORE', '.GITKEEP',
+    'LICENSE.MD', 'CHANGELOG.MD', 'CONTRIBUTING.MD'
+}
 
 # ─── Directory Setup ──────────────────────────────────────────────────────────
 def ensure_dirs():
