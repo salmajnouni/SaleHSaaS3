@@ -54,6 +54,11 @@ MAX_RETRIES     = int(os.getenv("MAX_RETRIES",       "3"))
 CHUNK_SIZE      = int(os.getenv("CHUNK_SIZE",        "400"))
 CHUNK_OVERLAP   = int(os.getenv("CHUNK_OVERLAP",     "40"))
 
+# ChromaDB v2 API base path (tenant + database)
+CHROMA_TENANT   = os.getenv("CHROMA_TENANT",   "default_tenant")
+CHROMA_DATABASE = os.getenv("CHROMA_DATABASE", "default_database")
+CHROMA_API_BASE = f"{CHROMADB_URL}/api/v2/tenants/{CHROMA_TENANT}/databases/{CHROMA_DATABASE}"
+
 # Supported file types
 SUPPORTED_EXTENSIONS = {
     '.pdf', '.docx', '.doc', '.txt', '.md', '.xlsx', '.xls',
@@ -208,29 +213,29 @@ def chromadb_request(method: str, path: str, **kwargs) -> requests.Response:
     return resp
 
 def ensure_collection() -> bool:
-    """Ensure the ChromaDB collection exists, create if not. Uses v2 API only."""
+    """Ensure the ChromaDB collection exists, create if not. Uses v2 API with tenant/database."""
     try:
         # Check if collection exists
         r = requests.get(
-            f"{CHROMADB_URL}/api/v2/collections/{COLLECTION_NAME}",
+            f"{CHROMA_API_BASE}/collections/{COLLECTION_NAME}",
             timeout=10
         )
         if r.status_code == 200:
-            log.info("  ChromaDB collection OK (v2)")
+            log.info(f"  ChromaDB collection OK [{CHROMA_TENANT}/{CHROMA_DATABASE}]")
             return True
         if r.status_code == 404:
             # Create collection
             rc = requests.post(
-                f"{CHROMADB_URL}/api/v2/collections",
+                f"{CHROMA_API_BASE}/collections",
                 json={"name": COLLECTION_NAME, "metadata": {"hnsw:space": "cosine"}},
                 timeout=10
             )
             if rc.status_code in [200, 201]:
-                log.info("  ChromaDB collection created (v2)")
+                log.info(f"  ChromaDB collection created [{CHROMA_TENANT}/{CHROMA_DATABASE}]")
                 return True
-            log.error(f"  ChromaDB create failed: {rc.status_code} {rc.text[:100]}")
+            log.error(f"  ChromaDB create failed: {rc.status_code} {rc.text[:200]}")
             return False
-        log.error(f"  ChromaDB check failed: {r.status_code} {r.text[:100]}")
+        log.error(f"  ChromaDB check failed: {r.status_code} {r.text[:200]}")
         return False
     except Exception as e:
         log.error(f"  Cannot connect to ChromaDB: {e}")
@@ -241,8 +246,8 @@ def save_chunks_to_chromadb(chunks: list, metadata_base: dict) -> tuple:
     saved = 0
     errors = []
 
-    url = f"{CHROMADB_URL}/api/v2/collections/{COLLECTION_NAME}/add"
-    log.info("  Using ChromaDB API: v2")
+    url = f"{CHROMA_API_BASE}/collections/{COLLECTION_NAME}/add"
+    log.info(f"  ChromaDB endpoint: {CHROMA_TENANT}/{CHROMA_DATABASE}/{COLLECTION_NAME}")
 
     for i, chunk in enumerate(chunks):
         embedding = get_embedding(chunk)
