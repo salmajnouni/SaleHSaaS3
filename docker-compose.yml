@@ -266,9 +266,9 @@ services:
       - "salehsaas.service=code-server"
       - "salehsaas.description=بيئة تطوير متكاملة من المتصفح - تعديل Pipelines والمعجم"
 
-  # ── 9. Knowledge Watcher - هضم المعرفة التلقائي ───────────────────────────
-  # ضع أي ملف في مجلد knowledge_inbox وسيُهضم تلقائياً في ChromaDB
-  # يدعم: PDF, Word, Excel, TXT, Markdown, وأكثر
+  # ── 9. Knowledge Watcher - Professional Document Ingestion Pipeline ─────────
+  # Drop any file in knowledge_inbox -> auto-processed into ChromaDB
+  # Supports: PDF, Word, Excel, TXT, CSV, PowerPoint, and more
   knowledge_watcher:
     build:
       context: ./services/knowledge_watcher
@@ -280,7 +280,8 @@ services:
       - tika
     environment:
       - INBOX_DIR=/knowledge_inbox
-      - PROCESSED_DIR=/knowledge_processed
+      - PROCESSING_DIR=/knowledge_processing
+      - ARCHIVE_DIR=/knowledge_archive
       - FAILED_DIR=/knowledge_failed
       - TIKA_URL=http://tika:9998/tika
       - CHROMADB_URL=http://chromadb:8000
@@ -288,9 +289,13 @@ services:
       - EMBED_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
       - COLLECTION_NAME=saleh_legal_knowledge
       - SCAN_INTERVAL=10
+      - MAX_RETRIES=3
+      - CHUNK_SIZE=400
+      - CHUNK_OVERLAP=40
     volumes:
       - ./knowledge_inbox:/knowledge_inbox
-      - ./knowledge_processed:/knowledge_processed
+      - ./knowledge_processing:/knowledge_processing
+      - ./knowledge_archive:/knowledge_archive
       - ./knowledge_failed:/knowledge_failed
     networks:
       salehsaas_net:
@@ -299,7 +304,7 @@ services:
       - "host.docker.internal:host-gateway"
     labels:
       - "salehsaas.service=knowledge-watcher"
-      - "salehsaas.description=هضم المعرفة التلقائي - ضع ملف في knowledge_inbox وسيُحفظ في ChromaDB"
+      - "salehsaas.description=Professional ingestion pipeline - inbox/processing/archive/failed"
 
   # ── 10. MCPO - MCP-to-OpenAPI Proxy ──────────────────────────────────────
   # يحوّل أدوات MCP إلى OpenAPI REST endpoints
