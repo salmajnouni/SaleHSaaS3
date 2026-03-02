@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [4.1.3] - 2026-03-02
+
+### Fixed
+- **SearXNG radio_browser (final fix)**: Replaced `disabled: true` approach with `use_default_settings.engines.remove` directive. This is the correct SearXNG API to prevent engines from loading entirely - they are removed before initialization, not just flagged as disabled. Eliminates `socket.herror: No address associated with name` crash permanently.
+
+---
+
 ## [4.1.2] - 2026-03-02
 
 ### Fixed

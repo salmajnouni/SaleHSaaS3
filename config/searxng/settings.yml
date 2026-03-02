@@ -1,4 +1,9 @@
-use_default_settings: true
+use_default_settings:
+  engines:
+    remove:
+      - radio browser
+      - ahmia
+      - torch
 
 general:
   instance_name: "SaleH SaaS Search"
@@ -40,15 +45,3 @@ outgoing:
   useragent_suffix: ""
   pool_connections: 100
   pool_maxsize: 20
-
-# تعطيل المحركات التي تفشل عند بدء التشغيل (تحتاج DNS خارجي أو غير متاحة)
-engines:
-  - name: radio browser
-    engine: radio_browser
-    disabled: true
-  - name: ahmia
-    engine: ahmia
-    disabled: true
-  - name: torch
-    engine: torch
-    disabled: true
