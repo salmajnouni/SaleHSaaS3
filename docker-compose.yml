@@ -158,7 +158,7 @@ services:
 
   # ── 4. Open WebUI Pipelines - المعالج القانوني ──────────────────────────
   pipelines:
-    image: ghcr.io/open-webui/pipelines:v2.11.0
+    image: ghcr.io/open-webui/pipelines:main
     container_name: salehsaas_pipelines
     restart: unless-stopped
     environment:
