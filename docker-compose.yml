@@ -241,7 +241,7 @@ services:
       # N8N_RUNNERS_ENABLED removed - deprecated in n8n v2.9+
       # N8N_RUNNERS_MODE=internal (default) - JS runner only, Python not needed
       - N8N_PUBLIC_API_DISABLED=false
-      - N8N_API_KEY=${N8N_API_KEY:-salehsaas-n8n-api-key}
+      - N8N_API_KEY=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYzJmNWJmYmYtZTNhMi00ZjI0LWJhZDYtYzhmNGNhNDUwMmY5IiwiaWF0IjoxNzcyNDkwMTYzLCJleHAiOjE3NzUwNzcyMDB9.r8pFpuSpx86VH5Gx9Z8WpKpLwdLKxsLrrdhLjoiG6LU}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./knowledge_inbox:/knowledge_inbox
