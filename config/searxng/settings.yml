@@ -1,13 +1,4 @@
-use_default_settings:
-  engines:
-    keep_only:
-      - google
-      - bing
-      - duckduckgo
-      - wikipedia
-      - wikidata
-      - brave
-      - startpage
+use_default_settings: true
 
 general:
   instance_name: "SaleH SaaS Search"
@@ -49,3 +40,12 @@ outgoing:
   useragent_suffix: ""
   pool_connections: 100
   pool_maxsize: 20
+
+# تعطيل المحركات التي تفشل عند بدء التشغيل
+engines:
+  - name: radio browser
+    disabled: true
+  - name: ahmia
+    disabled: true
+  - name: torch
+    disabled: true

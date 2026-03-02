@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [4.1.1] - 2026-03-02
+
+### Fixed
+- **Open WebUI CORS**: Replaced `CORS_ALLOW_ORIGIN` with correct `WEBUI_URL` variable that Open WebUI actually reads for allowed origins. Eliminates `http://localhost:3000 is not an accepted origin` error.
+- **SearXNG radio_browser**: Changed strategy from `keep_only` to explicit `disabled: true` per engine. Eliminates `socket.herror: No address associated with name` crash on startup.
+- **n8n Python runner**: Added `N8N_RUNNERS_MODE=external` to suppress `Failed to start Python task runner in internal mode` warning.
+
+---
+
 ## [4.1.0] - 2026-03-02
 
 ### Fixed

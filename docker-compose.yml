@@ -132,7 +132,9 @@ services:
 
       # ── إصلاح تحذيرات الأمان ──
       - USER_AGENT=Mozilla/5.0 (compatible; SaleH-SaaS/4.0; +http://localhost:3000)
-      - CORS_ALLOW_ORIGIN=http://localhost:3000,http://127.0.0.1:3000
+      # CORS: يجب استخدام WEBUI_URL لتحديد الأصل المسموح في Open WebUI
+      - WEBUI_URL=http://localhost:${WEBUI_PORT:-3000}
+      - CORS_ALLOW_ORIGIN=http://localhost:${WEBUI_PORT:-3000}
 
       # ── Pipelines ──
       - OPENAI_API_BASE_URL=http://pipelines:9099
@@ -235,6 +237,8 @@ services:
       - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
       - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
       # N8N_RUNNERS_ENABLED removed - deprecated in n8n v2.9+
+      # Python runner: external mode to suppress 'Python 3 is missing' warning
+      - N8N_RUNNERS_MODE=external
       - N8N_PUBLIC_API_DISABLED=false
       - N8N_API_KEY=${N8N_API_KEY:-salehsaas-n8n-api-key}
     volumes:
