@@ -389,25 +389,25 @@ def main():
     ensure_dirs()
 
     # Clean up any leftover files in processing folder from previous crash
-    leftover = list(PROCESSING_DIR.iterdir()) if PROCESSING_DIR.exists() else []
-    processable_leftover = [
-        f for f in leftover
-        if f.is_file()
-        and f.suffix.lower() in SUPPORTED_EXTENSIONS
-        and not f.name.startswith('.')
-    ]
-    if processable_leftover:
-        log.warning(f"Found {len(processable_leftover)} leftover file(s) in processing/ from previous run")
-        for f in processable_leftover:
-            try:
-                dest = INBOX_DIR / f.name
-                shutil.copy2(str(f), str(dest))
-                f.unlink()
-                log.warning(f"  Re-queued: {f.name}")
-            except PermissionError:
-                log.warning(f"  Skipping {f.name} (permission denied - likely README)")
-            except Exception as e:
-                log.warning(f"  Could not re-queue {f.name}: {e}")
+    # Only re-queue supported file types; skip anything else silently
+    try:
+        leftover = [f for f in PROCESSING_DIR.iterdir() if f.is_file()]
+        processable = [f for f in leftover if f.suffix.lower() in SUPPORTED_EXTENSIONS and not f.name.startswith('.')]
+        if processable:
+            log.warning(f"Re-queuing {len(processable)} leftover file(s) from previous run")
+            for f in processable:
+                try:
+                    dest = INBOX_DIR / f.name
+                    shutil.copy2(str(f), str(dest))
+                    try:
+                        f.unlink()
+                    except Exception:
+                        pass  # Can't delete source - that's OK, copy already done
+                    log.warning(f"  Re-queued: {f.name}")
+                except Exception as e:
+                    log.warning(f"  Skipped {f.name}: {e}")
+    except Exception as e:
+        log.warning(f"Processing folder cleanup skipped: {e}")
 
     stats = {"processed": 0, "failed": 0, "total_chunks": 0}
 
