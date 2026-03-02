@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [4.1.0] - 2026-03-02
+
+### Fixed
+- **SearXNG limiter.toml**: Created `config/searxng/limiter.toml` to resolve startup warning. Configured to allow all Docker network IPs (172.20.0.0/16).
+- **SearXNG engines**: Updated `settings.yml` to use `keep_only` strategy, disabling failed engines (ahmia, torch, radio_browser) and keeping only stable ones (google, bing, duckduckgo, wikipedia, brave).
+- **Open WebUI CORS**: Replaced wildcard `CORS_ALLOW_ORIGIN=*` with explicit `http://localhost:3000,http://127.0.0.1:3000`.
+- **Open WebUI USER_AGENT**: Added `USER_AGENT` environment variable to identify requests from langchain.
+- **n8n deprecation**: Removed deprecated `N8N_RUNNERS_ENABLED=true` variable (no longer needed in n8n v2.9+).
+
+---
+
 ## [4.0.0] - 2026-03-02
 
 ### Added

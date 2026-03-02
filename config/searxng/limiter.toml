@@ -1,0 +1,14 @@
+# SaleH SaaS - SearXNG Rate Limiter Configuration
+# تعطيل الـ limiter لأن النظام يعمل محلياً بدون وصول خارجي
+
+[botdetection.ip_limit]
+# تعطيل حد معدل الطلبات للاستخدام المحلي
+link_token = false
+
+[botdetection.ip_lists]
+block_ip = []
+pass_ip = [
+    "172.20.0.0/16",   # Docker network
+    "127.0.0.1",        # Localhost
+    "::1"               # IPv6 Localhost
+]

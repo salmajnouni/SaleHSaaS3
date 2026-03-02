@@ -1,4 +1,13 @@
-use_default_settings: true
+use_default_settings:
+  engines:
+    keep_only:
+      - google
+      - bing
+      - duckduckgo
+      - wikipedia
+      - wikidata
+      - brave
+      - startpage
 
 general:
   instance_name: "SaleH SaaS Search"
