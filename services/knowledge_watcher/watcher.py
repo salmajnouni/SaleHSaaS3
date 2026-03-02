@@ -212,8 +212,9 @@ def chromadb_request(method: str, path: str, **kwargs) -> requests.Response:
     # Last resort: return last response
     return resp
 
-def ensure_collection() -> bool:
-    """Ensure the ChromaDB collection exists, create if not. Uses v2 API with tenant/database."""
+def ensure_collection() -> str:
+    """Ensure the ChromaDB collection exists, create if not.
+    Returns the collection UUID (required for v2 add endpoint), or None on failure."""
     try:
         # Check if collection exists
         r = requests.get(
@@ -221,8 +222,9 @@ def ensure_collection() -> bool:
             timeout=10
         )
         if r.status_code == 200:
-            log.info(f"  ChromaDB collection OK [{CHROMA_TENANT}/{CHROMA_DATABASE}]")
-            return True
+            col_id = r.json().get("id")
+            log.info(f"  ChromaDB collection OK (id={col_id})")
+            return col_id
         if r.status_code == 404:
             # Create collection
             rc = requests.post(
@@ -231,23 +233,25 @@ def ensure_collection() -> bool:
                 timeout=10
             )
             if rc.status_code in [200, 201]:
-                log.info(f"  ChromaDB collection created [{CHROMA_TENANT}/{CHROMA_DATABASE}]")
-                return True
+                col_id = rc.json().get("id")
+                log.info(f"  ChromaDB collection created (id={col_id})")
+                return col_id
             log.error(f"  ChromaDB create failed: {rc.status_code} {rc.text[:200]}")
-            return False
+            return None
         log.error(f"  ChromaDB check failed: {r.status_code} {r.text[:200]}")
-        return False
+        return None
     except Exception as e:
         log.error(f"  Cannot connect to ChromaDB: {e}")
-        return False
+        return None
 
-def save_chunks_to_chromadb(chunks: list, metadata_base: dict) -> tuple:
-    """Save chunks to ChromaDB. Returns (saved_count, total_count)"""
+def save_chunks_to_chromadb(chunks: list, metadata_base: dict, collection_id: str) -> tuple:
+    """Save chunks to ChromaDB using collection UUID. Returns (saved_count, total_count)"""
     saved = 0
     errors = []
 
-    url = f"{CHROMA_API_BASE}/collections/{COLLECTION_NAME}/add"
-    log.info(f"  ChromaDB endpoint: {CHROMA_TENANT}/{CHROMA_DATABASE}/{COLLECTION_NAME}")
+    # v2 requires UUID in path, not collection name
+    url = f"{CHROMA_API_BASE}/collections/{collection_id}/add"
+    log.info(f"  ChromaDB add URL: .../{collection_id[:8]}..../add")
 
     for i, chunk in enumerate(chunks):
         embedding = get_embedding(chunk)
@@ -318,7 +322,8 @@ def process_file(file_path: Path) -> bool:
 
         # Step 4: Ensure ChromaDB collection
         log.info(f"  [STEP 3/4] Checking ChromaDB collection...")
-        if not ensure_collection():
+        collection_id = ensure_collection()
+        if not collection_id:
             raise ConnectionError("ChromaDB unavailable")
 
         # Step 5: Save to ChromaDB
@@ -331,7 +336,7 @@ def process_file(file_path: Path) -> bool:
             "ingested_at": datetime.utcnow().isoformat() + "Z"
         }
 
-        saved, total = save_chunks_to_chromadb(chunks, metadata_base)
+        saved, total = save_chunks_to_chromadb(chunks, metadata_base, collection_id)
         log.info(f"  [STEP 4/4] Saved {saved}/{total} chunks")
 
         if saved == 0:
