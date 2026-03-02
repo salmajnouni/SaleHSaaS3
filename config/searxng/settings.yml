@@ -41,11 +41,14 @@ outgoing:
   pool_connections: 100
   pool_maxsize: 20
 
-# تعطيل المحركات التي تفشل عند بدء التشغيل
+# تعطيل المحركات التي تفشل عند بدء التشغيل (تحتاج DNS خارجي أو غير متاحة)
 engines:
   - name: radio browser
+    engine: radio_browser
     disabled: true
   - name: ahmia
+    engine: ahmia
     disabled: true
   - name: torch
+    engine: torch
     disabled: true

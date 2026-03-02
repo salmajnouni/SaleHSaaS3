@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [4.1.2] - 2026-03-02
+
+### Fixed
+- **n8n crash**: Removed `N8N_RUNNERS_MODE=external` which caused fatal error `Missing auth token`. n8n now runs in default internal mode (JS runner only). Python runner warning is informational only and does not affect functionality.
+- **SearXNG radio_browser**: Added explicit `engine: radio_browser` field alongside `disabled: true` to ensure SearXNG correctly matches and disables the engine before initialization.
+
+---
+
 ## [4.1.1] - 2026-03-02
 
 ### Fixed
