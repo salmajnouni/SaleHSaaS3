@@ -393,12 +393,25 @@ def main():
 
     # Clean up any leftover files in processing folder from previous crash
     leftover = list(PROCESSING_DIR.iterdir()) if PROCESSING_DIR.exists() else []
-    if leftover:
-        log.warning(f"Found {len(leftover)} leftover file(s) in processing/ from previous run")
-        for f in leftover:
-            if f.is_file():
-                log.warning(f"  Re-queuing: {f.name}")
-                shutil.move(str(f), str(INBOX_DIR / f.name))
+    processable_leftover = [
+        f for f in leftover
+        if f.is_file()
+        and f.suffix.lower() in SUPPORTED_EXTENSIONS
+        and not f.name.startswith('.')
+        and f.name.upper() not in IGNORE_FILENAMES
+    ]
+    if processable_leftover:
+        log.warning(f"Found {len(processable_leftover)} leftover file(s) in processing/ from previous run")
+        for f in processable_leftover:
+            try:
+                dest = INBOX_DIR / f.name
+                shutil.copy2(str(f), str(dest))
+                f.unlink()
+                log.warning(f"  Re-queued: {f.name}")
+            except PermissionError:
+                log.warning(f"  Skipping {f.name} (permission denied - likely README)")
+            except Exception as e:
+                log.warning(f"  Could not re-queue {f.name}: {e}")
 
     stats = {"processed": 0, "failed": 0, "total_chunks": 0}
 
