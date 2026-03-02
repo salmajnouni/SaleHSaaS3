@@ -388,6 +388,22 @@ def main():
 
     ensure_dirs()
 
+    # Wait for ChromaDB to be ready (since we removed healthcheck)
+    log.info("Waiting for ChromaDB to be ready...")
+    for attempt in range(1, 31):  # up to 5 minutes (30 x 10s)
+        try:
+            r = requests.get(f"{CHROMADB_URL}/api/v1/heartbeat", timeout=5)
+            if r.status_code == 200:
+                log.info(f"ChromaDB is ready (attempt {attempt})")
+                break
+        except Exception:
+            pass
+        if attempt < 30:
+            log.info(f"  ChromaDB not ready yet, retrying in 10s... ({attempt}/30)")
+            time.sleep(10)
+    else:
+        log.warning("ChromaDB did not respond after 5 minutes - continuing anyway")
+
     # Clean up any leftover files in processing folder from previous crash
     # Only re-queue supported file types; skip anything else silently
     try:
