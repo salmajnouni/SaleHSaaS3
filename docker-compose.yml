@@ -140,6 +140,11 @@ services:
       - OPENAI_API_BASE_URL=http://pipelines:9099
       - OPENAI_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
 
+      # ── MCP Tool Servers (Global - pre-configured via env var) ──
+      # يضيف أدوات MCP تلقائياً كـ Global Tool Servers بدون إعداد يدوي
+      # المسارات الصحيحة: /n8n_builder و /ollama_model_builder و /saleh_legal_rag
+      - TOOL_SERVER_CONNECTIONS=[{"url":"http://mcpo:8000","path":"/n8n_builder","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"n8n Builder","description":"Create, run and manage n8n workflows"}},{"url":"http://mcpo:8000","path":"/ollama_model_builder","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"Ollama Model Builder","description":"Manage Ollama AI models"}},{"url":"http://mcpo:8000","path":"/saleh_legal_rag","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"Legal RAG","description":"Search Saudi legal documents"}}]
+
     volumes:
       - open_webui_data:/app/backend/data
       - saleh_uploads:/app/backend/data/uploads
