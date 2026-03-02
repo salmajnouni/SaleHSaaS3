@@ -38,10 +38,24 @@ env/
 node_modules/
 npm-debug.log*
 
+# Knowledge folders - keep structure, ignore content
+knowledge_inbox/*
+knowledge_processed/*
+knowledge_processing/*
+knowledge_failed/*
+knowledge_archive/*
+!knowledge_inbox/.gitkeep
+!knowledge_processed/.gitkeep
+!knowledge_processing/.gitkeep
+!knowledge_failed/.gitkeep
+!knowledge_archive/.gitkeep
+
 # Docker volumes (local only)
 postgres_data/
 redis_data/
 ollama_models/
+chromadb_data/
+n8n_data/
 
 # IDE
 .vscode/settings.json

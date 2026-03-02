@@ -8,6 +8,14 @@
 
 # Changelog
 
+## [4.3.0] - 2026-03-03
+
+### توحيد البنية (Structure Unification)
+- إضافة مجلدات knowledge_inbox/processed/processing/failed/archive مع .gitkeep
+- تحديث .gitignore: استثناء محتوى مجلدات knowledge مع الحفاظ على البنية
+- إضافة chromadb_data/ و n8n_data/ إلى .gitignore
+- إضافة مجلد n8n_workflows/ مع README توضيحي للمسار الصحيح
+
 All notable changes to SaleH SaaS are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
