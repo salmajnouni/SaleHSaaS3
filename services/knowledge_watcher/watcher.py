@@ -208,53 +208,41 @@ def chromadb_request(method: str, path: str, **kwargs) -> requests.Response:
     return resp
 
 def ensure_collection() -> bool:
-    """Ensure the ChromaDB collection exists, create if not"""
-    for version in ["v2", "v1"]:
-        try:
-            url_get = f"{CHROMADB_URL}/api/{version}/collections/{COLLECTION_NAME}"
-            r = requests.get(url_get, timeout=10)
-            if r.status_code == 200:
-                log.info(f"  ChromaDB collection OK (API {version})")
+    """Ensure the ChromaDB collection exists, create if not. Uses v2 API only."""
+    try:
+        # Check if collection exists
+        r = requests.get(
+            f"{CHROMADB_URL}/api/v2/collections/{COLLECTION_NAME}",
+            timeout=10
+        )
+        if r.status_code == 200:
+            log.info("  ChromaDB collection OK (v2)")
+            return True
+        if r.status_code == 404:
+            # Create collection
+            rc = requests.post(
+                f"{CHROMADB_URL}/api/v2/collections",
+                json={"name": COLLECTION_NAME, "metadata": {"hnsw:space": "cosine"}},
+                timeout=10
+            )
+            if rc.status_code in [200, 201]:
+                log.info("  ChromaDB collection created (v2)")
                 return True
-            if r.status_code == 404:
-                url_create = f"{CHROMADB_URL}/api/{version}/collections"
-                rc = requests.post(
-                    url_create,
-                    json={"name": COLLECTION_NAME, "metadata": {"hnsw:space": "cosine"}},
-                    timeout=10
-                )
-                if rc.status_code in [200, 201]:
-                    log.info(f"  ChromaDB collection created (API {version})")
-                    return True
-        except Exception as e:
-            log.warning(f"  ChromaDB {version} check error: {e}")
-    log.error("  Cannot connect to ChromaDB!")
-    return False
+            log.error(f"  ChromaDB create failed: {rc.status_code} {rc.text[:100]}")
+            return False
+        log.error(f"  ChromaDB check failed: {r.status_code} {r.text[:100]}")
+        return False
+    except Exception as e:
+        log.error(f"  Cannot connect to ChromaDB: {e}")
+        return False
 
 def save_chunks_to_chromadb(chunks: list, metadata_base: dict) -> tuple:
     """Save chunks to ChromaDB. Returns (saved_count, total_count)"""
     saved = 0
     errors = []
 
-    for version in ["v2", "v1"]:
-        url = f"{CHROMADB_URL}/api/{version}/collections/{COLLECTION_NAME}/add"
-        # Test if this version works with a small request
-        try:
-            test = requests.get(
-                f"{CHROMADB_URL}/api/{version}/collections/{COLLECTION_NAME}",
-                timeout=5
-            )
-            if test.status_code == 405:
-                continue
-            working_version = version
-            break
-        except Exception:
-            continue
-    else:
-        working_version = "v1"
-
-    url = f"{CHROMADB_URL}/api/{working_version}/collections/{COLLECTION_NAME}/add"
-    log.info(f"  Using ChromaDB API: {working_version}")
+    url = f"{CHROMADB_URL}/api/v2/collections/{COLLECTION_NAME}/add"
+    log.info("  Using ChromaDB API: v2")
 
     for i, chunk in enumerate(chunks):
         embedding = get_embedding(chunk)
@@ -388,13 +376,13 @@ def main():
 
     ensure_dirs()
 
-    # Wait for ChromaDB to be ready (since we removed healthcheck)
+    # Wait for ChromaDB to be ready - use v2 API (v1 is deprecated)
     log.info("Waiting for ChromaDB to be ready...")
     for attempt in range(1, 31):  # up to 5 minutes (30 x 10s)
         try:
-            r = requests.get(f"{CHROMADB_URL}/api/v1/heartbeat", timeout=5)
+            r = requests.get(f"{CHROMADB_URL}/api/v2/heartbeat", timeout=5)
             if r.status_code == 200:
-                log.info(f"ChromaDB is ready (attempt {attempt})")
+                log.info(f"ChromaDB is ready on v2 API (attempt {attempt})")
                 break
         except Exception:
             pass
