@@ -1,3 +1,11 @@
+## [4.2.0] - 2026-03-02
+
+### تحسينات الأمان والأداء
+- تعطيل التسجيل التلقائي (ENABLE_SIGNUP=false) لمنع الوصول غير المصرح
+- تثبيت إصدارات الصور: Open WebUI v0.6.5، Pipelines v0.6.5، n8n 2.9.4
+- ضبط n8n لحفظ بيانات الأخطاء فقط (EXECUTIONS_DATA_SAVE_ON_SUCCESS=none)
+- تفعيل تنظيف سجلات التنفيذ تلقائياً بعد 7 أيام (EXECUTIONS_DATA_MAX_AGE=168)
+
 # Changelog
 
 All notable changes to SaleH SaaS are documented in this file.
