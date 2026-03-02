@@ -1,17 +1,62 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to SaleH SaaS are documented in this file.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+---
+
+## [4.0.0] - 2026-03-02
+
+### Added
+- **Dockerfile.tika**: Custom Tika image with Microsoft TrueType core fonts (Arial, Times New Roman, Helvetica, Courier New). Eliminates all `Using fallback font LiberationSans` PDFBox warnings.
+- **n8n_builder MCP Tool** (`tools/mcp/n8n_builder.py`): 10-function MCP tool enabling AI models to create, manage, activate, and execute n8n workflows from natural language chat.
+- **n8n Public API**: Enabled `N8N_PUBLIC_API_DISABLED=false` and configured `N8N_API_KEY` for programmatic workflow management.
+- **Knowledge Watcher v3.0** (`services/knowledge_watcher/watcher.py`): Professional document ingestion pipeline with automatic monitoring, Tika extraction, Ollama embeddings (300s timeout), ChromaDB v2 storage, and date-based archival.
+- **mcpo config** (`config/mcpo/config.json`): Three registered MCP tools: `ollama_model_builder`, `saleh_legal_rag`, `n8n_builder`.
+
+### Fixed
+- **ChromaDB v2 API**: Migrated from deprecated v1 to full v2 path `/api/v2/tenants/default_tenant/databases/default_database/`.
+- **ChromaDB UUID addressing**: Collection add operations now use UUID-based endpoint.
+- **Ollama timeout**: Increased to 300 seconds for large document chunks.
+- **PowerShell encoding**: All log messages in English to prevent Unicode issues on Windows.
+- **File re-queue**: Crash-proof using copy+delete instead of move.
+
+### Changed
+- **docker-compose.yml**: `tika` service builds from `Dockerfile.tika`, image tagged `salehsaas-tika-fonts:latest`.
+- **Knowledge Watcher**: Removed `IGNORE_FILENAMES` — inbox processes all files by design.
+- **Documentation**: Consolidated knowledge watcher docs into `docs/guides/knowledge_watcher.md`.
+
+---
+
+## [3.0.0] - 2026-03-01
+
+### Added
+- **MCP Setup Guide** (`MCP_SETUP_GUIDE.md`): Complete guide for configuring MCP tools in Open WebUI.
+- **saleh_legal_rag MCP Tool**: Semantic search over ingested legal documents.
+- **ollama_model_builder MCP Tool**: Manage Ollama models from chat.
+- **mcpo service**: MCP-to-OpenAPI proxy at port `8020`.
+- **n8n workflows folder** (`n8n/workflows/`): Pre-built workflow templates.
+- **Pipelines**: `saleh_legal_pipeline.py` and `saleh_legal_rag.py` for RAG-enhanced processing.
+- **Legal Glossary**: Saudi legal terminology database in `saleh_brain/glossary/`.
+
+### Changed
+- Architecture expanded to 10 services.
+- PostgreSQL added as persistent backend for n8n.
+
+---
 
 ## [2.0.0] - 2026-03-01
 
 ### Added
 - **Smart Chat API**: Full RAG pipeline with Llama 3 and ChromaDB.
 - **Dashboard v2.0**: New UI with 4 tabs (Overview, Chat, Search, Files).
-- **Ollama Embeddings Search**: Search now uses `nomic-embed-text` via Ollama, removing the ONNX dependency.
+- **Ollama Embeddings Search**: Uses `nomic-embed-text` via Ollama.
 
 ### Changed
-- Dashboard port changed from `8088` to `8000` for simplicity.
-- Improved logging in `file_watcher` to show chunk count and collection name.
+- Dashboard port changed from `8088` to `8000`.
+- Improved logging in `file_watcher`.
+
+---
 
 ## [1.0.0] - 2026-03-01
 

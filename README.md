@@ -1,84 +1,244 @@
-> **Note**
-> هذا المستودع قيد إعادة بناء كاملة للانتقال إلى الإصدار 4.0. قد تكون بعض الميزات غير مستقرة.
+<div align="center">
 
-# SaleH SaaS 4.0 - نظام المعرفة القانونية السعودي
+# 🕋 SaleH SaaS 4.0
 
-🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
+**نظام ذكاء اصطناعي قانوني متكامل — صُنع بفخر في مكة المكرمة، المملكة العربية السعودية**
 
-**SaleH SaaS** هو نظام ذكاء اصطناعي محلي بالكامل، مصمم لإدارة المعرفة القانونية والتشريعية السعودية. يعمل النظام على Windows باستخدام Docker وOllama، ويوفر واجهة محادثة ذكية معززة بالاسترجاع (RAG) لفهم القوانين والأنظمة واللوائح السعودية بدقة.
+[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)](./CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![Docker](https://img.shields.io/badge/docker-compose-2496ED.svg)](./docker-compose.yml)
+[![Python](https://img.shields.io/badge/python-3.11+-yellow.svg)](./requirements.txt)
 
-![Dashboard](https://raw.githubusercontent.com/salmajnouni/SaleHSaaS3/main/docs/assets/dashboard_v4_ar.png) <!-- TODO: Add new screenshot -->
+</div>
 
-## ✨ الميزات الرئيسية (الإصدار 4.0)
+---
 
-- **محادثة ذكية معززة (RAG):** اسأل عن أي مادة قانونية واحصل على إجابة دقيقة من القوانين الفعلية، وليس من ذاكرة النموذج العامة.
-- **معالج قانوني ذكي (Pipeline):** يفهم المصطلحات القانونية السعودية، ويكشف التعارضات بين الأنظمة، ويحقن السياق تلقائياً في المحادثة.
-- **دعم كامل للوثائق:** ارفع ملفات PDF, Word, Excel, PowerPoint مباشرة من الواجهة لتحليلها.
-- **بحث متقدم:** ابحث في الإنترنت محلياً باستخدام SearXNG، أو في الوثائق المرفوعة.
-- **أتمتة ونشر:** استخدم n8n لنشر المحتوى على وسائل التواصل الاجتماعي أو إرسال تقارير مجدولة.
-- **بيئة تطوير مدمجة:** عدّل الـ Pipelines والمعاجم مباشرة من المتصفح باستخدام Code Server.
-- **محلي 100% وآمن:** جميع البيانات تُعالج محلياً على جهازك. لا يوجد أي اتصال خارجي.
+## نظرة عامة
 
-## 🚀 الهيكل التقني (4.0)
+**SaleH SaaS** منصة ذكاء اصطناعي محلية متكاملة مصممة للمؤسسات القانونية والحكومية السعودية. تعمل بالكامل على البنية التحتية المحلية دون إرسال أي بيانات خارجياً، وتوفر قدرات RAG (الاسترجاع المعزز بالتوليد) متقدمة على الوثائق القانونية السعودية مع أتمتة كاملة لسير العمل عبر n8n.
 
-يعتمد النظام على هيكل مبسّط وقوي من 8 حاويات Docker أساسية:
+---
 
-| # | الخدمة | المنفذ | الوظيفة |
-|---|---|---|---|
-| 1 | **Open WebUI** | 3000 | الواجهة الرئيسية + RAG + محادثة |
-| 2 | **Pipelines** | 9099 | المعجم القانوني + تقارير |
-| 3 | **ChromaDB** | 8010 | ذاكرة القوانين |
-| 4 | **Apache Tika** | - | استخراج PDF/Word/Excel |
-| 5 | **SearXNG** | - | بحث الإنترنت المحلي |
-| 6 | **n8n** | 5678 | نشر على الميديا + أتمتة |
-| 7 | **PostgreSQL** | - | قاعدة البيانات |
-| 8 | **Code Server** | 8443 | تطوير من المتصفح |
+## المكونات الرئيسية
 
-بالإضافة إلى **Ollama** الذي يعمل على Windows مباشرة لتشغيل نماذج الذكاء الاصطناعي.
+| # | الخدمة | الصورة | المنفذ | الوصف |
+|---|---|---|---|---|
+| 1 | **Open WebUI** | `ghcr.io/open-webui/open-webui:main` | `3000` | واجهة المحادثة الرئيسية + RAG |
+| 2 | **PostgreSQL** | `postgres:16-alpine` | داخلي | قاعدة البيانات الرئيسية |
+| 3 | **ChromaDB** | `chromadb/chroma:latest` | `8010` | قاعدة البيانات المتجهية للوثائق |
+| 4 | **Apache Tika** | `salehsaas-tika-fonts:latest` | داخلي | استخراج النصوص من PDF وWord وExcel |
+| 5 | **Ollama** | Windows Host | `11434` | نماذج اللغة والتضمين المحلية |
+| 6 | **Knowledge Watcher** | مبني محلياً | داخلي | خط أنابيب استيعاب الوثائق التلقائي v3.0 |
+| 7 | **n8n** | `n8nio/n8n:latest` | `5678` | أتمتة سير العمل |
+| 8 | **mcpo** | مبني محلياً | `8020` | وكيل MCP-to-OpenAPI |
+| 9 | **SearXNG** | `searxng/searxng:latest` | داخلي | بحث محلي على الإنترنت |
+| 10 | **Code Server** | `codercom/code-server:latest` | `8443` | بيئة التطوير من المتصفح |
 
-## 🛠️ الإعداد والتشغيل
+---
 
-### المتطلبات
+## المتطلبات
 
-1. **Docker Desktop**
-2. **Ollama for Windows**
-3. **Git**
+- **نظام التشغيل:** Windows 10/11 مع PowerShell
+- **Docker Desktop:** الإصدار 4.x أو أحدث
+- **Ollama:** مثبت على Windows ويعمل على المنفذ `11434`
+- **Git:** مثبت ومُعدّ
+- **ذاكرة RAM:** 16 GB كحد أدنى (32 GB موصى به)
+- **مساحة القرص:** 50 GB على الأقل
 
-### خطوات الإعداد
+---
 
-1. **تحميل المشروع:**
-   ```powershell
-   git clone https://github.com/salmajnouni/SaleHSaaS3.git
-   cd SaleHSaaS3
-   ```
+## التثبيت السريع
 
-2. **تشغيل سكريبت الإعداد:**
-   افتح PowerShell **كمسؤول (Run as Administrator)** وشغّل:
-   ```powershell
-   .\setup.ps1
-   ```
-   - سيقوم السكريبت بالتحقق من Docker وOllama، وإعداد ملف `.env`، وسحب الصور، وتشغيل كل شيء.
-   - **هام:** عند تشغيل السكريبت لأول مرة، سيطلب منك تعديل ملف `.env` لوضع كلمات المرور والمفاتيح السرية.
+```powershell
+# 1. استنساخ المستودع
+git clone https://github.com/salmajnouni/SaleHSaaS3.git
+cd SaleHSaaS3
 
-3. **الوصول للخدمات:**
-   - **Open WebUI (الواجهة الرئيسية):** [http://localhost:3000](http://localhost:3000)
-   - **n8n (الأتمتة):** [http://localhost:5678](http://localhost:5678)
-   - **Code Server (التطوير):** [http://localhost:8443](http://localhost:8443)
+# 2. نسخ ملف الإعدادات
+copy .env.example .env
 
-## 📖 كيفية الاستخدام
+# 3. تعديل الإعدادات (اختياري)
+notepad .env
 
-1. **أنشئ حساب:** افتح Open WebUI على [http://localhost:3000](http://localhost:3000) وأنشئ حساب المدير.
-2. **ارفع الوثائق:** اذهب إلى `Documents` من القائمة الجانبية وارفع القوانين والأنظمة التي تريد أن يتعلمها النموذج.
-3. **ابدأ المحادثة:** ابدأ محادثة جديدة. يمكنك الآن سؤال النموذج عن أي شيء في الوثائق المرفوعة.
-4. **استخدام المعالج القانوني:** سيقوم المعالج تلقائياً بحقن تعريفات المصطلحات القانونية في محادثاتك.
+# 4. بناء وتشغيل جميع الخدمات
+docker-compose up -d --build
 
-## 🛣️ خارطة الطريق
+# 5. التحقق من حالة الخدمات
+docker-compose ps
+```
 
-- [ ] تحسين واجهة رفع الملفات.
-- [ ] إضافة دعم لتوليد التقارير بصيغة Word/PDF.
-- [ ] ربط أعمق مع n8n لإنشاء تقارير دورية.
-- [ ] تطوير واجهة لإدارة المعجم القانوني.
+---
 
-## 🤝 المساهمة
+## الوصول إلى الخدمات
 
-نرحب بجميع المساهمات. يرجى فتح Issue لمناقشة الأفكار أو Pull Request لإضافة تحسينات.
+| الخدمة | الرابط | بيانات الدخول الافتراضية |
+|---|---|---|
+| Open WebUI | http://localhost:3000 | أنشئ حساباً عند أول تشغيل |
+| n8n | http://localhost:5678 | admin / admin123 |
+| Code Server | http://localhost:8443 | salehsaas123 |
+| ChromaDB API | http://localhost:8010 | — |
+| mcpo API | http://localhost:8020 | — |
+
+---
+
+## خط أنابيب استيعاب المعرفة (v3.0)
+
+يعمل **Knowledge Watcher** تلقائياً على مراقبة مجلد `knowledge_inbox` وإدخال الوثائق إلى قاعدة البيانات المتجهية دون أي تدخل يدوي.
+
+```
+knowledge_inbox/          ← ضع الملفات هنا
+knowledge_processing/     ← قيد المعالجة (تلقائي)
+knowledge_archive/        ← مؤرشف بنجاح (مرتب بالتاريخ)
+knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
+```
+
+**الصيغ المدعومة:** PDF، DOCX، XLSX، PPTX، TXT، CSV، MD، وأكثر من 1000 صيغة أخرى عبر Apache Tika.
+
+**آلية العمل:**
+
+1. يكتشف الملف في `knowledge_inbox` خلال 10 ثوانٍ
+2. يستخرج النص عبر Apache Tika (مع دعم كامل للخطوط العربية والغربية)
+3. يقسّم النص إلى أجزاء (400 حرف، تداخل 40)
+4. يولّد التضمينات عبر Ollama (`nomic-embed-text:latest`)
+5. يخزّن في ChromaDB v2 API (مجموعة: `saleh_legal_knowledge`)
+6. يؤرشف الملف في `knowledge_archive/YYYY-MM-DD/`
+
+---
+
+## أدوات MCP المتاحة
+
+يوفر **mcpo** ثلاثة أدوات قابلة للاستخدام مباشرة من Open WebUI:
+
+| الأداة | الوصف | الوظائف الرئيسية |
+|---|---|---|
+| `ollama_model_builder` | إدارة نماذج Ollama | تحميل، حذف، عرض النماذج |
+| `saleh_legal_rag` | بحث قانوني متقدم | بحث دلالي في الوثائق السعودية |
+| `n8n_builder` | بناء سير العمل | إنشاء، تفعيل، تنفيذ workflows في n8n |
+
+**إعداد mcpo في Open WebUI:**
+
+1. اذهب إلى: Settings → Tools → Add Tool
+2. أدخل URL: `http://localhost:8020`
+3. أدخل API Key: `salehsaas-mcpo-key`
+
+---
+
+## إعدادات n8n API
+
+```
+URL:     http://localhost:5678
+API Key: salehsaas-n8n-api-key
+```
+
+يمكن للنموذج الذكي إنشاء وإدارة workflows تلقائياً عبر أداة `n8n_builder` من خلال المحادثة الطبيعية في Open WebUI.
+
+---
+
+## هيكل المشروع
+
+```
+SaleHSaaS3/
+├── config/
+│   ├── mcpo/config.json          # إعدادات أدوات MCP (3 أدوات)
+│   ├── postgres/init.sql         # تهيئة قاعدة البيانات
+│   └── searxng/settings.yml      # إعدادات البحث المحلي
+├── docker/
+│   ├── mcpo/Dockerfile           # صورة mcpo المخصصة
+│   └── code-server/              # إعدادات Code Server
+├── docs/guides/                  # توثيق تقني مفصّل
+├── knowledge_inbox/              # مجلد إدخال الوثائق
+├── knowledge_archive/            # أرشيف الوثائق المعالجة
+├── knowledge_failed/             # الوثائق الفاشلة + تقارير الأخطاء
+├── n8n/workflows/                # قوالب سير العمل الجاهزة
+├── pipelines/                    # معالجات Open WebUI
+│   ├── saleh_legal_pipeline.py   # خط أنابيب RAG القانوني
+│   └── saleh_legal_rag.py        # محرك البحث الدلالي
+├── saleh_brain/
+│   └── glossary/                 # المعجم القانوني السعودي
+├── scripts/windows/              # سكريبتات التثبيت والإدارة
+├── services/
+│   └── knowledge_watcher/        # خدمة استيعاب الوثائق v3.0
+│       ├── Dockerfile
+│       └── watcher.py
+├── tools/mcp/
+│   ├── legal_rag_mcp.py          # أداة RAG القانوني
+│   ├── n8n_builder.py            # أداة بناء n8n workflows
+│   └── ollama_model_builder.py   # أداة إدارة Ollama
+├── Dockerfile.tika               # صورة Tika مع خطوط Microsoft
+├── docker-compose.yml            # تكوين جميع الخدمات
+├── .env.example                  # نموذج متغيرات البيئة
+├── CHANGELOG.md                  # سجل التغييرات
+└── ARCHITECTURE.md               # المخطط المعماري
+```
+
+---
+
+## الأوامر الشائعة
+
+```powershell
+# تشغيل جميع الخدمات
+docker-compose up -d
+
+# إيقاف جميع الخدمات
+docker-compose down
+
+# عرض سجلات خدمة معينة (مثال: Knowledge Watcher)
+docker logs salehsaas_watcher --tail 50 -f
+
+# إعادة بناء خدمة معينة
+docker-compose build --no-cache tika
+docker-compose up -d tika
+
+# التحقق من حالة ChromaDB
+Invoke-WebRequest -Uri "http://localhost:8010/api/v2/heartbeat"
+
+# التحقق من n8n API
+Invoke-WebRequest -Uri "http://localhost:5678/api/v1/workflows" `
+  -Headers @{"X-N8N-API-KEY"="salehsaas-n8n-api-key"}
+
+# سحب آخر التحديثات وإعادة التشغيل
+git pull origin main
+docker-compose up -d --build
+```
+
+---
+
+## استكشاف الأخطاء
+
+| المشكلة | الحل |
+|---|---|
+| Knowledge Watcher لا يعالج الملفات | `docker logs salehsaas_watcher --tail 30` |
+| ChromaDB لا يستجيب | `docker-compose restart chromadb` |
+| Ollama لا يولّد تضمينات | تأكد من تشغيل Ollama على Windows وتحميل `nomic-embed-text` |
+| تحذيرات خطوط Tika | تم الحل في v4.0 — أعد بناء Tika: `docker-compose build --no-cache tika` |
+| mcpo لا يتصل | `docker logs salehsaas_mcpo --tail 20` |
+| n8n API لا يستجيب | تحقق من المتغير `N8N_PUBLIC_API_DISABLED=false` في docker-compose.yml |
+
+---
+
+## الأمان والخصوصية
+
+- جميع البيانات تُعالج **محلياً** — لا إرسال خارجي من أي نوع
+- Ollama يعمل على الجهاز المحلي مباشرة
+- ChromaDB مخزّن في Docker volume محلي
+- لا يوجد اتصال بأي خدمة سحابية خارجية
+
+---
+
+## التوثيق التقني
+
+| الملف | المحتوى |
+|---|---|
+| [CHANGELOG.md](./CHANGELOG.md) | سجل جميع التغييرات والإصدارات |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | المخطط المعماري التفصيلي |
+| [INSTALL_GUIDE.md](./INSTALL_GUIDE.md) | دليل التثبيت المفصّل |
+| [MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md) | دليل إعداد أدوات MCP |
+| [docs/guides/knowledge_watcher.md](./docs/guides/knowledge_watcher.md) | توثيق خدمة استيعاب الوثائق |
+
+---
+
+<div align="center">
+
+**صُنع بفخر في مكة المكرمة 🕋 — جميع الحقوق محفوظة © 2026 SaleH SaaS**
+
+</div>
