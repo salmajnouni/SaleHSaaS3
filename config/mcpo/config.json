@@ -7,6 +7,14 @@
     "saleh_legal_rag": {
       "command": "python3",
       "args": ["/tools/mcp/legal_rag_mcp.py"]
+    },
+    "n8n_builder": {
+      "command": "python3",
+      "args": ["/tools/mcp/n8n_builder.py"],
+      "env": {
+        "N8N_BASE_URL": "http://n8n:5678",
+        "N8N_API_KEY": "salehsaas-n8n-api-key"
+      }
     }
   }
 }
