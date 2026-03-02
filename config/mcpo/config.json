@@ -13,7 +13,7 @@
       "args": ["/tools/mcp/n8n_builder.py"],
       "env": {
         "N8N_BASE_URL": "http://n8n:5678",
-        "N8N_API_KEY": "salehsaas-n8n-api-key"
+        "N8N_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYzJmNWJmYmYtZTNhMi00ZjI0LWJhZDYtYzhmNGNhNDUwMmY5IiwiaWF0IjoxNzcyNDkwMTYzLCJleHAiOjE3NzUwNzcyMDB9.r8pFpuSpx86VH5Gx9Z8WpKpLwdLKxsLrrdhLjoiG6LU"
       }
     }
   }
