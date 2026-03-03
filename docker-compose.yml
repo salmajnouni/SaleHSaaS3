@@ -254,6 +254,12 @@ services:
       - ./knowledge_inbox:/knowledge_inbox
       - ./knowledge_processed:/knowledge_processed
       - ./n8n/workflows:/home/node/.n8n/workflows
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
@@ -337,7 +343,8 @@ services:
     container_name: salehsaas_n8n_bridge
     restart: unless-stopped
     depends_on:
-      - n8n
+      n8n:
+        condition: service_healthy
     environment:
       - PORT=3333
       - BEARER_TOKEN=${BRIDGE_API_KEY:-salehsaas-bridge-key}
