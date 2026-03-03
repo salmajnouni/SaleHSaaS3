@@ -1,0 +1,181 @@
+{
+  "name": "🤖 مساعد القوانين السعودية - Saudi Laws Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "مرحباً! أنا مساعد القوانين السعودية. يمكنني مساعدتك في:\n- البحث في الأنظمة والتشريعات السعودية\n- شرح المواد القانونية\n- الإجابة على الاستفسارات القانونية\n\nما الذي تودّ الاستفسار عنه؟",
+        "options": {}
+      },
+      "id": "chat-trigger-001",
+      "name": "💬 Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "saleh-legal-chat-001"
+    },
+    {
+      "parameters": {
+        "jsCode": "// استخراج رسالة المستخدم وإعداد طلب البحث\nconst message = $input.first().json.chatInput || $input.first().json.message || '';\nconst sessionId = $input.first().json.sessionId || 'default';\n\nreturn [{\n  json: {\n    query: message,\n    sessionId: sessionId,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "extract-query-001",
+      "name": "📝 استخراج السؤال",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/query",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query_texts\": [\"{{ $json.query }}\"],\n  \"n_results\": 5,\n  \"include\": [\"documents\", \"metadatas\", \"distances\"]\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "chromadb-search-001",
+      "name": "🔍 البحث في ChromaDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// تجهيز السياق من نتائج ChromaDB\nconst query = $('📝 استخراج السؤال').first().json.query;\nconst chromaResult = $input.first().json;\n\nlet context = '';\nlet sources = [];\n\ntry {\n  const documents = chromaResult.documents?.[0] || [];\n  const metadatas = chromaResult.metadatas?.[0] || [];\n  const distances = chromaResult.distances?.[0] || [];\n  \n  if (documents.length > 0) {\n    context = documents\n      .filter((doc, i) => distances[i] < 1.5) // فلترة النتائج ذات الصلة\n      .map((doc, i) => {\n        const meta = metadatas[i] || {};\n        const source = meta.source_name || meta.source || 'مصدر قانوني';\n        sources.push(source);\n        return `[${source}]:\\n${doc}`;\n      })\n      .join('\\n\\n---\\n\\n');\n  }\n} catch(e) {\n  context = '';\n}\n\nconst systemPrompt = `أنت مساعد قانوني متخصص في الأنظمة والتشريعات السعودية.\nأجب على الأسئلة بدقة واحترافية باللغة العربية.\nاستند إلى النصوص القانونية المقدمة إذا كانت متاحة.\nإذا لم تجد إجابة في النصوص، وضّح ذلك وقدّم معلومات عامة مفيدة.\n\n${context ? `السياق القانوني المتاح:\\n${context}` : 'لا توجد نصوص قانونية محددة متاحة لهذا السؤال.'}`;\n\nreturn [{\n  json: {\n    query: query,\n    systemPrompt: systemPrompt,\n    hasContext: context.length > 0,\n    sources: [...new Set(sources)]\n  }\n}];"
+      },
+      "id": "prepare-context-001",
+      "name": "📚 تجهيز السياق القانوني",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3.1:8b\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"{{ $json.systemPrompt }}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.query }}\"\n    }\n  ],\n  \"stream\": false,\n  \"options\": {\n    \"temperature\": 0.3,\n    \"num_predict\": 2048\n  }\n}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "ollama-chat-001",
+      "name": "🧠 Ollama: توليد الإجابة",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// تنسيق الإجابة النهائية\nconst ollamaResponse = $input.first().json;\nconst contextData = $('📚 تجهيز السياق القانوني').first().json;\n\nlet answer = '';\n\ntry {\n  answer = ollamaResponse?.message?.content || ollamaResponse?.response || '';\n} catch(e) {\n  answer = '';\n}\n\nif (!answer) {\n  answer = 'عذراً، حدث خطأ في معالجة طلبك. يرجى المحاولة مرة أخرى.';\n}\n\n// إضافة المصادر إذا وُجدت\nif (contextData.hasContext && contextData.sources?.length > 0) {\n  answer += `\\n\\n---\\n📚 **المصادر:** ${contextData.sources.join('، ')}`;\n}\n\nreturn [{\n  json: {\n    output: answer\n  }\n}];"
+      },
+      "id": "format-response-001",
+      "name": "✅ تنسيق الإجابة",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "💬 Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "📝 استخراج السؤال",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📝 استخراج السؤال": {
+      "main": [
+        [
+          {
+            "node": "🔍 البحث في ChromaDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 البحث في ChromaDB": {
+      "main": [
+        [
+          {
+            "node": "📚 تجهيز السياق القانوني",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📚 تجهيز السياق القانوني": {
+      "main": [
+        [
+          {
+            "node": "🧠 Ollama: توليد الإجابة",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 Ollama: توليد الإجابة": {
+      "main": [
+        [
+          {
+            "node": "✅ تنسيق الإجابة",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Riyadh"
+  },
+  "tags": [
+    {
+      "name": "n8n-openai-bridge"
+    },
+    {
+      "name": "legal"
+    },
+    {
+      "name": "chat"
+    },
+    {
+      "name": "saudi-laws"
+    }
+  ],
+  "meta": {
+    "instanceId": "salehsaas"
+  }
+}

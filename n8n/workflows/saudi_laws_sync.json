@@ -16,7 +16,10 @@
       "name": "⏰ جدولة يومية (2 صباحاً)",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300]
+      "position": [
+        240,
+        300
+      ]
     },
     {
       "parameters": {
@@ -65,7 +68,10 @@
       "name": "⚙️ إعدادات النظام",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
@@ -81,7 +87,11 @@
       "name": "📥 سحب قائمة هيئة الخبراء",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [700, 180]
+      "position": [
+        700,
+        180
+      ],
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -97,27 +107,37 @@
       "name": "📰 سحب أعداد أم القرى",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [700, 420]
+      "position": [
+        700,
+        420
+      ],
+      "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// معالجة صفحة هيئة الخبراء واستخراج روابط الأنظمة\nconst html = $input.first().json.data || '';\n\n// استخراج روابط الوثائق النظامية\nconst linkRegex = /href=\"([^\"]*LawDetails[^\"]*)\"/gi;\nconst titleRegex = /<td[^>]*class=\"[^\"]*law-title[^\"]*\"[^>]*>([^<]+)<\\/td>/gi;\n\nconst links = [];\nlet match;\n\nwhile ((match = linkRegex.exec(html)) !== null) {\n  links.push({\n    source: 'boe',\n    source_name: 'هيئة الخبراء بمجلس الوزراء',\n    url: match[1].startsWith('http') ? match[1] : 'https://www.boe.gov.sa' + match[1],\n    fetched_at: new Date().toISOString()\n  });\n}\n\n// إذا لم يوجد روابط، استخدم صفحة البحث الرئيسية\nif (links.length === 0) {\n  // استخدام قائمة أنظمة معروفة كـ fallback\n  const knownLaws = [\n    { id: 'labor', name: 'نظام العمل', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=1' },\n    { id: 'companies', name: 'نظام الشركات', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=2' },\n    { id: 'procurement', name: 'نظام المنافسات والمشتريات الحكومية', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=3' },\n    { id: 'vat', name: 'نظام ضريبة القيمة المضافة', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=4' },\n    { id: 'anticorruption', name: 'نظام مكافحة الفساد', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=5' }\n  ];\n  \n  return knownLaws.map(law => ({\n    source: 'boe_fallback',\n    source_name: 'هيئة الخبراء بمجلس الوزراء',\n    law_id: law.id,\n    law_name: law.name,\n    url: law.url,\n    fetched_at: new Date().toISOString()\n  }));\n}\n\nreturn links.slice(0, 50); // أول 50 نظام"
+        "jsCode": "// معالجة صفحة هيئة الخبراء\nconst inputData = $input.first();\nconst html = inputData?.json?.data || inputData?.json?.body || '';\nconst knownLaws = [\n  { id: 'labor', name: 'نظام العمل', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=1' },\n  { id: 'companies', name: 'نظام الشركات', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=2' },\n  { id: 'procurement', name: 'نظام المنافسات والمشتريات الحكومية', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=3' },\n  { id: 'vat', name: 'نظام ضريبة القيمة المضافة', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=4' },\n  { id: 'anticorruption', name: 'نظام مكافحة الفساد', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=5' }\n];\n  return knownLaws.map(law => ({ json: { source: 'boe_fallback', source_name: 'هيئة الخبراء بمجلس الوزراء', law_id: law.id, law_name: law.name, url: law.url, fetched_at: new Date().toISOString() } }));\n}\nconst linkRegex = /href=\"([^\"]*LawDetails[^\"]*)\"/gi;\nconst links = [];\nlet match;\nwhile ((match = linkRegex.exec(html)) !== null) {\n  links.push({ json: { source: 'boe', source_name: 'هيئة الخبراء بمجلس الوزراء', url: match[1].startsWith(\"http\") ? match[1] : \"https://www.boe.gov.sa\" + match[1], fetched_at: new Date().toISOString() } });\n}\nreturn links.length > 0 ? links.slice(0, 50) : knownLaws.map(law => ({ json: { source: 'boe_fallback', source_name: 'هيئة الخبراء بمجلس الوزراء', law_id: law.id, law_name: law.name, url: law.url, fetched_at: new Date().toISOString() } }));"
       },
       "id": "parse-boe",
       "name": "🔍 تحليل صفحة هيئة الخبراء",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [940, 180]
+      "position": [
+        940,
+        180
+      ]
     },
     {
       "parameters": {
-        "jsCode": "// معالجة صفحة أم القرى واستخراج الإصدارات الجديدة\nconst html = $input.first().json.data || '';\n\n// استخراج روابط الأعداد\nconst issueRegex = /href=\"([^\"]*issue[^\"]*|[^\"]*عدد[^\"]*)\"/gi;\nconst dateRegex = /(\\d{4}-\\d{2}-\\d{2}|\\d{1,2}\\/\\d{1,2}\\/\\d{4})/g;\n\nconst issues = [];\nlet match;\n\nwhile ((match = issueRegex.exec(html)) !== null) {\n  issues.push({\n    source: 'uqn',\n    source_name: 'جريدة أم القرى الرسمية',\n    url: match[1].startsWith('http') ? match[1] : 'https://www.uqn.gov.sa' + match[1],\n    fetched_at: new Date().toISOString(),\n    type: 'official_gazette'\n  });\n}\n\n// Fallback: استخدام RSS أو الأعداد الأخيرة\nif (issues.length === 0) {\n  // توليد روابط الأعداد الأخيرة بناءً على التاريخ الهجري الحالي\n  const recentIssues = [];\n  const today = new Date();\n  \n  for (let i = 0; i < 4; i++) {\n    const issueDate = new Date(today);\n    issueDate.setDate(today.getDate() - (i * 7));\n    recentIssues.push({\n      source: 'uqn_fallback',\n      source_name: 'جريدة أم القرى الرسمية',\n      url: `https://www.uqn.gov.sa/issues`,\n      week_offset: i,\n      approximate_date: issueDate.toISOString().split('T')[0],\n      fetched_at: new Date().toISOString(),\n      type: 'official_gazette'\n    });\n  }\n  return recentIssues;\n}\n\nreturn issues.slice(0, 10); // آخر 10 أعداد"
+        "jsCode": "// معالجة صفحة أم القرى\nconst inputData = $input.first();\nconst html = inputData?.json?.data || inputData?.json?.body || '';\nconst today = new Date();\nconst fallback = Array.from({length: 4}, (_, i) => { const d = new Date(today); d.setDate(today.getDate() - i*7); return { json: { source: 'uqn_fallback', source_name: 'جريدة أم القرى الرسمية', url: 'https://www.uqn.gov.sa/issues', approximate_date: d.toISOString().split(\"T\")[0], fetched_at: new Date().toISOString(), type: 'official_gazette' } }; });\nconst issueRegex = /href=\"([^\"]*issue[^\"]*)\"/gi;\nconst issues = [];\nlet match;\nwhile ((match = issueRegex.exec(html)) !== null) {\n  issues.push({ json: { source: 'uqn', source_name: 'جريدة أم القرى الرسمية', url: match[1].startsWith(\"http\") ? match[1] : \"https://www.uqn.gov.sa\" + match[1], fetched_at: new Date().toISOString(), type: 'official_gazette' } });\n}\nreturn issues.length > 0 ? issues.slice(0, 10) : fallback;"
       },
       "id": "parse-uqn",
       "name": "📋 تحليل صفحة أم القرى",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [940, 420]
+      "position": [
+        940,
+        420
+      ]
     },
     {
       "parameters": {
@@ -129,7 +149,10 @@
       "name": "🔗 دمج المصادر",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [1180, 300]
+      "position": [
+        1180,
+        300
+      ]
     },
     {
       "parameters": {
@@ -151,8 +174,12 @@
       "name": "📄 تحميل الوثيقة",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1420, 300],
-      "onError": "continueRegularOutput"
+      "position": [
+        1420,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -173,8 +200,12 @@
       "name": "📑 Tika: استخراج النص",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1660, 300],
-      "onError": "continueRegularOutput"
+      "position": [
+        1660,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -184,7 +215,10 @@
       "name": "✂️ تقسيم النص إلى Chunks",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1900, 300]
+      "position": [
+        1900,
+        300
+      ]
     },
     {
       "parameters": {
@@ -211,8 +245,12 @@
       "name": "🧠 Ollama: توليد Embedding",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2140, 300],
-      "onError": "continueRegularOutput"
+      "position": [
+        2140,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -222,7 +260,10 @@
       "name": "✅ التحقق من الـ Embedding",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2380, 300]
+      "position": [
+        2380,
+        300
+      ]
     },
     {
       "parameters": {
@@ -257,8 +298,12 @@
       "name": "💾 ChromaDB: حفظ/تحديث",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2620, 300],
-      "onError": "continueRegularOutput"
+      "position": [
+        2620,
+        300
+      ],
+      "onError": "continueRegularOutput",
+      "continueOnFail": true
     },
     {
       "parameters": {
@@ -268,7 +313,10 @@
       "name": "📊 إنشاء تقرير المزامنة",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2860, 300]
+      "position": [
+        2860,
+        300
+      ]
     },
     {
       "parameters": {
@@ -278,7 +326,10 @@
       "name": "🗄️ إنشاء مجموعة ChromaDB",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [460, 520]
+      "position": [
+        460,
+        520
+      ]
     },
     {
       "parameters": {
@@ -307,100 +358,163 @@
       "name": "🔎 تصفية الوثائق الفارغة",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [2140, 520]
+      "position": [
+        2140,
+        520
+      ]
     }
   ],
   "connections": {
     "⏰ جدولة يومية (2 صباحاً)": {
       "main": [
         [
-          { "node": "⚙️ إعدادات النظام", "type": "main", "index": 0 }
+          {
+            "node": "⚙️ إعدادات النظام",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "⚙️ إعدادات النظام": {
       "main": [
         [
-          { "node": "🗄️ إنشاء مجموعة ChromaDB", "type": "main", "index": 0 },
-          { "node": "📥 سحب قائمة هيئة الخبراء", "type": "main", "index": 0 },
-          { "node": "📰 سحب أعداد أم القرى", "type": "main", "index": 0 }
+          {
+            "node": "🗄️ إنشاء مجموعة ChromaDB",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📥 سحب قائمة هيئة الخبراء",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📰 سحب أعداد أم القرى",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "📥 سحب قائمة هيئة الخبراء": {
       "main": [
         [
-          { "node": "🔍 تحليل صفحة هيئة الخبراء", "type": "main", "index": 0 }
+          {
+            "node": "🔍 تحليل صفحة هيئة الخبراء",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "📰 سحب أعداد أم القرى": {
       "main": [
         [
-          { "node": "📋 تحليل صفحة أم القرى", "type": "main", "index": 0 }
+          {
+            "node": "📋 تحليل صفحة أم القرى",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "🔍 تحليل صفحة هيئة الخبراء": {
       "main": [
         [
-          { "node": "🔗 دمج المصادر", "type": "main", "index": 0 }
+          {
+            "node": "🔗 دمج المصادر",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "📋 تحليل صفحة أم القرى": {
       "main": [
         [
-          { "node": "🔗 دمج المصادر", "type": "main", "index": 1 }
+          {
+            "node": "🔗 دمج المصادر",
+            "type": "main",
+            "index": 1
+          }
         ]
       ]
     },
     "🔗 دمج المصادر": {
       "main": [
         [
-          { "node": "📄 تحميل الوثيقة", "type": "main", "index": 0 }
+          {
+            "node": "📄 تحميل الوثيقة",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "📄 تحميل الوثيقة": {
       "main": [
         [
-          { "node": "📑 Tika: استخراج النص", "type": "main", "index": 0 }
+          {
+            "node": "📑 Tika: استخراج النص",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "📑 Tika: استخراج النص": {
       "main": [
         [
-          { "node": "✂️ تقسيم النص إلى Chunks", "type": "main", "index": 0 }
+          {
+            "node": "✂️ تقسيم النص إلى Chunks",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "✂️ تقسيم النص إلى Chunks": {
       "main": [
         [
-          { "node": "🧠 Ollama: توليد Embedding", "type": "main", "index": 0 }
+          {
+            "node": "🧠 Ollama: توليد Embedding",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "🧠 Ollama: توليد Embedding": {
       "main": [
         [
-          { "node": "✅ التحقق من الـ Embedding", "type": "main", "index": 0 }
+          {
+            "node": "✅ التحقق من الـ Embedding",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "✅ التحقق من الـ Embedding": {
       "main": [
         [
-          { "node": "💾 ChromaDB: حفظ/تحديث", "type": "main", "index": 0 }
+          {
+            "node": "💾 ChromaDB: حفظ/تحديث",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "💾 ChromaDB: حفظ/تحديث": {
       "main": [
         [
-          { "node": "📊 إنشاء تقرير المزامنة", "type": "main", "index": 0 }
+          {
+            "node": "📊 إنشاء تقرير المزامنة",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -414,9 +528,18 @@
   },
   "staticData": null,
   "tags": [
-    { "name": "legal", "createdAt": "2026-03-03" },
-    { "name": "saudi-laws", "createdAt": "2026-03-03" },
-    { "name": "rag", "createdAt": "2026-03-03" }
+    {
+      "name": "legal",
+      "createdAt": "2026-03-03"
+    },
+    {
+      "name": "saudi-laws",
+      "createdAt": "2026-03-03"
+    },
+    {
+      "name": "rag",
+      "createdAt": "2026-03-03"
+    }
   ],
   "triggerCount": 1,
   "updatedAt": "2026-03-03T00:00:00.000Z",
