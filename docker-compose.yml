@@ -3,15 +3,16 @@
 # 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
 #
 # الهيكل المبسّط - 9 حاويات:
-#   1. postgres      - قاعدة البيانات الرئيسية
-#   2. chromadb      - قاعدة البيانات المتجهية (القوانين والوثائق)
-#   3. open_webui    - الواجهة الرئيسية + RAG + Pipelines + Code Execution
-#   4. pipelines     - المعالج القانوني المخصص
-#   5. tika          - استخراج النصوص من الوثائق
-#   6. searxng       - البحث المحلي على الإنترنت
-#   7. n8n           - الأتمتة والنشر على الميديا
-#   8. code_server   - بيئة التطوير من المتصفح
-#   9. mcpo          - MCP-to-OpenAPI Proxy (Ollama Model Builder + Legal RAG)
+#   1. postgres         - قاعدة البيانات الرئيسية
+#   2. chromadb         - قاعدة البيانات المتجهية (القوانين والوثائق)
+#   3. open_webui       - الواجهة الرئيسية + RAG + Pipelines + Code Execution
+#   4. pipelines        - المعالج القانوني المخصص
+#   5. tika             - استخراج النصوص من الوثائق
+#   6. searxng          - البحث المحلي على الإنترنت
+#   7. n8n              - الأتمتة والنشر على الميديا
+#   8. code_server      - بيئة التطوير من المتصفح
+#   9. knowledge_watcher - معالج الوثائق التلقائي
+#  10. n8n_bridge       - n8n OpenAI Bridge (n8n workflows كنماذج OpenAI)
 #
 # Ollama يعمل على Windows مباشرة (host.docker.internal:11434)
 # جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
@@ -95,7 +96,7 @@ services:
         condition: service_healthy
       chromadb:
         condition: service_started
-      mcpo:
+      n8n_bridge:
         condition: service_started
     environment:
       # ── Ollama على Windows ──
@@ -140,10 +141,11 @@ services:
       - OPENAI_API_BASE_URL=http://pipelines:9099
       - OPENAI_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
 
-      # ── MCP Tool Servers (Global - pre-configured via env var) ──
-      # يضيف أدوات MCP تلقائياً كـ Global Tool Servers بدون إعداد يدوي
-      # المسارات الصحيحة: /n8n_builder و /ollama_model_builder و /saleh_legal_rag
-      - TOOL_SERVER_CONNECTIONS=[{"url":"http://mcpo:8000","path":"/n8n_builder","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"n8n Builder","description":"Create, run and manage n8n workflows"}},{"url":"http://mcpo:8000","path":"/ollama_model_builder","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"Ollama Model Builder","description":"Manage Ollama AI models"}},{"url":"http://mcpo:8000","path":"/saleh_legal_rag","auth_type":"bearer","key":"${MCPO_API_KEY:-salehsaas-mcpo-key}","config":{"enable":true},"info":{"name":"Legal RAG","description":"Search Saudi legal documents"}}]
+      # ── n8n OpenAI Bridge - n8n workflows كنماذج OpenAI إضافية ──
+      # يُضاف كـ OpenAI-compatible connection في Open WebUI
+      # الاتصال يتم من Admin Settings → Connections → Add OpenAI Connection
+      # URL: http://n8n_bridge:3333  |  API Key: ${BRIDGE_API_KEY:-salehsaas-bridge-key}
+      # بعد الإضافة تظهر workflows المُعلَّمة بـ n8n-openai-bridge كنماذج في القائمة
 
     volumes:
       - open_webui_data:/app/backend/data
@@ -246,7 +248,7 @@ services:
       # N8N_RUNNERS_ENABLED removed - deprecated in n8n v2.9+
       # N8N_RUNNERS_MODE=internal (default) - JS runner only, Python not needed
       - N8N_PUBLIC_API_DISABLED=false
-      - N8N_API_KEY=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYzJmNWJmYmYtZTNhMi00ZjI0LWJhZDYtYzhmNGNhNDUwMmY5IiwiaWF0IjoxNzcyNDkwMTYzLCJleHAiOjE3NzUwNzcyMDB9.r8pFpuSpx86VH5Gx9Z8WpKpLwdLKxsLrrdhLjoiG6LU}
+      - N8N_API_KEY=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./knowledge_inbox:/knowledge_inbox
@@ -326,32 +328,32 @@ services:
       - "salehsaas.service=knowledge-watcher"
       - "salehsaas.description=Professional ingestion pipeline - inbox/processing/archive/failed"
 
-  # ── 10. MCPO - MCP-to-OpenAPI Proxy ──────────────────────────────────────
-  # يحوّل أدوات MCP إلى OpenAPI REST endpoints
-  # يتيح لـ Open WebUI استخدام:
-  #   - Ollama Model Builder: إدارة النماذج (تحميل، عرض، معلومات)
-  #   - Legal RAG Tool: بحث قانوني متقدم في الوثائق السعودية
-  #   - n8n Builder: إنشاء وتشغيل وإدارة workflows في n8n
-  mcpo:
-    build:
-      context: .
-      dockerfile: docker/mcpo/Dockerfile
-    container_name: salehsaas_mcpo
+  # ── 10. n8n OpenAI Bridge - n8n workflows كنماذج OpenAI ────────────────
+  # يُحوّل n8n workflows إلى نماذج OpenAI-compatible
+  # كل workflow مُعلَّم بـ n8n-openai-bridge يظهر كنموذج في Open WebUI
+  # يدعم: Streaming، Session Memory، User Context، File Uploads
+  n8n_bridge:
+    image: ghcr.io/sveneisenschmidt/n8n-openai-bridge:latest
+    container_name: salehsaas_n8n_bridge
     restart: unless-stopped
-    command: >
-      --port 8000
-      --api-key "${MCPO_API_KEY:-salehsaas-mcpo-key}"
-      --config /config/config.json
-    volumes:
-      - ./config/mcpo:/config:ro
-      - ./tools/mcp:/tools/mcp:ro
+    depends_on:
+      - n8n
+    environment:
+      - PORT=3333
+      - BEARER_TOKEN=${BRIDGE_API_KEY:-salehsaas-bridge-key}
+      - MODEL_LOADER_TYPE=n8n-api
+      - N8N_BASE_URL=http://n8n:5678
+      - N8N_API_BEARER_TOKEN=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA}
+      - AUTO_DISCOVERY_TAG=n8n-openai-bridge
+      - AUTO_DISCOVERY_POLL_INTERVAL=60
+      - LOG_REQUESTS=false
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.60
     ports:
-      - "${MCPO_PORT:-8020}:8000"
+      - "${BRIDGE_PORT:-3333}:3333"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     labels:
-      - "salehsaas.service=mcpo"
-      - "salehsaas.description=MCP-to-OpenAPI Proxy - Ollama Model Builder + Legal RAG + n8n Builder"
+      - "salehsaas.service=n8n-bridge"
+      - "salehsaas.description=n8n OpenAI Bridge - n8n workflows كنماذج في Open WebUI"
