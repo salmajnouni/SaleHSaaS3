@@ -11,7 +11,10 @@
       "name": "💬 Chat Trigger",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.1,
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "webhookId": "saleh-legal-chat-001"
     },
     {
@@ -22,7 +25,10 @@
       "name": "📝 استخراج السؤال",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [460, 300]
+      "position": [
+        460,
+        300
+      ]
     },
     {
       "parameters": {
@@ -48,7 +54,10 @@
       "name": "🔍 البحث في ChromaDB",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [680, 300],
+      "position": [
+        680,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -59,7 +68,10 @@
       "name": "📚 تجهيز السياق القانوني",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 300]
+      "position": [
+        900,
+        300
+      ]
     },
     {
       "parameters": {
@@ -85,18 +97,24 @@
       "name": "🧠 Ollama: توليد الإجابة",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 300],
+      "position": [
+        1120,
+        300
+      ],
       "continueOnFail": true
     },
     {
       "parameters": {
-        "jsCode": "// تنسيق الإجابة النهائية\nconst ollamaResponse = $input.first().json;\nconst contextData = $('📚 تجهيز السياق القانوني').first().json;\n\nlet answer = '';\n\ntry {\n  answer = ollamaResponse?.message?.content || ollamaResponse?.response || '';\n} catch(e) {\n  answer = '';\n}\n\nif (!answer) {\n  answer = 'عذراً، حدث خطأ في معالجة طلبك. يرجى المحاولة مرة أخرى.';\n}\n\n// إضافة المصادر إذا وُجدت\nif (contextData.hasContext && contextData.sources?.length > 0) {\n  answer += `\\n\\n---\\n📚 **المصادر:** ${contextData.sources.join('، ')}`;\n}\n\nreturn [{\n  json: {\n    output: answer\n  }\n}];"
+        "jsCode": "// تنسيق الإجابة النهائية\nconst rawInput = $input.first().json;\n// n8n HTTP Request node يضع الاستجابة في .data أو مباشرة في json\nconst ollamaResponse = rawInput?.data || rawInput;\nconst contextData = $('📚 تجهيز السياق القانوني').first().json;\n\nlet answer = '';\ntry {\n  // /api/chat يرجع: { message: { content: \"...\" } }\n  // /api/generate يرجع: { response: \"...\" }\n  answer = ollamaResponse?.message?.content \n        || ollamaResponse?.response \n        || '';\n} catch(e) {\n  answer = '';\n}\n\nif (!answer || answer.trim() === '') {\n  answer = 'عذراً، لم أتمكن من توليد إجابة. يرجى المحاولة مرة أخرى.';\n}\n\n// إضافة المصادر إذا وُجدت\nif (contextData && contextData.hasContext && contextData.sources && contextData.sources.length > 0) {\n  answer += '\\n\\n---\\n📚 **المصادر:** ' + contextData.sources.join('، ');\n}\n\nreturn [{\n  json: {\n    output: answer\n  }\n}];"
       },
       "id": "format-response-001",
       "name": "✅ تنسيق الإجابة",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1340, 300]
+      "position": [
+        1340,
+        300
+      ]
     }
   ],
   "connections": {
