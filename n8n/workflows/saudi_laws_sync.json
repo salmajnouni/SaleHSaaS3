@@ -80,7 +80,8 @@
           "timeout": 30000,
           "headers": {
             "User-Agent": "Mozilla/5.0 (compatible; SaleH-SaaS/4.0; Legal Research Bot)"
-          }
+          },
+          "allowUnauthorizedCerts": true
         }
       },
       "id": "fetch-boe",
@@ -100,7 +101,8 @@
           "timeout": 30000,
           "headers": {
             "User-Agent": "Mozilla/5.0 (compatible; SaleH-SaaS/4.0; Legal Research Bot)"
-          }
+          },
+          "allowUnauthorizedCerts": true
         }
       },
       "id": "fetch-uqn",
@@ -165,7 +167,8 @@
             "response": {
               "responseFormat": "text"
             }
-          }
+          },
+          "allowUnauthorizedCerts": true
         }
       },
       "id": "fetch-document",
