@@ -307,17 +307,37 @@
       ]
     },
     {
-      "parameters": {
-        "jsCode": "// إنشاء مجموعة saleh_legal_knowledge في ChromaDB إذا لم تكن موجودة\nconst chromaUrl = 'http://chromadb:8000';\n\ntry {\n  // Check if collection exists\n  const checkResp = await fetch(`${chromaUrl}/api/v1/collections/saleh_legal_knowledge`);\n  \n  if (checkResp.status === 200) {\n    const col = await checkResp.json();\n    return [{ json: { status: 'exists', collection: col.name, message: 'المجموعة موجودة بالفعل' } }];\n  }\n  \n  // Create collection\n  const createResp = await fetch(`${chromaUrl}/api/v1/collections`, {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({\n      name: 'saleh_legal_knowledge',\n      metadata: {\n        description: 'القوانين والأنظمة السعودية',\n        created_by: 'SaleH-SaaS',\n        version: '4.0'\n      }\n    })\n  });\n  \n  if (createResp.status === 200 || createResp.status === 201) {\n    const result = await createResp.json();\n    return [{ json: { status: 'created', collection: result.name, message: 'تم إنشاء المجموعة بنجاح' } }];\n  } else {\n    const errText = await createResp.text();\n    // If already exists (409), treat as success\n    if (createResp.status === 409 || errText.includes('already exists')) {\n      return [{ json: { status: 'exists', message: 'المجموعة موجودة بالفعل' } }];\n    }\n    return [{ json: { status: 'error', code: createResp.status, message: errText } }];\n  }\n} catch (err) {\n  return [{ json: { status: 'error', message: err.message } }];\n}"
-      },
       "id": "ensure-collection",
       "name": "🗄️ إنشاء مجموعة ChromaDB",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         460,
         520
-      ]
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ name: 'saleh_legal_knowledge', metadata: { description: 'القوانين والأنظمة السعودية', created_by: 'SaleH-SaaS' } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      }
     },
     {
       "parameters": {
