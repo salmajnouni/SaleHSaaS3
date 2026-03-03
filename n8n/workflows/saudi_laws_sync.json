@@ -58,7 +58,7 @@
             {
               "id": "collection",
               "name": "collection_name",
-              "value": "saudi_laws",
+              "value": "saleh_legal_knowledge",
               "type": "string"
             }
           ]
@@ -225,21 +225,20 @@
         "url": "http://host.docker.internal:11434/api/embeddings",
         "method": "POST",
         "sendBody": true,
-        "bodyParameters": {
+        "options": {
+          "timeout": 120000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
           "parameters": [
             {
-              "name": "model",
-              "value": "nomic-embed-text"
-            },
-            {
-              "name": "prompt",
-              "value": "={{ $json.text }}"
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
-        "options": {
-          "timeout": 120000
-        }
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"nomic-embed-text:latest\",\n  \"prompt\": \"{{ $json.text }}\"\n}"
       },
       "id": "get-embedding",
       "name": "🧠 Ollama: توليد Embedding",
@@ -267,32 +266,23 @@
     },
     {
       "parameters": {
-        "url": "http://chromadb:8000/api/v1/collections/saudi_laws/upsert",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/upsert",
         "method": "POST",
         "sendBody": true,
-        "bodyParameters": {
+        "options": {
+          "timeout": 30000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
           "parameters": [
             {
-              "name": "ids",
-              "value": "={{ [$json.doc_id + '_chunk_' + $json.chunk_index] }}"
-            },
-            {
-              "name": "embeddings",
-              "value": "={{ [$json.embedding] }}"
-            },
-            {
-              "name": "documents",
-              "value": "={{ [$json.text] }}"
-            },
-            {
-              "name": "metadatas",
-              "value": "={{ [{ law_name: $json.law_name, source: $json.source, source_name: $json.source_name, url: $json.url, chunk_index: $json.chunk_index, fetched_at: $json.fetched_at, processed_at: $json.processed_at }] }}"
+              "name": "Content-Type",
+              "value": "application/json"
             }
           ]
         },
-        "options": {
-          "timeout": 30000
-        }
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ids\": [\"{{ $json.doc_id }}_chunk_{{ $json.chunk_index }}\"],\n  \"embeddings\": [{{ JSON.stringify($json.embedding) }}],\n  \"documents\": [\"{{ $json.text.replace(/\"/g, '\\\\\"') }}\"],\n  \"metadatas\": [{\n    \"law_name\": \"{{ $json.law_name }}\",\n    \"source\": \"{{ $json.source }}\",\n    \"source_name\": \"{{ $json.source_name }}\",\n    \"url\": \"{{ $json.url }}\",\n    \"chunk_index\": {{ $json.chunk_index }},\n    \"fetched_at\": \"{{ $json.fetched_at }}\"\n  }]\n}"
       },
       "id": "upsert-chromadb",
       "name": "💾 ChromaDB: حفظ/تحديث",
@@ -307,7 +297,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// إنشاء تقرير نهائي بنتائج المزامنة\nconst items = $input.all();\n\nconst stats = {\n  total_processed: items.length,\n  successful: items.filter(i => i.json.status === 200 || i.json.upserted_count > 0).length,\n  failed: items.filter(i => i.json.error).length,\n  sources: {\n    boe: items.filter(i => i.json.source === 'boe' || i.json.source === 'boe_fallback').length,\n    uqn: items.filter(i => i.json.source === 'uqn' || i.json.source === 'uqn_fallback').length\n  },\n  run_date: new Date().toISOString(),\n  collection: 'saudi_laws'\n};\n\nconst report = `\n📊 تقرير مزامنة القوانين السعودية\n=====================================\n📅 تاريخ التشغيل: ${stats.run_date}\n📦 إجمالي الـ Chunks المعالجة: ${stats.total_processed}\n✅ نجح: ${stats.successful}\n❌ فشل: ${stats.failed}\n\n📚 المصادر:\n  - هيئة الخبراء (BOE): ${stats.sources.boe} chunk\n  - أم القرى (UQN): ${stats.sources.uqn} chunk\n\n💾 قاعدة البيانات: ChromaDB - مجموعة '${stats.collection}'\n=====================================\n`;\n\nreturn [{ json: { report, stats } }];"
+        "jsCode": "// إنشاء تقرير نهائي بنتائج المزامنة\nconst items = $input.all();\n\nconst stats = {\n  total_processed: items.length,\n  successful: items.filter(i => i.json.status === 200 || i.json.upserted_count > 0).length,\n  failed: items.filter(i => i.json.error).length,\n  sources: {\n    boe: items.filter(i => i.json.source === 'boe' || i.json.source === 'boe_fallback').length,\n    uqn: items.filter(i => i.json.source === 'uqn' || i.json.source === 'uqn_fallback').length\n  },\n  run_date: new Date().toISOString(),\n  collection: 'saleh_legal_knowledge'\n};\n\nconst report = `\n📊 تقرير مزامنة القوانين السعودية\n=====================================\n📅 تاريخ التشغيل: ${stats.run_date}\n📦 إجمالي الـ Chunks المعالجة: ${stats.total_processed}\n✅ نجح: ${stats.successful}\n❌ فشل: ${stats.failed}\n\n📚 المصادر:\n  - هيئة الخبراء (BOE): ${stats.sources.boe} chunk\n  - أم القرى (UQN): ${stats.sources.uqn} chunk\n\n💾 قاعدة البيانات: ChromaDB - مجموعة '${stats.collection}'\n=====================================\n`;\n\nreturn [{ json: { report, stats } }];"
       },
       "id": "generate-report",
       "name": "📊 إنشاء تقرير المزامنة",
@@ -320,7 +310,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// إنشاء مجموعة saudi_laws في ChromaDB إذا لم تكن موجودة\nconst response = await $helpers.httpRequest({\n  method: 'POST',\n  url: 'http://chromadb:8000/api/v1/collections',\n  body: JSON.stringify({\n    name: 'saudi_laws',\n    metadata: {\n      description: 'القوانين والأنظمة السعودية - هيئة الخبراء وأم القرى',\n      created_by: 'SaleH SaaS',\n      embedding_model: 'nomic-embed-text'\n    }\n  }),\n  headers: { 'Content-Type': 'application/json' }\n}).catch(e => ({ status: 'already_exists', message: e.message }));\n\nreturn [{ json: { collection_status: response.status || 'created', collection_name: 'saudi_laws' } }];"
+        "jsCode": "// إنشاء مجموعة saleh_legal_knowledge في ChromaDB إذا لم تكن موجودة\nconst response = await $helpers.httpRequest({\n  method: 'POST',\n  url: 'http://chromadb:8000/api/v1/collections',\n  body: JSON.stringify({\n    name: 'saleh_legal_knowledge',\n    metadata: {\n      description: 'القوانين والأنظمة السعودية - هيئة الخبراء وأم القرى',\n      created_by: 'SaleH SaaS',\n      embedding_model: 'nomic-embed-text'\n    }\n  }),\n  headers: { 'Content-Type': 'application/json' }\n}).catch(e => ({ status: 'already_exists', message: e.message }));\n\nreturn [{ json: { collection_status: response.status || 'created', collection_name: 'saleh_legal_knowledge' } }];"
       },
       "id": "ensure-collection",
       "name": "🗄️ إنشاء مجموعة ChromaDB",
