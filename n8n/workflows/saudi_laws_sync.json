@@ -141,9 +141,7 @@
     },
     {
       "parameters": {
-        "mode": "combine",
-        "combinationMode": "mergeByPosition",
-        "options": {}
+        "mode": "append"
       },
       "id": "merge-sources",
       "name": "🔗 دمج المصادر",
