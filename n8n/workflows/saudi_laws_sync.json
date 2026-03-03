@@ -486,11 +486,23 @@
       "main": [
         [
           {
-            "node": "🧠 Ollama: توليد Embedding",
+            "node": "🔎 تصفية الوثائق الفارغة",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "🔎 تصفية الوثائق الفارغة": {
+      "main": [
+        [
+          {
+            "node": "🧠 Ollama: توليد Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
       ]
     },
     "🧠 Ollama: توليد Embedding": {
