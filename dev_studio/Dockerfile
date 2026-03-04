@@ -40,16 +40,17 @@ RUN code-server --install-extension ms-python.python \
  && code-server --install-extension ms-toolsai.jupyter \
  && code-server --install-extension esbenp.prettier-vscode \
  && code-server --install-extension dbaeumer.vscode-eslint
-
 # 4. تثبيت Continue (مساعد AI) من Open VSX - المصدر الرسمي لـ code-server
 RUN CONTINUE_VERSION="1.3.32" && \
     curl -fL "https://open-vsx.org/api/Continue/continue/linux-x64/${CONTINUE_VERSION}/file/Continue.continue-${CONTINUE_VERSION}@linux-x64.vsix" \
     -o /tmp/continue.vsix && \
     code-server --install-extension /tmp/continue.vsix && \
     rm /tmp/continue.vsix
-
 # 5. نسخ إعداد Continue الجاهز
 COPY config/continue-config.json /home/coder/.continue/config.json
 RUN chown -R coder:coder /home/coder/.continue
-
+# 6. حذف config.yaml القديم لإجبار code-server على قراءة PASSWORD من البيئة
+RUN rm -f /home/coder/.config/code-server/config.yaml
 USER coder
+# تشغيل code-server مع قراءة كلمة المرور من متغير البيئة PASSWORD
+CMD ["sh", "-c", "exec code-server --bind-addr 0.0.0.0:8080 --auth password --disable-telemetry /home/coder/SaleHSaaS3"]
