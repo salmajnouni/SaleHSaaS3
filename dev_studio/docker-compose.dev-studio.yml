@@ -53,14 +53,14 @@ services:
         if ! command -v pip3 > /dev/null 2>&1; then
           echo '⚙️  تثبيت Python وpip...' &&
           apt-get update -qq &&
-          apt-get install -y -qq python3 python3-pip python3-venv &&
+          apt-get install -y -qq python3 python3-pip python3-venv python3-setuptools &&
           echo '✅ Python جاهز'
         fi &&
 
         # تثبيت حزم Python إذا لم تكن مثبتة
         if ! python3 -c 'import fastapi' 2>/dev/null; then
           echo '📦 تثبيت حزم Python (RAG + AI) - مرة واحدة فقط...' &&
-          pip3 install --quiet --break-system-packages \
+          python3 -m pip install --quiet --break-system-packages \
             chromadb \
             langchain \
             langchain-community \
