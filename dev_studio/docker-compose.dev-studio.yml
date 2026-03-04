@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     container_name: saleh_dev_studio
     restart: unless-stopped
+    env_file:
+      - ../.env
     environment:
       - PASSWORD=${CODE_SERVER_PASSWORD}
       - TZ=Asia/Riyadh
