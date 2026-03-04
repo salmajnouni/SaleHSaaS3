@@ -15,7 +15,7 @@ RUN apt-get update -qq && \
     && rm -rf /var/lib/apt/lists/*
 
 # تثبيت جميع حزم Python المطلوبة لـ RAG والذكاء الاصطناعي
-RUN pip3 install --no-cache-dir \
+RUN pip3 install --no-cache-dir --break-system-packages \
     chromadb \
     langchain \
     langchain-community \
