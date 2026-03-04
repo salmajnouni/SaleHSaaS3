@@ -66,7 +66,7 @@
       ],
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const embedding = $json.embedding;\nconst prev = $('📚 تحميل وتقسيم النصوص').item.json;\nreturn [{ json: {\n  ids: [prev.chunk_id],\n  embeddings: [embedding],\n  documents: [prev.chunk_text],\n  metadatas: [{ law_name: prev.law_name, law_id: prev.law_id }],\n  chunk_id: prev.chunk_id,\n  law_name: prev.law_name\n} }];"
+        "jsCode": "const embedding = $json.embedding;\nconst prev = $('📚 تحميل وتقسيم النصوص').item.json;\nreturn {\n  ids: [prev.chunk_id],\n  embeddings: [embedding],\n  documents: [prev.chunk_text],\n  metadatas: [{ law_name: prev.law_name, law_id: prev.law_id }],\n  chunk_id: prev.chunk_id,\n  law_name: prev.law_name\n};"
       }
     },
     {
