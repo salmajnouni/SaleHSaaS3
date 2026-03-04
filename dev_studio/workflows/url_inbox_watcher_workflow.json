@@ -152,14 +152,11 @@
     },
     {
       "parameters": {
-        "operation": "move",
-        "sourcePath": "={{ $json.filePath }}",
-        "destinationPath": "=D:\\SaleHSaaS3\\url_processed\\{{ $json.fileName }}",
-        "options": {}
+        "command": "=powershell -Command \"Move-Item -Path '{{ $('📝 بناء Markdown').first().json.filePath }}' -Destination 'D:\\SaleHSaaS3\\url_processed\\{{ $('📝 بناء Markdown').first().json.fileName }}' -Force\""
       },
       "id": "move-to-processed",
       "name": "📦 نقل إلى url_processed",
-      "type": "n8n-nodes-base.moveFile",
+      "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [2660, 200],
       "notes": "ينقل الملف الأصلي إلى url_processed بعد المعالجة الناجحة"
