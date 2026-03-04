@@ -1,5 +1,5 @@
 {
-  "name": "🔗 URL to Knowledge — تحويل الروابط إلى معرفة",
+  "name": "🔗 URL to Knowledge v2 — تحويل الروابط إلى معرفة (Jina Premium)",
   "nodes": [
     {
       "parameters": {
@@ -92,7 +92,8 @@
         "headerParameters": {
           "parameters": [
             { "name": "Accept", "value": "text/plain" },
-            { "name": "X-Return-Format", "value": "markdown" }
+            { "name": "X-Return-Format", "value": "markdown" },
+            { "name": "Authorization", "value": "Bearer jina_dc99ce20ea034f5a9c8295a654d1128bHX6fO6j6_c93ytgTSdqWi3iaQD8B" }
           ]
         },
         "options": { "timeout": 30000 }
@@ -102,7 +103,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [900, 350],
-      "notes": "Jina.ai Reader يستخرج النص من أي صفحة ويب بما فيها منشورات السوشيال ميديا"
+      "notes": "Jina.ai Reader Premium — يستخرج النص من أي صفحة ويب بما فيها منشورات السوشيال ميديا"
     },
     {
       "parameters": {
@@ -111,7 +112,8 @@
         "headerParameters": {
           "parameters": [
             { "name": "Accept", "value": "text/plain" },
-            { "name": "X-Return-Format", "value": "markdown" }
+            { "name": "X-Return-Format", "value": "markdown" },
+            { "name": "Authorization", "value": "Bearer jina_dc99ce20ea034f5a9c8295a654d1128bHX6fO6j6_c93ytgTSdqWi3iaQD8B" }
           ]
         },
         "options": { "timeout": 30000 }
