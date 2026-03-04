@@ -1,11 +1,11 @@
 {
   "models": [
     {
-      "title": "🧠 سالح التقني (Llama 3.1 8B)",
+      "title": "🧠 DeepSeek-R1 7B (تفكير عميق)",
       "provider": "ollama",
-      "model": "llama3.1:8b",
+      "model": "deepseek-r1:7b",
       "apiBase": "http://host.docker.internal:11434",
-      "systemMessage": "أنت سالح التقني، مهندس برمجيات خبير متخصص في الذكاء الاصطناعي والتطوير. تساعد في كتابة كود نظيف واحترافي، وتشرح الكود بالعربية عند الحاجة. تتبع أفضل الممارسات وتقترح تحسينات دائماً."
+      "systemMessage": "أنت مساعد برمجي خبير. تفكر بعمق قبل الإجابة وتقدم حلولاً دقيقة ومحسّنة. تشرح الكود بوضوح وتتبع أفضل الممارسات."
     },
     {
       "title": "⚡ Qwen2.5 3B (سريع)",
@@ -14,20 +14,26 @@
       "apiBase": "http://host.docker.internal:11434"
     },
     {
-      "title": "🌟 GLM-4.7 Flash",
+      "title": "🦙 Llama3.1 8B",
       "provider": "ollama",
-      "model": "glm-4.7-flash:latest",
+      "model": "llama3.1:8b",
       "apiBase": "http://host.docker.internal:11434"
     },
     {
-      "title": "🔍 Qwen3-VL 8B (رؤية + كود)",
+      "title": "🌟 Mistral 7B",
       "provider": "ollama",
-      "model": "qwen3-vl:8b",
+      "model": "mistral:latest",
+      "apiBase": "http://host.docker.internal:11434"
+    },
+    {
+      "title": "💎 Gemma3 4B",
+      "provider": "ollama",
+      "model": "gemma3:4b",
       "apiBase": "http://host.docker.internal:11434"
     }
   ],
   "tabAutocompleteModel": {
-    "title": "Autocomplete",
+    "title": "Autocomplete - Qwen2.5",
     "provider": "ollama",
     "model": "qwen2.5:3b",
     "apiBase": "http://host.docker.internal:11434"
@@ -45,24 +51,31 @@
     },
     {
       "name": "explain",
-      "prompt": "اشرح هذا الكود بالتفصيل باللغة العربية، موضحاً:\n1. ما الذي يفعله\n2. كيف يعمل خطوة بخطوة\n3. لماذا تم اختيار هذا الأسلوب\n\n{{{ input }}}",
+      "prompt": "اشرح هذا الكود بالتفصيل باللغة العربية:\n1. ما الذي يفعله\n2. كيف يعمل خطوة بخطوة\n3. لماذا تم اختيار هذا الأسلوب\n\n{{{ input }}}",
       "description": "شرح الكود بالعربية"
     },
     {
-      "name": "optimize",
-      "prompt": "حسّن هذا الكود من حيث الأداء والسرعة وقابلية القراءة وأفضل الممارسات. أعطني الكود المحسّن مع شرح التغييرات:\n\n{{{ input }}}",
-      "description": "تحسين أداء الكود"
-    },
-    {
-      "name": "test",
-      "prompt": "اكتب اختبارات شاملة (Unit Tests) لهذا الكود باستخدام pytest:\n\n{{{ input }}}",
-      "description": "توليد اختبارات تلقائية"
-    },
-    {
-      "name": "api",
-      "prompt": "صمم وأنشئ REST API كاملة لهذا المتطلب باستخدام FastAPI مع Pydantic Models ومعالجة الأخطاء:\n\n{{{ input }}}",
-      "description": "تصميم REST API"
+      "name": "fix",
+      "prompt": "هذا الكود يحتوي على خطأ أو مشكلة. حلّل المشكلة وأصلحها:\n\n{{{ input }}}",
+      "description": "إصلاح الأخطاء"
     }
   ],
-  "allowAnonymousTelemetry": false
+  "slashCommands": [
+    {
+      "name": "edit",
+      "description": "تعديل الكود المحدد"
+    },
+    {
+      "name": "comment",
+      "description": "إضافة تعليقات للكود"
+    },
+    {
+      "name": "share",
+      "description": "مشاركة المحادثة"
+    },
+    {
+      "name": "cmd",
+      "description": "تنفيذ أمر terminal"
+    }
+  ]
 }
