@@ -1,0 +1,218 @@
+{
+  "name": "📚 Knowledge Inbox Processor",
+  "nodes": [
+    {
+      "id": "node-trigger",
+      "name": "⏰ Schedule - كل 30 دقيقة",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [100, 300],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-read-folder",
+      "name": "📂 قراءة ملفات knowledge_inbox",
+      "type": "n8n-nodes-base.readBinaryFiles",
+      "typeVersion": 1,
+      "position": [320, 300],
+      "parameters": {
+        "fileSelector": "D:\\SaleHSaaS3\\knowledge_inbox\\*.*",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-check-files",
+      "name": "🔍 هل توجد ملفات؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [540, 300],
+      "parameters": {
+        "conditions": {
+          "options": {"caseSensitive": false},
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $items().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-upload-knowledge",
+      "name": "⬆️ رفع إلى OpenWebUI Knowledge",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/api/v1/knowledge/{{ $env.OPENWEBUI_KNOWLEDGE_ID }}/file/add",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.OPENWEBUI_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "node-collect-names",
+      "name": "📋 جمع أسماء الملفات",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [980, 200],
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "processed_files",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-summarize",
+      "name": "🤖 توليد تقرير بـ DeepSeek",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 200],
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:11434/api/chat",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={\n  \"model\": \"deepseek-r1:7b\",\n  \"stream\": false,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"أنت مساعد متخصص في تلخيص المعرفة. مهمتك كتابة تقرير موجز وواضح بالعربية عن الملفات التي تمت معالجتها.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"تمت معالجة الملفات التالية وإضافتها إلى قاعدة المعرفة:\\n{{ $json.processed_files.map(f => '- ' + f.fileName).join('\\n') }}\\n\\nاكتب تقريراً موجزاً يشمل:\\n1. عدد الملفات المُعالجة\\n2. أنواع الملفات\\n3. توصية بكيفية الاستفادة منها في المحادثات\"\n    }\n  ]\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-move-files",
+      "name": "📁 نقل إلى knowledge_processed",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1200, 380],
+      "parameters": {
+        "command": "=powershell -Command \"Get-ChildItem 'D:\\SaleHSaaS3\\knowledge_inbox\\*.*' | ForEach-Object { Move-Item $_.FullName 'D:\\SaleHSaaS3\\knowledge_processed\\' -Force }; Write-Output 'تم النقل بنجاح'\""
+      }
+    },
+    {
+      "id": "node-format-report",
+      "name": "📊 تنسيق التقرير النهائي",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1420, 200],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "report_title",
+              "value": "=📚 تقرير هضم المعرفة - {{ $now.toFormat('dd/MM/yyyy HH:mm') }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "files_count",
+              "value": "={{ $('جمع أسماء الملفات').item.json.processed_files.length }}",
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "ai_summary",
+              "value": "={{ $('توليد تقرير بـ DeepSeek').item.json.message.content }}",
+              "type": "string"
+            },
+            {
+              "id": "a4",
+              "name": "processed_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-save-report",
+      "name": "💾 حفظ التقرير في ملف",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1640, 200],
+      "parameters": {
+        "command": "=powershell -Command \"$report = @\"\n📚 تقرير هضم المعرفة\nالتاريخ: {{ $now.toFormat('dd/MM/yyyy HH:mm') }}\nعدد الملفات: {{ $('تنسيق التقرير النهائي').item.json.files_count }}\n\n{{ $('تنسيق التقرير النهائي').item.json.ai_summary }}\n\"@; $report | Out-File -FilePath 'D:\\SaleHSaaS3\\logs\\knowledge_report_{{ $now.toFormat('yyyyMMdd_HHmm') }}.txt' -Encoding UTF8; Write-Output 'تم حفظ التقرير'\""
+      }
+    },
+    {
+      "id": "node-no-files",
+      "name": "✅ لا توجد ملفات جديدة",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [760, 420],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "⏰ Schedule - كل 30 دقيقة": {
+      "main": [[{"node": "📂 قراءة ملفات knowledge_inbox", "type": "main", "index": 0}]]
+    },
+    "📂 قراءة ملفات knowledge_inbox": {
+      "main": [[{"node": "🔍 هل توجد ملفات؟", "type": "main", "index": 0}]]
+    },
+    "🔍 هل توجد ملفات؟": {
+      "main": [
+        [{"node": "⬆️ رفع إلى OpenWebUI Knowledge", "type": "main", "index": 0}],
+        [{"node": "✅ لا توجد ملفات جديدة", "type": "main", "index": 0}]
+      ]
+    },
+    "⬆️ رفع إلى OpenWebUI Knowledge": {
+      "main": [[{"node": "📋 جمع أسماء الملفات", "type": "main", "index": 0}]]
+    },
+    "📋 جمع أسماء الملفات": {
+      "main": [
+        [{"node": "🤖 توليد تقرير بـ DeepSeek", "type": "main", "index": 0}],
+        [{"node": "📁 نقل إلى knowledge_processed", "type": "main", "index": 0}]
+      ]
+    },
+    "🤖 توليد تقرير بـ DeepSeek": {
+      "main": [[{"node": "📊 تنسيق التقرير النهائي", "type": "main", "index": 0}]]
+    },
+    "📊 تنسيق التقرير النهائي": {
+      "main": [[{"node": "💾 حفظ التقرير في ملف", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "tags": ["knowledge", "openwebui", "automation", "reporting"]
+}
