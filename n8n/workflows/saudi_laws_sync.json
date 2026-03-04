@@ -36,7 +36,7 @@
       ],
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const item = $input.item.json;\nconst text = item.text || '';\nconst chunkSize = 800;\nconst overlap = 100;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 50) { chunks.push(chunk); }\n  if (end >= text.length) break;\n  start += chunkSize - overlap;\n}\nif (chunks.length === 0) chunks.push(text);\nconst timestamp = Date.now();\nreturn chunks.map((chunk, i) => ({\n  json: {\n    chunk_id: `${item.id}_chunk_${i}_${timestamp}`,\n    chunk_text: chunk,\n    law_name: item.law_name,\n    source: item.source,\n    law_id: item.id,\n    fetched_at: item.fetched_at,\n    chunk_index: i,\n    total_chunks: chunks.length\n  }\n}));"
+        "jsCode": "const item = $input.item.json;\nconst text = item.text || '';\nconst chunkSize = 800;\nconst overlap = 100;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 50) { chunks.push(chunk); }\n  if (end >= text.length) break;\n  start += chunkSize - overlap;\n}\nif (chunks.length === 0) chunks.push(text);\nconst timestamp = Date.now();\nconst results = [];\nfor (let i = 0; i < chunks.length; i++) {\n  results.push({\n    chunk_id: item.id + '_chunk_' + i + '_' + timestamp,\n    chunk_text: chunks[i],\n    law_name: item.law_name,\n    source: item.source,\n    law_id: item.id,\n    fetched_at: item.fetched_at,\n    chunk_index: i,\n    total_chunks: chunks.length\n  });\n}\nreturn results;"
       }
     },
     {
