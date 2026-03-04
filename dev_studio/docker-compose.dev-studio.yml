@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   dev_studio:
     build:
@@ -8,17 +6,16 @@ services:
     container_name: saleh_dev_studio
     restart: unless-stopped
     environment:
-      - PASSWORD=${CODE_SERVER_PASSWORD:-saleh_dev_2026}
+      - PASSWORD=${CODE_SERVER_PASSWORD}
       - TZ=Asia/Riyadh
     volumes:
       - ../:/home/coder/SaleHSaaS3
     ports:
-      - "8080:8080"
+      - "${CODE_SERVER_PORT:-8080}:8080"
     networks:
       - salehsaas_net
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
 networks:
   salehsaas_net:
     external: true
