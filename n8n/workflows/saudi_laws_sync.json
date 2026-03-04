@@ -214,21 +214,7 @@
         280
       ],
       "parameters": {
-        "jsCode": "// تجهيز محتوى الملف للحفظ\nconst item = $input.item;\nconst text = item.json.extracted_text || '';\nconst header = '# ' + (item.json.law_name || item.json.source_name || 'وثيقة قانونية') + '\\n'\n  + 'المصدر: ' + (item.json.source_name || '') + '\\n'\n  + 'الرابط: ' + (item.json.url || '') + '\\n'\n  + 'تاريخ الجلب: ' + (item.json.fetched_at || '') + '\\n\\n';\nconst fullContent = header + text;\nconst base64Content = Buffer.from(fullContent, 'utf8').toString('base64');\nreturn [{ json: item.json, binary: { fileContent: { data: base64Content, mimeType: 'text/plain', fileName: item.json.filename } } }];"
-      }
-    },
-    {
-      "id": "save-to-inbox",
-      "name": "💾 حفظ في knowledge_inbox",
-      "type": "n8n-nodes-base.writeBinaryFile",
-      "typeVersion": 1,
-      "position": [
-        1400,
-        280
-      ],
-      "parameters": {
-        "fileName": "=/knowledge_inbox/{{ $json.filename }}",
-        "dataPropertyName": "fileContent"
+        "jsCode": "// تجهيز البيانات للإرسال المباشر إلى ChromaDB عبر Ollama\nconst item = $input.first();\nconst text = item.json.text || '';\nconst source = item.json.source || 'unknown';\nconst lawName = item.json.law_name || '';\nconst lawId = item.json.law_id || '';\nconst url = item.json.url || '';\nconst approxDate = item.json.approximate_date || '';\n\nif (!text || text.length < 50) {\n  return [{ json: { skip: true, reason: 'text too short' } }];\n}\n\n// Split text into chunks of ~500 chars with overlap\nconst chunkSize = 500;\nconst overlap = 50;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 30) {\n    chunks.push(chunk);\n  }\n  start += chunkSize - overlap;\n}\n\nif (chunks.length === 0) {\n  return [{ json: { skip: true, reason: 'no chunks' } }];\n}\n\nconst timestamp = Date.now();\nconst results = chunks.map((chunk, i) => ({\n  json: {\n    chunk_text: chunk,\n    chunk_id: `${source}_${lawId}_${timestamp}_${i}`,\n    metadata: {\n      source: source,\n      law_name: lawName,\n      law_id: lawId,\n      url: url,\n      approximate_date: approxDate,\n      chunk_index: i,\n      total_chunks: chunks.length\n    }\n  }\n}));\n\nreturn results;\n"
       }
     },
     {
@@ -242,6 +228,75 @@
       ],
       "parameters": {
         "jsCode": "const items = $input.all();\nconst count = items.length;\nconst names = items.map(function(i) { return i.json.law_name || i.json.source_name || '?'; });\nconsole.log('تم حفظ ' + count + ' وثيقة في knowledge_inbox');\nreturn [{ json: { saved_count: count, documents: names, timestamp: new Date().toISOString(), status: 'success' } }];"
+      }
+    },
+    {
+      "id": "embed-pass-001",
+      "name": "🧠 Ollama Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        360
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text:latest', prompt: $json.chunk_text }) }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "includeInputFields": true
+        }
+      }
+    },
+    {
+      "id": "chroma-save-001",
+      "name": "💾 ChromaDB Upsert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        360
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/upsert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ids: [$json.chunk_id], embeddings: [$json.embedding], documents: [$json.chunk_text], metadatas: [$json.metadata] }) }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
       }
     }
   ],
@@ -365,14 +420,25 @@
       "main": [
         [
           {
-            "node": "💾 حفظ في knowledge_inbox",
+            "node": "🧠 Ollama Embedding",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "💾 حفظ في knowledge_inbox": {
+    "🧠 Ollama Embedding": {
+      "main": [
+        [
+          {
+            "node": "💾 ChromaDB Upsert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 ChromaDB Upsert": {
       "main": [
         [
           {
