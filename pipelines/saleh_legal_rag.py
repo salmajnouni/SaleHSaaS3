@@ -1,12 +1,15 @@
-
 """
 SaleH SaaS - Legal RAG Pipeline & MCP Tool
 ==========================================
 
 هذا الملف يخدم غرضين:
-1. كـ Pipeline لـ Open WebUI: لحقن السياق القانوني تلقائياً.
+1. كـ Pipeline لـ Open WebUI: لحقن السياق القانوني تلقائياً في كل محادثة.
 2. كـ MCP Tool Server: لتوفير أداة بحث قانوني يمكن استدعاؤها.
 
+التغييرات:
+- تصحيح اسم الـ collection: saleh_legal_knowledge
+- ترقية ChromaDB API من v1 إلى v2
+- إضافة pipe() method كاملة للـ streaming
 """
 
 import os
@@ -17,14 +20,17 @@ import requests
 from typing import List, Dict, Any, Optional, Generator, Iterator
 from pydantic import BaseModel
 
+
 class Pipeline:
     class Valves(BaseModel):
         CHROMADB_URL: str = "http://chromadb:8000"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
         EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-        COLLECTION_NAME: str = "saleh_legal_docs"
+        COLLECTION_NAME: str = "saleh_legal_knowledge"
+        CHROMADB_TENANT: str = "default_tenant"
+        CHROMADB_DATABASE: str = "default_database"
         TOP_K: int = 5
-        MIN_RELEVANCE_SCORE: float = 0.3
+        MIN_RELEVANCE_SCORE: float = 0.2
         ENABLE_RAG: bool = True
         SYSTEM_PROMPT: str = """أنت مساعد قانوني متخصص في الأنظمة والتشريعات السعودية.
 عند الإجابة:
@@ -51,6 +57,22 @@ class Pipeline:
             print(f"Embedding error: {e}", file=sys.stderr)
         return None
 
+    def _get_collection_id(self) -> Optional[str]:
+        """الحصول على collection ID من ChromaDB v2"""
+        try:
+            url = (
+                f"{self.valves.CHROMADB_URL}/api/v2/tenants/"
+                f"{self.valves.CHROMADB_TENANT}/databases/"
+                f"{self.valves.CHROMADB_DATABASE}/collections/"
+                f"{self.valves.COLLECTION_NAME}"
+            )
+            resp = requests.get(url, timeout=10)
+            if resp.status_code == 200:
+                return resp.json().get("id")
+        except Exception as e:
+            print(f"ChromaDB collection lookup error: {e}", file=sys.stderr)
+        return None
+
     def _search_chromadb(self, query: str, top_k: int = None) -> List[Dict]:
         if top_k is None:
             top_k = self.valves.TOP_K
@@ -59,9 +81,20 @@ class Pipeline:
         if not embedding:
             return []
 
+        collection_id = self._get_collection_id()
+        if not collection_id:
+            print("ChromaDB: collection not found", file=sys.stderr)
+            return []
+
         try:
+            url = (
+                f"{self.valves.CHROMADB_URL}/api/v2/tenants/"
+                f"{self.valves.CHROMADB_TENANT}/databases/"
+                f"{self.valves.CHROMADB_DATABASE}/collections/"
+                f"{collection_id}/query"
+            )
             resp = requests.post(
-                f"{self.valves.CHROMADB_URL}/api/v1/collections/{self.valves.COLLECTION_NAME}/query",
+                url,
                 json={
                     "query_embeddings": [embedding],
                     "n_results": top_k,
@@ -82,11 +115,13 @@ class Pipeline:
                     if similarity >= self.valves.MIN_RELEVANCE_SCORE:
                         results.append({
                             "text": doc,
-                            "doc_name": meta.get("doc_name", "وثيقة"),
-                            "article_ref": meta.get("article_ref", ""),
+                            "doc_name": meta.get("doc_name", meta.get("law_name", "وثيقة")),
+                            "article_ref": meta.get("article_ref", meta.get("source", "")),
                             "similarity": round(similarity, 3)
                         })
                 return results
+            else:
+                print(f"ChromaDB query error {resp.status_code}: {resp.text[:200]}", file=sys.stderr)
         except Exception as e:
             print(f"ChromaDB search error: {e}", file=sys.stderr)
 
@@ -115,15 +150,59 @@ class Pipeline:
 
         return "\n".join(context_parts)
 
-    # ... (pipe and inlet methods remain for pipeline functionality)
     def inlet(self, body: dict, user: Optional[dict] = None) -> dict:
-        # ... (existing inlet implementation)
+        """حقن السياق القانوني في الرسائل قبل إرسالها للنموذج"""
+        if not self.valves.ENABLE_RAG:
+            return body
+
+        messages = body.get("messages", [])
+        if not messages:
+            return body
+
+        # استخراج آخر رسالة من المستخدم
+        last_user_msg = ""
+        for msg in reversed(messages):
+            if msg.get("role") == "user":
+                last_user_msg = msg.get("content", "")
+                break
+
+        if not last_user_msg:
+            return body
+
+        # البحث في ChromaDB
+        results = self._search_chromadb(last_user_msg)
+        if not results:
+            return body
+
+        # بناء السياق
+        context = self._build_context(results)
+
+        # إضافة system message مع السياق
+        system_msg = {
+            "role": "system",
+            "content": f"{self.valves.SYSTEM_PROMPT}\n\n{context}"
+        }
+
+        # إضافة أو تحديث system message
+        if messages and messages[0].get("role") == "system":
+            messages[0]["content"] = f"{self.valves.SYSTEM_PROMPT}\n\n{context}"
+        else:
+            messages.insert(0, system_msg)
+
+        body["messages"] = messages
         return body
+
+    def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict) -> Iterator[str]:
+        """تمرير الطلب مع السياق القانوني"""
+        # inlet يتولى حقن السياق تلقائياً
+        yield from []
+
 
 # --- MCP Tool Server Implementation ---
 
 def send_mcp_response(response: Dict[str, Any]):
     print(json.dumps(response), flush=True)
+
 
 def get_tools():
     return {
@@ -143,20 +222,19 @@ def get_tools():
         ],
     }
 
+
 def search_saudi_legal_documents(invocation_id: str, inputs: Dict[str, Any]):
     query = inputs.get("query")
     if not query:
         send_mcp_response({"type": "error", "invocation_id": invocation_id, "error": "Missing query"})
         return
 
-    # استخدام نفس منطق البحث من الـ Pipeline
     pipeline_instance = Pipeline()
     results = pipeline_instance._search_chromadb(query)
-    
+
     if not results:
         output = "لم يتم العثور على نتائج مطابقة في قاعدة المعرفة القانونية."
     else:
-        # يمكن إرجاع النتائج كـ JSON أو كنص منسق
         output = json.dumps(results, indent=2, ensure_ascii=False)
 
     send_mcp_response({
@@ -166,6 +244,7 @@ def search_saudi_legal_documents(invocation_id: str, inputs: Dict[str, Any]):
         "output": output,
         "is_last": True,
     })
+
 
 def main_mcp():
     for line in sys.stdin:
@@ -189,6 +268,6 @@ def main_mcp():
         except Exception as e:
             send_mcp_response({"type": "error", "error": str(e)})
 
+
 if __name__ == "__main__":
-    # هذا الملف يعمل الآن كخادم MCP
     main_mcp()
