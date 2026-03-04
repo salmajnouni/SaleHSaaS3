@@ -43,21 +43,9 @@ RUN code-server --install-extension ms-python.python \
  && code-server --install-extension esbenp.prettier-vscode \
  && code-server --install-extension dbaeumer.vscode-eslint
 
-# 4. تثبيت Continue من Open VSX
-RUN CONTINUE_VERSION="1.3.32" && \
-    curl -fL "https://open-vsx.org/api/Continue/continue/linux-x64/${CONTINUE_VERSION}/file/Continue.continue-${CONTINUE_VERSION}@linux-x64.vsix" \
-    -o /tmp/continue.vsix && \
-    code-server --install-extension /tmp/continue.vsix && \
-    rm /tmp/continue.vsix
-
-# 5. نسخ إعداد Continue
-COPY config/continue-config.json /home/coder/.continue/config.json
-RUN chown -R coder:coder /home/coder/.continue
-
-# 6. نسخ entrypoint script الذي يكتب كلمة المرور عند التشغيل
-COPY entrypoint-dev.sh /usr/local/bin/entrypoint-dev.sh
-RUN chmod +x /usr/local/bin/entrypoint-dev.sh && \
-    chown coder:coder /usr/local/bin/entrypoint-dev.sh
+# 4. كتابة entrypoint مباشرة داخل الصورة (بدون COPY لتجنب مشكلة CRLF على Windows)
+RUN printf '#!/bin/sh\nmkdir -p /home/coder/.config/code-server\nprintf "bind-addr: 0.0.0.0:8080\\nauth: password\\npassword: %%s\\ncert: false\\n" "$PASSWORD" > /home/coder/.config/code-server/config.yaml\nexec code-server --config /home/coder/.config/code-server/config.yaml /home/coder/SaleHSaaS3\n' > /usr/local/bin/entrypoint-dev.sh \
+ && chmod +x /usr/local/bin/entrypoint-dev.sh
 
 USER coder
 ENTRYPOINT ["/usr/local/bin/entrypoint-dev.sh"]
