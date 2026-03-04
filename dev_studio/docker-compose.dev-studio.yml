@@ -1,27 +1,23 @@
+version: "3.9"
+
 services:
-  code-server:
+  dev_studio:
     build:
       context: .
       dockerfile: Dockerfile
-    image: saleh-code-server:latest
-    container_name: saleh-code-server
+    container_name: saleh_dev_studio
     restart: unless-stopped
+    environment:
+      - PASSWORD=${CODE_SERVER_PASSWORD:-saleh_dev_2026}
+      - TZ=Asia/Riyadh
+    volumes:
+      - ../:/home/coder/SaleHSaaS3
     ports:
       - "8080:8080"
-    environment:
-      - PASSWORD=saleh_dev_2026
-      - TZ=Asia/Riyadh
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-    volumes:
-      - ../:/home/coder/SaleHSaaS
-      - vscode_extensions:/home/coder/.local/share/code-server/extensions
     networks:
       - salehsaas_net
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-volumes:
-  vscode_extensions:
 
 networks:
   salehsaas_net:

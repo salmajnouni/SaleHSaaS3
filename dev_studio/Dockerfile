@@ -1,21 +1,18 @@
+# SaleH Dev Studio - Dockerfile
+# يبني صورة تحتوي على كل ما يلزم لبيئة تطوير متكاملة
+
 FROM codercom/code-server:latest
 
-USER root
-
-# تثبيت Python وpip وأدوات البناء
-RUN apt-get update -qq && \
-    apt-get install -y -qq \
-        python3 \
+# 1. تثبيت Python والحزم الأساسية
+RUN sudo apt-get update && \
+    sudo apt-get install -y --no-install-recommends \
         python3-pip \
         python3-venv \
-        python3-dev \
-        build-essential \
-        curl \
         git \
-    && rm -rf /var/lib/apt/lists/*
+    && sudo rm -rf /var/lib/apt/lists/*
 
-# تثبيت جميع حزم Python المطلوبة لـ RAG والذكاء الاصطناعي
-RUN pip3 install --no-cache-dir --break-system-packages \
+# 2. تثبيت حزم Python لـ RAG والذكاء الاصطناعي
+RUN sudo python3 -m pip install --no-cache-dir --break-system-packages \
     chromadb \
     langchain \
     langchain-community \
@@ -38,13 +35,10 @@ RUN pip3 install --no-cache-dir --break-system-packages \
     numpy \
     rich
 
-# تثبيت امتدادات VS Code
-RUN code-server --install-extension ms-python.python --force && \
-    code-server --install-extension ms-python.vscode-pylance --force && \
-    code-server --install-extension eamodio.gitlens --force && \
-    code-server --install-extension esbenp.prettier-vscode --force && \
-    code-server --install-extension ms-azuretools.vscode-docker --force || true
-
-USER coder
-
-EXPOSE 8080
+# 3. تثبيت امتدادات VS Code الأساسية
+RUN code-server --install-extension ms-python.python && \
+    code-server --install-extension ms-python.vscode-pylance && \
+    code-server --install-extension ms-toolsai.jupyter && \
+    code-server --install-extension esbenp.prettier-vscode && \
+    code-server --install-extension dbaeumer.vscode-eslint && \
+    code-server --install-extension continue.continue
