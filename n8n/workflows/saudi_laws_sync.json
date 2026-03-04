@@ -93,11 +93,11 @@
           },
           "conditions": [
             {
-              "id": "check-emb",
+              "id": "check-embed",
               "leftValue": "={{ $json.embedding }}",
               "rightValue": "",
               "operator": {
-                "type": "string",
+                "type": "array",
                 "operation": "notEmpty"
               }
             }
@@ -118,7 +118,7 @@
       "continueOnFail": true,
       "parameters": {
         "method": "POST",
-        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/upsert",
+        "url": "http://chromadb:8000/api/v2/tenants/default_tenant/databases/default_database/collections/saleh_legal_knowledge/upsert",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -151,8 +151,8 @@
         460
       ],
       "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "console.log('فشل الـ embedding للـ chunk:', $input.item.json.chunk_id);\nreturn [$input.item];"
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  console.log('فشل chunk:', JSON.stringify(item.json.chunk_id || 'unknown'));\n}\nreturn items.map(item => ({ json: item.json }));"
       }
     },
     {
