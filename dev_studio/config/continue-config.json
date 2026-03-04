@@ -1,29 +1,35 @@
 {
   "models": [
     {
-      "title": "🧠 سالح التقني (Qwen2.5-Coder 7B)",
+      "title": "🧠 سالح التقني (Llama 3.1 8B)",
       "provider": "ollama",
-      "model": "qwen2.5-coder:7b",
+      "model": "llama3.1:8b",
       "apiBase": "http://host.docker.internal:11434",
       "systemMessage": "أنت سالح التقني، مهندس برمجيات خبير متخصص في الذكاء الاصطناعي والتطوير. تساعد في كتابة كود نظيف واحترافي، وتشرح الكود بالعربية عند الحاجة. تتبع أفضل الممارسات وتقترح تحسينات دائماً."
     },
     {
-      "title": "🚀 DeepSeek-Coder V2 (للمشاريع الكبيرة)",
+      "title": "⚡ Qwen2.5 3B (سريع)",
       "provider": "ollama",
-      "model": "deepseek-coder-v2:16b",
+      "model": "qwen2.5:3b",
       "apiBase": "http://host.docker.internal:11434"
     },
     {
-      "title": "⚡ Qwen2.5-Coder 1.5B (سريع جداً)",
+      "title": "🌟 GLM-4.7 Flash",
       "provider": "ollama",
-      "model": "qwen2.5-coder:1.5b",
+      "model": "glm-4.7-flash:latest",
+      "apiBase": "http://host.docker.internal:11434"
+    },
+    {
+      "title": "🔍 Qwen3-VL 8B (رؤية + كود)",
+      "provider": "ollama",
+      "model": "qwen3-vl:8b",
       "apiBase": "http://host.docker.internal:11434"
     }
   ],
   "tabAutocompleteModel": {
     "title": "Autocomplete",
     "provider": "ollama",
-    "model": "qwen2.5-coder:1.5b",
+    "model": "qwen2.5:3b",
     "apiBase": "http://host.docker.internal:11434"
   },
   "embeddingsProvider": {
@@ -38,28 +44,23 @@
       "description": "مراجعة احترافية للكود"
     },
     {
-      "name": "test",
-      "prompt": "اكتب اختبارات شاملة (Unit Tests) لهذا الكود باستخدام pytest:\n\n{{{ input }}}",
-      "description": "توليد اختبارات تلقائية"
-    },
-    {
       "name": "explain",
       "prompt": "اشرح هذا الكود بالتفصيل باللغة العربية، موضحاً:\n1. ما الذي يفعله\n2. كيف يعمل خطوة بخطوة\n3. لماذا تم اختيار هذا الأسلوب\n\n{{{ input }}}",
       "description": "شرح الكود بالعربية"
     },
     {
       "name": "optimize",
-      "prompt": "حسّن هذا الكود من حيث:\n1. الأداء والسرعة\n2. استهلاك الذاكرة\n3. قابلية القراءة\n4. أفضل الممارسات\n\nأعطني الكود المحسّن مع شرح التغييرات:\n\n{{{ input }}}",
+      "prompt": "حسّن هذا الكود من حيث الأداء والسرعة وقابلية القراءة وأفضل الممارسات. أعطني الكود المحسّن مع شرح التغييرات:\n\n{{{ input }}}",
       "description": "تحسين أداء الكود"
     },
     {
-      "name": "docker",
-      "prompt": "أنشئ Dockerfile وdocker-compose.yml احترافيين لهذا المشروع:\n\n{{{ input }}}",
-      "description": "توليد ملفات Docker"
+      "name": "test",
+      "prompt": "اكتب اختبارات شاملة (Unit Tests) لهذا الكود باستخدام pytest:\n\n{{{ input }}}",
+      "description": "توليد اختبارات تلقائية"
     },
     {
       "name": "api",
-      "prompt": "صمم وأنشئ REST API كاملة لهذا المتطلب باستخدام FastAPI:\n- نقاط النهاية (Endpoints)\n- نماذج البيانات (Pydantic Models)\n- التوثيق التلقائي\n- معالجة الأخطاء\n\nالمتطلب:\n{{{ input }}}",
+      "prompt": "صمم وأنشئ REST API كاملة لهذا المتطلب باستخدام FastAPI مع Pydantic Models ومعالجة الأخطاء:\n\n{{{ input }}}",
       "description": "تصميم REST API"
     }
   ],
