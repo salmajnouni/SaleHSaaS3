@@ -1,0 +1,46 @@
+{
+  // ─── عام ──────────────────────────────────────────────────────
+  "editor.fontFamily": "'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.wordWrap": "on",
+  "workbench.iconTheme": "material-icon-theme",
+
+  // ─── Python ───────────────────────────────────────────────────
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoSearchPaths": true,
+  "python.formatting.provider": "black",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+
+  // ─── تنسيق الكود ───────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "all",
+
+  // ─── Git & GitLens ────────────────────────────────────────────
+  "git.autofetch": true,
+  "gitlens.currentLine.enabled": false,
+
+  // ─── الملفات والمجلدات ──────────────────────────────────────────
+  "files.autoSave": "onFocusChange",
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/__pycache__": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true
+  },
+
+  // ─── تجربة المستخدم ──────────────────────────────────────────────
+  "workbench.startupEditor": "none",
+  "telemetry.telemetryLevel": "off"
+}
