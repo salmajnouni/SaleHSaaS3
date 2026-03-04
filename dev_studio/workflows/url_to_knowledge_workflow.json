@@ -1,0 +1,262 @@
+{
+  "name": "🔗 URL to Knowledge — تحويل الروابط إلى معرفة",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "url-to-knowledge",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "📥 استقبال الرابط",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "url-to-knowledge-webhook",
+      "notes": "أرسل POST request مع: {\"url\": \"https://...\", \"title\": \"اختياري\"}"
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $input.first().json.body?.url || $input.first().json.url;\nconst title = $input.first().json.body?.title || $input.first().json.title || '';\n\nif (!url) throw new Error('يرجى إرسال رابط في حقل url');\n\n// تحديد نوع الرابط\nlet type = 'webpage';\nif (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';\nelse if (url.includes('twitter.com') || url.includes('x.com')) type = 'twitter';\nelse if (url.includes('linkedin.com')) type = 'linkedin';\nelse if (url.includes('facebook.com') || url.includes('fb.com')) type = 'facebook';\nelse if (url.includes('instagram.com')) type = 'instagram';\nelse if (url.includes('tiktok.com')) type = 'tiktok';\nelse if (url.match(/\\.(mp3|wav|ogg|m4a|aac)$/i)) type = 'audio';\nelse if (url.match(/\\.(mp4|avi|mov|mkv|webm)$/i)) type = 'video';\nelse if (url.match(/\\.(pdf)$/i)) type = 'pdf';\n\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = title.replace(/[^\\u0600-\\u06FFa-zA-Z0-9\\s]/g, '').trim().slice(0, 50) || type;\nconst filename = `${timestamp}_${safeTitle}.md`;\n\nreturn [{ json: { url, type, title, filename, timestamp } }];"
+      },
+      "id": "detect-type",
+      "name": "🔍 تحديد نوع الرابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "youtube",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "youtube",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "route-youtube",
+      "name": "YouTube؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "social",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "webpage",
+              "operator": { "type": "string", "operation": "notEquals" }
+            }
+          ]
+        }
+      },
+      "id": "route-social",
+      "name": "سوشيال ميديا؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:5678/webhook/youtube-transcript",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "url", "value": "={{ $json.url }}" },
+            { "name": "language", "value": "ar,en" }
+          ]
+        },
+        "options": { "timeout": 60000 }
+      },
+      "id": "youtube-transcript",
+      "name": "🎬 استخراج نص YouTube",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 100],
+      "notes": "يستخدم yt-dlp + Whisper لاستخراج النص. يجب تثبيت سير عمل youtube-transcript-service أولاً."
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Accept", "value": "text/plain" },
+            { "name": "X-Return-Format", "value": "markdown" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "jina-reader-social",
+      "name": "📱 استخراج منشور سوشيال ميديا",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 350],
+      "notes": "Jina.ai Reader يستخرج النص من أي صفحة ويب بما فيها منشورات السوشيال ميديا"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Accept", "value": "text/plain" },
+            { "name": "X-Return-Format", "value": "markdown" }
+          ]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "jina-reader-web",
+      "name": "🌐 استخراج محتوى الموقع",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 500],
+      "notes": "Jina.ai Reader مجاني ويحول أي صفحة ويب إلى Markdown نظيف"
+    },
+    {
+      "parameters": {
+        "jsCode": "// جمع النتائج من أي مسار\nconst input = $input.first().json;\nconst prevData = $('🔍 تحديد نوع الرابط').first().json;\n\nlet content = '';\nlet source = '';\n\n// من YouTube transcript\nif (input.transcript) {\n  content = input.transcript;\n  source = 'YouTube Transcript';\n}\n// من Jina Reader (body كنص)\nelse if (typeof input.body === 'string' && input.body.length > 100) {\n  content = input.body;\n  source = 'Jina.ai Reader';\n}\n// من Jina Reader (data)\nelse if (input.data) {\n  content = typeof input.data === 'string' ? input.data : JSON.stringify(input.data);\n  source = 'Jina.ai Reader';\n}\nelse {\n  content = JSON.stringify(input);\n  source = 'Raw Response';\n}\n\n// تنظيف المحتوى\ncontent = content\n  .replace(/\\[\\d+\\]/g, '')  // إزالة مراجع الأرقام\n  .replace(/\\n{3,}/g, '\\n\\n')  // تقليل الأسطر الفارغة المتكررة\n  .trim();\n\nconst wordCount = content.split(/\\s+/).length;\n\nreturn [{ json: {\n  ...prevData,\n  content,\n  source,\n  wordCount,\n  contentPreview: content.slice(0, 200)\n}}];"
+      },
+      "id": "merge-content",
+      "name": "🔀 دمج المحتوى",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "qwen2.5:3b" },
+            { "name": "prompt", "value": "=أنت مساعد متخصص في تلخيص وتنظيم المحتوى. المحتوى التالي مستخرج من: {{ $json.url }}\n\nالمهمة:\n1. اكتب ملخصاً موجزاً (3-5 أسطر) للمحتوى الرئيسي\n2. استخرج 5-10 نقاط رئيسية\n3. حدد الموضوع الرئيسي والكلمات المفتاحية\n\nالمحتوى:\n{{ $json.content.slice(0, 3000) }}\n\nأجب بالعربية بصيغة Markdown منظمة." },
+            { "name": "stream", "value": false },
+            { "name": "options", "value": "={{ { \"temperature\": 0.3, \"num_predict\": 1000 } }}" }
+          ]
+        },
+        "options": { "timeout": 120000 }
+      },
+      "id": "ai-summarize",
+      "name": "🤖 تلخيص ذكي بـ AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300],
+      "notes": "يستخدم qwen2.5:3b للسرعة. غيّره إلى deepseek-r1:7b للدقة"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst aiResponse = data.response || '';\n\n// بناء ملف Markdown منظم\nconst markdown = `---\ntitle: \"${data.title || data.url}\"\nurl: ${data.url}\ntype: ${data.type}\nsource: ${data.source}\ndate: ${data.timestamp}\nwords: ${data.wordCount}\n---\n\n# ${data.title || 'محتوى من: ' + data.url}\n\n**المصدر:** ${data.url}  \n**النوع:** ${data.type}  \n**التاريخ:** ${new Date(data.timestamp).toLocaleDateString('ar-SA')}  \n**عدد الكلمات:** ${data.wordCount}\n\n---\n\n## 📋 الملخص الذكي\n\n${aiResponse}\n\n---\n\n## 📄 المحتوى الكامل\n\n${data.content}\n`;\n\nreturn [{ json: {\n  ...data,\n  markdown,\n  filename: data.filename\n}}];"
+      },
+      "id": "build-markdown",
+      "name": "📝 بناء ملف Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=D:\\SaleHSaaS3\\knowledge_inbox\\{{ $json.filename }}",
+        "dataPropertyName": "markdown",
+        "encoding": "utf8",
+        "options": {}
+      },
+      "id": "save-to-inbox",
+      "name": "💾 حفظ في knowledge_inbox",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [1780, 300],
+      "notes": "يحفظ الملف مباشرة في knowledge_inbox ليُهضم تلقائياً"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, filename: $json.filename, url: $json.url, type: $json.type, words: $json.wordCount, message: 'تم حفظ المحتوى في knowledge_inbox بنجاح' }) }}"
+      },
+      "id": "respond-success",
+      "name": "✅ رد النجاح",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2000, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: $json.message || 'خطأ غير معروف', url: $('🔍 تحديد نوع الرابط').first().json.url }) }}",
+        "options": { "responseCode": 500 }
+      },
+      "id": "respond-error",
+      "name": "❌ رد الخطأ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2000, 500]
+    }
+  ],
+  "connections": {
+    "📥 استقبال الرابط": {
+      "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
+    },
+    "🔍 تحديد نوع الرابط": {
+      "main": [[{ "node": "YouTube؟", "type": "main", "index": 0 }]]
+    },
+    "YouTube؟": {
+      "main": [
+        [{ "node": "🎬 استخراج نص YouTube", "type": "main", "index": 0 }],
+        [{ "node": "سوشيال ميديا؟", "type": "main", "index": 0 }]
+      ]
+    },
+    "سوشيال ميديا؟": {
+      "main": [
+        [{ "node": "📱 استخراج منشور سوشيال ميديا", "type": "main", "index": 0 }],
+        [{ "node": "🌐 استخراج محتوى الموقع", "type": "main", "index": 0 }]
+      ]
+    },
+    "🎬 استخراج نص YouTube": {
+      "main": [[{ "node": "🔀 دمج المحتوى", "type": "main", "index": 0 }]]
+    },
+    "📱 استخراج منشور سوشيال ميديا": {
+      "main": [[{ "node": "🔀 دمج المحتوى", "type": "main", "index": 0 }]]
+    },
+    "🌐 استخراج محتوى الموقع": {
+      "main": [[{ "node": "🔀 دمج المحتوى", "type": "main", "index": 0 }]]
+    },
+    "🔀 دمج المحتوى": {
+      "main": [[{ "node": "🤖 تلخيص ذكي بـ AI", "type": "main", "index": 0 }]]
+    },
+    "🤖 تلخيص ذكي بـ AI": {
+      "main": [[{ "node": "📝 بناء ملف Markdown", "type": "main", "index": 0 }]]
+    },
+    "📝 بناء ملف Markdown": {
+      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
+    },
+    "💾 حفظ في knowledge_inbox": {
+      "main": [[{ "node": "✅ رد النجاح", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "salehsaas"
+  },
+  "tags": [
+    { "name": "knowledge", "createdAt": "2026-03-05" },
+    { "name": "rag", "createdAt": "2026-03-05" }
+  ]
+}
