@@ -2,7 +2,7 @@
 # SaleH SaaS 4.0 - Docker Compose Configuration
 # 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
 #
-# الهيكل المبسّط - 9 حاويات:
+# الهيكل المبسّط - 8 حاويات:
 #   1. postgres         - قاعدة البيانات الرئيسية
 #   2. chromadb         - قاعدة البيانات المتجهية (القوانين والوثائق)
 #   3. open_webui       - الواجهة الرئيسية + RAG + Pipelines + Code Execution
@@ -10,9 +10,8 @@
 #   5. tika             - استخراج النصوص من الوثائق
 #   6. searxng          - البحث المحلي على الإنترنت
 #   7. n8n              - الأتمتة والنشر على الميديا
-#   8. code_server      - بيئة التطوير من المتصفح
-#   9. knowledge_watcher - معالج الوثائق التلقائي
-#  10. n8n_bridge       - n8n OpenAI Bridge (n8n workflows كنماذج OpenAI)
+#   8. knowledge_watcher - معالج الوثائق التلقائي
+#   9. n8n_bridge       - n8n OpenAI Bridge (n8n workflows كنماذج OpenAI)
 #
 # Ollama يعمل على Windows مباشرة (host.docker.internal:11434)
 # جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
@@ -271,26 +270,6 @@ services:
       - "salehsaas.service=automation"
       - "salehsaas.description=أتمتة النشر على الميديا وإرسال التقارير"
 
-  # ── 8. Code Server - بيئة التطوير من المتصفح ───────────────────────────
-  code_server:
-    image: codercom/code-server:latest
-    container_name: salehsaas_code
-    restart: unless-stopped
-    environment:
-      - PASSWORD=${CODE_SERVER_PASSWORD:-salehsaas123}
-      - TZ=Asia/Riyadh
-    volumes:
-      - ./:/home/coder/project
-      - ./pipelines:/home/coder/project/pipelines
-      - ./saleh_brain:/home/coder/project/saleh_brain
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.50
-    ports:
-      - "${CODE_SERVER_PORT:-8443}:8080"
-    labels:
-      - "salehsaas.service=code-server"
-      - "salehsaas.description=بيئة تطوير متكاملة من المتصفح - تعديل Pipelines والمعجم"
 
   # ── 9. Knowledge Watcher - Professional Document Ingestion Pipeline ─────────
   # Drop any file in knowledge_inbox -> auto-processed into ChromaDB
