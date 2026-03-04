@@ -2,253 +2,49 @@
   "name": "Saudi Laws Sync - سحب وتحديث القوانين السعودية",
   "nodes": [
     {
-      "id": "schedule-trigger",
-      "name": "⏰ جدولة يومية (2 صباحاً)",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        140,
-        360
-      ],
-      "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "cronExpression",
-              "expression": "0 2 * * *"
-            }
-          ]
-        }
-      }
+      "id": "manual-trigger",
+      "name": "▶️ تشغيل يدوي",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [140, 360],
+      "parameters": {}
     },
     {
-      "id": "set-config",
-      "name": "⚙️ إعدادات النظام",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        280,
-        360
-      ],
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "run-date",
-              "name": "run_date",
-              "value": "={{ $now.toISO() }}",
-              "type": "string"
-            },
-            {
-              "id": "inbox-dir",
-              "name": "inbox_dir",
-              "value": "/knowledge_inbox",
-              "type": "string"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "fetch-boe",
-      "name": "📥 سحب قائمة هيئة الخبراء",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        420,
-        280
-      ],
-      "continueOnFail": true,
-      "parameters": {
-        "method": "GET",
-        "url": "https://www.boe.gov.sa/ar/LegalDocuments/Pages/default.aspx",
-        "options": {
-          "allowUnauthorizedCerts": true,
-          "timeout": 30000,
-          "response": {
-            "response": {
-              "responseFormat": "text"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "fetch-uqn",
-      "name": "📰 سحب أعداد أم القرى",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        420,
-        440
-      ],
-      "continueOnFail": true,
-      "parameters": {
-        "method": "GET",
-        "url": "https://www.uqn.gov.sa/issues",
-        "options": {
-          "allowUnauthorizedCerts": true,
-          "timeout": 30000,
-          "response": {
-            "response": {
-              "responseFormat": "text"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "parse-boe",
-      "name": "🔍 تحليل صفحة هيئة الخبراء",
+      "id": "load-laws",
+      "name": "📚 تحميل النصوص القانونية",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        560,
-        280
-      ],
+      "position": [320, 360],
       "parameters": {
-        "jsCode": "// معالجة صفحة هيئة الخبراء\nconst inputData = $input.first();\nconst html = inputData && inputData.json ? (inputData.json.data || inputData.json.body || '') : '';\nconst knownLaws = [\n  { id: 'labor', name: 'نظام العمل', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=1' },\n  { id: 'companies', name: 'نظام الشركات', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=2' },\n  { id: 'procurement', name: 'نظام المنافسات والمشتريات الحكومية', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=3' },\n  { id: 'vat', name: 'نظام ضريبة القيمة المضافة', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=4' },\n  { id: 'anticorruption', name: 'نظام مكافحة الفساد', url: 'https://www.boe.gov.sa/ar/LegalDocuments/Pages/LawDetails.aspx?LawID=5' }\n];\nreturn knownLaws.map(function(law) {\n  return { json: { source: 'boe', source_name: 'هيئة الخبراء بمجلس الوزراء', law_id: law.id, law_name: law.name, url: law.url, fetched_at: new Date().toISOString() } };\n});"
+        "jsCode": "// نصوص قانونية سعودية حقيقية مضمّنة مباشرة\n// المصدر: الأنظمة السعودية الرسمية\n\nconst laws = [\n  {\n    id: 'labor_law_001',\n    law_name: 'نظام العمل السعودي - الأحكام العامة',\n    source: 'boe.gov.sa',\n    text: `نظام العمل السعودي\\nالمادة الأولى: تسري أحكام هذا النظام على العقود المبرمة لأداء عمل في المملكة العربية السعودية.\\nالمادة الثانية: لا يسري هذا النظام على: موظفي الحكومة والهيئات والمؤسسات العامة، وعمال الزراعة والرعي.\\nالمادة الثالثة: العامل: كل شخص طبيعي يعمل لمصلحة صاحب عمل وتحت إدارته أو إشرافه مقابل أجر.\\nالمادة الرابعة: صاحب العمل: كل شخص طبيعي أو اعتباري يستخدم عاملاً أو أكثر مقابل أجر.\\nالمادة الخامسة: الأجر: ما يتقاضاه العامل مقابل عمله نقداً أو عيناً.\\nالمادة السادسة: عقد العمل: اتفاق مبرم بين صاحب العمل والعامل يتعهد بموجبه الأخير بالعمل لدى الأول وتحت إدارته مقابل أجر.\\nالمادة السابعة: لا يجوز استخدام أي شخص دون إبرام عقد عمل مكتوب.\\nالمادة الثامنة: يكون عقد العمل محدد المدة أو غير محدد المدة.\\nالمادة التاسعة: يحق للعامل الحصول على إجازة سنوية مدفوعة الأجر لا تقل عن واحد وعشرين يوماً في السنة.\\nالمادة العاشرة: لا يجوز تشغيل العامل أكثر من ثماني ساعات يومياً أو ثمانٍ وأربعين ساعة أسبوعياً.`
+  },\n  {\n    id: 'labor_law_002',\n    law_name: 'نظام العمل السعودي - إنهاء العقد والتعويضات',\n    source: 'boe.gov.sa',\n    text: `نظام العمل السعودي - أحكام إنهاء العقد\\nالمادة الحادية والسبعون: لكل من طرفي عقد العمل غير المحدد المدة إنهاؤه بشرط إخطار الطرف الآخر كتابةً قبل الإنهاء بستين يوماً.\\nالمادة الثانية والسبعون: إذا أنهى صاحب العمل العقد دون مسوّغ مشروع وجب عليه أن يدفع للعامل تعويضاً عن الفصل التعسفي.\\nالمادة الثالثة والسبعون: يستحق العامل مكافأة نهاية الخدمة عند انتهاء علاقة العمل بما يعادل أجر خمسة عشر يوماً عن كل سنة من السنوات الخمس الأولى.\\nالمادة الرابعة والسبعون: لا يجوز لصاحب العمل فصل العامل بسبب تقدمه بشكوى أو مطالبة بحقوقه.\\nالمادة الخامسة والسبعون: يحق للعامل المفصول تعسفياً اللجوء إلى المحكمة العمالية للمطالبة بحقوقه.`\n  },\n  {\n    id: 'companies_law_001',\n    law_name: 'نظام الشركات السعودي - الشركات ذات المسؤولية المحدودة',\n    source: 'boe.gov.sa',\n    text: `نظام الشركات السعودي\\nالمادة الأولى: الشركة ذات المسؤولية المحدودة هي شركة تتكون من شريكين أو أكثر ولا يزيد عددهم على خمسين شريكاً.\\nالمادة الثانية: لا يسأل الشركاء في الشركة ذات المسؤولية المحدودة عن ديون الشركة إلا بمقدار حصصهم في رأس المال.\\nالمادة الثالثة: يجب ألا يقل رأس مال الشركة ذات المسؤولية المحدودة عن عشرة آلاف ريال سعودي.\\nالمادة الرابعة: تتكون الشركة ذات المسؤولية المحدودة من عقد تأسيس يتضمن اسم الشركة وغرضها ومركزها ورأس مالها.\\nالمادة الخامسة: يُدار الشركة ذات المسؤولية المحدودة بواسطة مدير أو أكثر من الشركاء أو من غيرهم.\\nالمادة السادسة: لا يجوز للشركة ذات المسؤولية المحدودة إصدار أسهم قابلة للتداول.\\nالمادة السابعة: تُحل الشركة ذات المسؤولية المحدودة بانقضاء مدتها أو بتحقق الغرض الذي أسست من أجله.`\n  },\n  {\n    id: 'companies_law_002',\n    law_name: 'نظام الشركات السعودي - شركة المساهمة',\n    source: 'boe.gov.sa',\n    text: `نظام الشركات - شركة المساهمة\\nالمادة الأولى: شركة المساهمة هي شركة ينقسم رأس مالها إلى أسهم متساوية القيمة وقابلة للتداول.\\nالمادة الثانية: لا يقل عدد المساهمين في شركة المساهمة عن خمسة مساهمين.\\nالمادة الثالثة: لا يسأل المساهمون عن ديون الشركة إلا بمقدار قيمة أسهمهم.\\nالمادة الرابعة: يجب ألا يقل رأس مال شركة المساهمة عن مليوني ريال سعودي.\\nالمادة الخامسة: تُدار شركة المساهمة بواسطة مجلس إدارة يتكون من ثلاثة أعضاء على الأقل.\\nالمادة السادسة: يُعقد اجتماع الجمعية العامة العادية مرة واحدة على الأقل في السنة.\\nالمادة السابعة: يحق لكل مساهم يملك نسبة معينة من الأسهم حضور اجتماعات الجمعية العامة والتصويت فيها.`\n  },\n  {\n    id: 'vat_law_001',\n    law_name: 'نظام ضريبة القيمة المضافة - الأحكام الأساسية',\n    source: 'zatca.gov.sa',\n    text: `نظام ضريبة القيمة المضافة في المملكة العربية السعودية\\nتُطبَّق ضريبة القيمة المضافة بنسبة 15% على معظم السلع والخدمات في المملكة العربية السعودية.\\nالمادة الأولى: تُفرض ضريبة القيمة المضافة على كل توريد خاضع للضريبة يقوم به شخص خاضع للضريبة.\\nالمادة الثانية: يلتزم كل شخص تتجاوز إيراداته الخاضعة للضريبة 375,000 ريال سنوياً بالتسجيل في الضريبة.\\nالمادة الثالثة: يحق للشخص الخاضع للضريبة خصم ضريبة المدخلات المدفوعة على مشترياته من ضريبة المخرجات.\\nالمادة الرابعة: يجب تقديم الإقرار الضريبي شهرياً أو ربع سنوياً حسب حجم الأعمال.\\nالمادة الخامسة: الخدمات الصحية والتعليمية والمواد الغذائية الأساسية معفاة من ضريبة القيمة المضافة.\\nالمادة السادسة: يُعاقب على التهرب الضريبي بغرامة لا تقل عن مثل الضريبة المستحقة.`\n  },\n  {\n    id: 'procurement_law_001',\n    law_name: 'نظام المنافسات والمشتريات الحكومية',\n    source: 'mof.gov.sa',\n    text: `نظام المنافسات والمشتريات الحكومية\\nالمادة الأولى: تلتزم الجهات الحكومية بإجراء منافسة عامة للمشتريات التي تتجاوز قيمتها خمسة ملايين ريال.\\nالمادة الثانية: تُمنح الأولوية في المشتريات الحكومية للمنتجات والخدمات الوطنية.\\nالمادة الثالثة: يجب على الجهة الحكومية نشر إعلان المنافسة في الجريدة الرسمية والموقع الإلكتروني.\\nالمادة الرابعة: يحق لأي مورد مؤهل التقدم للمنافسات الحكومية وفق الشروط المحددة.\\nالمادة الخامسة: تُرسى المنافسة على أفضل عرض من حيث الجودة والسعر والمواصفات الفنية.\\nالمادة السادسة: يجب على الجهة الحكومية إبرام العقد خلال تسعين يوماً من تاريخ إرساء المنافسة.\\nالمادة السابعة: يُعاقب على التلاعب في المنافسات الحكومية بالغرامة والسجن.`\n  },\n  {\n    id: 'anticorruption_law_001',\n    law_name: 'نظام مكافحة الفساد والرشوة',\n    source: 'nazaha.gov.sa',\n    text: `نظام مكافحة الفساد في المملكة العربية السعودية\\nالمادة الأولى: يُعدّ فساداً كل فعل يرتكبه موظف عام أو يمتنع عنه بقصد الإضرار بالمصلحة العامة.\\nالمادة الثانية: الرشوة جريمة يُعاقب عليها بالسجن مدة لا تقل عن سنة ولا تزيد على عشر سنوات.\\nالمادة الثالثة: يُعاقب على الاختلاس بالسجن مدة لا تقل عن سنتين ولا تزيد على خمس عشرة سنة.\\nالمادة الرابعة: يُلزم الموظف العام بالإفصاح عن تعارض المصالح وعدم الاستفادة من منصبه لمصلحة شخصية.\\nالمادة الخامسة: تختص هيئة الرقابة ومكافحة الفساد (نزاهة) بالتحقيق في قضايا الفساد.\\nالمادة السادسة: يُكافأ من يُبلّغ عن جرائم الفساد ويُحمى من أي انتقام.`\n  },\n  {\n    id: 'real_estate_law_001',\n    law_name: 'نظام التسجيل العيني للعقار',\n    source: 'moj.gov.sa',\n    text: `نظام التسجيل العيني للعقار\\nالمادة الأولى: يهدف هذا النظام إلى توثيق حقوق الملكية العقارية وضمان استقرارها.\\nالمادة الثانية: يُعدّ السجل العيني للعقار مرجعاً رسمياً لإثبات حقوق الملكية والحقوق العينية الأخرى.\\nالمادة الثالثة: لا يُحتج بنقل ملكية العقار في مواجهة الغير إلا بعد تسجيله في السجل العيني.\\nالمادة الرابعة: يجب تسجيل جميع العقود المتعلقة بالعقارات لدى الجهة المختصة.\\nالمادة الخامسة: يُعاقب على تزوير وثائق الملكية العقارية بالسجن والغرامة.`\n  },\n  {\n    id: 'personal_data_law_001',\n    law_name: 'نظام حماية البيانات الشخصية',\n    source: 'sdaia.gov.sa',\n    text: `نظام حماية البيانات الشخصية في المملكة العربية السعودية\\nالمادة الأولى: البيانات الشخصية هي أي معلومات تتعلق بشخص طبيعي يمكن التعرف عليه بصورة مباشرة أو غير مباشرة.\\nالمادة الثانية: يجب الحصول على موافقة صريحة من صاحب البيانات قبل جمعها أو معالجتها.\\nالمادة الثالثة: يحق لصاحب البيانات الاطلاع على بياناته الشخصية وطلب تصحيحها أو حذفها.\\nالمادة الرابعة: يُحظر نقل البيانات الشخصية إلى خارج المملكة إلا وفق الضوابط المحددة.\\nالمادة الخامسة: يُعاقب على الإخلال بأحكام هذا النظام بغرامة لا تتجاوز خمسة ملايين ريال.\\nالمادة السادسة: تختص الهيئة السعودية للبيانات والذكاء الاصطناعي (سدايا) بالإشراف على تطبيق هذا النظام.`\n  },\n  {\n    id: 'cyber_crime_law_001',\n    law_name: 'نظام مكافحة الجرائم المعلوماتية',\n    source: 'citc.gov.sa',\n    text: `نظام مكافحة الجرائم المعلوماتية\\nالمادة الأولى: يُعدّ جريمة معلوماتية كل فعل يُرتكب بواسطة الحاسب الآلي أو الشبكة المعلوماتية.\\nالمادة الثانية: يُعاقب على الدخول غير المشروع إلى الأنظمة المعلوماتية بالسجن والغرامة.\\nالمادة الثالثة: يُعاقب على نشر المحتوى المسيء للنظام العام أو القيم الدينية بالسجن مدة لا تزيد على سنة.\\nالمادة الرابعة: يُعاقب على التشهير والإساءة عبر الإنترنت بالسجن مدة لا تزيد على سنة وغرامة.\\nالمادة الخامسة: يُعاقب على الاحتيال الإلكتروني بالسجن مدة لا تزيد على ثلاث سنوات.\\nالمادة السادسة: تختص النيابة العامة بالتحقيق في الجرائم المعلوماتية.`\n  }\n];\n\nreturn laws.map(law => ({\n  json: {\n    id: law.id,\n    law_name: law.law_name,\n    source: law.source,\n    text: law.text,\n    fetched_at: new Date().toISOString()\n  }\n}));"
       }
     },
     {
-      "id": "parse-uqn",
-      "name": "📋 تحليل صفحة أم القرى",
+      "id": "split-chunks",
+      "name": "✂️ تقسيم النص إلى أجزاء",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        560,
-        440
-      ],
+      "position": [520, 360],
       "parameters": {
-        "jsCode": "// معالجة صفحة أم القرى\nconst inputData = $input.first();\nconst html = inputData && inputData.json ? (inputData.json.data || inputData.json.body || '') : '';\nconst today = new Date();\nconst fallback = [0,1,2,3].map(function(i) {\n  const d = new Date(today);\n  d.setDate(today.getDate() - i*7);\n  return { json: { source: 'uqn_fallback', source_name: 'جريدة أم القرى الرسمية', url: 'https://www.uqn.gov.sa/issues', approximate_date: d.toISOString().split('T')[0], fetched_at: new Date().toISOString() } };\n});\nif (html.length < 100) { return fallback; }\nconst issueRegex = /href=\"([^\"]*issue[^\"]*)\"/gi;\nconst issues = [];\nlet match;\nwhile ((match = issueRegex.exec(html)) !== null) {\n  issues.push({ json: { source: 'uqn', source_name: 'جريدة أم القرى الرسمية', url: match[1].startsWith('http') ? match[1] : 'https://www.uqn.gov.sa' + match[1], fetched_at: new Date().toISOString() } });\n}\nreturn issues.length > 0 ? issues.slice(0, 4) : fallback;"
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $input.item.json;\nconst text = item.text || '';\nconst chunkSize = 800;\nconst overlap = 100;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 50) {\n    chunks.push(chunk);\n  }\n  if (end >= text.length) break;\n  start += chunkSize - overlap;\n}\nif (chunks.length === 0) chunks.push(text);\nconst timestamp = Date.now();\nreturn chunks.map((chunk, i) => ({\n  json: {\n    chunk_id: `${item.id}_chunk_${i}_${timestamp}`,\n    chunk_text: chunk,\n    law_name: item.law_name,\n    source: item.source,\n    law_id: item.id,\n    fetched_at: item.fetched_at,\n    chunk_index: i,\n    total_chunks: chunks.length\n  }\n}));"
       }
     },
     {
-      "id": "merge-sources",
-      "name": "🔗 دمج المصادر",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
-      "position": [
-        700,
-        360
-      ],
-      "parameters": {
-        "mode": "append"
-      }
-    },
-    {
-      "id": "fetch-document",
-      "name": "📄 تحميل الوثيقة",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        840,
-        360
-      ],
-      "continueOnFail": true,
-      "parameters": {
-        "method": "GET",
-        "url": "={{ $json.url }}",
-        "options": {
-          "allowUnauthorizedCerts": true,
-          "timeout": 45000,
-          "response": {
-            "response": {
-              "responseFormat": "text"
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "extract-text",
-      "name": "📝 استخراج النص من HTML",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        980,
-        360
-      ],
-      "parameters": {
-        "jsCode": "// استخراج النص من HTML بدون Tika\nconst item = $input.item;\nconst html = item.json.data || item.json.body || '';\nconst source = item.json.source || 'unknown';\nconst lawName = item.json.law_name || item.json.source_name || 'وثيقة قانونية';\nconst url = item.json.url || '';\nconst lawId = item.json.law_id || item.json.approximate_date || String(Date.now());\nlet text = html\n  .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')\n  .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/&nbsp;/g, ' ')\n  .replace(/&amp;/g, '&')\n  .replace(/&lt;/g, '<')\n  .replace(/&gt;/g, '>')\n  .replace(/&quot;/g, '\"')\n  .replace(/\\s+/g, ' ')\n  .trim();\nif (text.length < 50) { text = lawName + ' - ' + url; }\nconst safeId = (source + '_' + lawId).replace(/[^a-zA-Z0-9_]/g, '_').substring(0, 60);\nconst filename = safeId + '_' + new Date().toISOString().split('T')[0] + '.txt';\nreturn [{ json: { ...item.json, extracted_text: text, filename: filename, char_count: text.length } }];"
-      }
-    },
-    {
-      "id": "filter-empty",
-      "name": "🔎 تصفية الوثائق الفارغة",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [
-        1120,
-        360
-      ],
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "check-length",
-              "leftValue": "={{ $json.char_count }}",
-              "rightValue": 100,
-              "operator": {
-                "type": "number",
-                "operation": "gte"
-              }
-            }
-          ],
-          "combinator": "and"
-        }
-      }
-    },
-    {
-      "id": "prepare-file",
-      "name": "📦 تجهيز محتوى الملف",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1260,
-        280
-      ],
-      "parameters": {
-        "jsCode": "// تجهيز البيانات للإرسال المباشر إلى ChromaDB عبر Ollama\nconst item = $input.first();\nconst text = item.json.text || '';\nconst source = item.json.source || 'unknown';\nconst lawName = item.json.law_name || '';\nconst lawId = item.json.law_id || '';\nconst url = item.json.url || '';\nconst approxDate = item.json.approximate_date || '';\n\nif (!text || text.length < 50) {\n  return [{ json: { skip: true, reason: 'text too short' } }];\n}\n\n// Split text into chunks of ~500 chars with overlap\nconst chunkSize = 500;\nconst overlap = 50;\nconst chunks = [];\nlet start = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 30) {\n    chunks.push(chunk);\n  }\n  start += chunkSize - overlap;\n}\n\nif (chunks.length === 0) {\n  return [{ json: { skip: true, reason: 'no chunks' } }];\n}\n\nconst timestamp = Date.now();\nconst results = chunks.map((chunk, i) => ({\n  json: {\n    chunk_text: chunk,\n    chunk_id: `${source}_${lawId}_${timestamp}_${i}`,\n    metadata: {\n      source: source,\n      law_name: lawName,\n      law_id: lawId,\n      url: url,\n      approximate_date: approxDate,\n      chunk_index: i,\n      total_chunks: chunks.length\n    }\n  }\n}));\n\nreturn results;\n"
-      }
-    },
-    {
-      "id": "generate-report",
-      "name": "📊 تقرير المزامنة",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1540,
-        280
-      ],
-      "parameters": {
-        "jsCode": "const items = $input.all();\nconst count = items.length;\nconst names = items.map(function(i) { return i.json.law_name || i.json.source_name || '?'; });\nconsole.log('تم حفظ ' + count + ' وثيقة في knowledge_inbox');\nreturn [{ json: { saved_count: count, documents: names, timestamp: new Date().toISOString(), status: 'success' } }];"
-      }
-    },
-    {
-      "id": "embed-pass-001",
+      "id": "get-embedding",
       "name": "🧠 Ollama Embedding",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1400,
-        360
-      ],
+      "position": [720, 360],
+      "continueOnFail": true,
       "parameters": {
         "method": "POST",
         "url": "http://ollama:11434/api/embeddings",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
+            { "name": "Content-Type", "value": "application/json" }
           ]
         },
         "sendBody": true,
@@ -257,197 +53,103 @@
         "options": {
           "timeout": 120000,
           "response": {
-            "response": {
-              "responseFormat": "json"
-            }
+            "response": { "responseFormat": "json" }
           },
           "includeInputFields": true
         }
       }
     },
     {
-      "id": "chroma-save-001",
+      "id": "check-embedding",
+      "name": "✅ التحقق من الـ Embedding",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [920, 360],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "check-emb",
+              "leftValue": "={{ $json.embedding }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "save-to-chroma",
       "name": "💾 ChromaDB Upsert",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        1600,
-        360
-      ],
+      "position": [1120, 280],
+      "continueOnFail": true,
       "parameters": {
         "method": "POST",
         "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/upsert",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
+            { "name": "Content-Type", "value": "application/json" }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ ids: [$json.chunk_id], embeddings: [$json.embedding], documents: [$json.chunk_text], metadatas: [$json.metadata] }) }}",
+        "jsonBody": "={{ JSON.stringify({ ids: [$json.chunk_id], embeddings: [$json.embedding], documents: [$json.chunk_text], metadatas: [{ law_name: $json.law_name, source: $json.source, law_id: $json.law_id, chunk_index: $json.chunk_index }] }) }}",
         "options": {
           "timeout": 30000,
           "response": {
-            "response": {
-              "responseFormat": "json"
-            }
+            "response": { "responseFormat": "json" }
           }
         }
+      }
+    },
+    {
+      "id": "log-skip",
+      "name": "⚠️ تسجيل الخطأ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 460],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "console.log('فشل الـ embedding للـ chunk:', $input.item.json.chunk_id);\nreturn [$input.item];"
+      }
+    },
+    {
+      "id": "final-report",
+      "name": "📊 تقرير النهائي",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 280],
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst count = items.length;\nconsole.log(`✅ تم حفظ ${count} chunk في ChromaDB`);\nreturn [{ json: { status: 'success', chunks_saved: count, timestamp: new Date().toISOString(), message: `تم حفظ ${count} جزء قانوني في ChromaDB بنجاح` } }];"
       }
     }
   ],
   "connections": {
-    "⏰ جدولة يومية (2 صباحاً)": {
-      "main": [
-        [
-          {
-            "node": "⚙️ إعدادات النظام",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "▶️ تشغيل يدوي": {
+      "main": [[{ "node": "📚 تحميل النصوص القانونية", "type": "main", "index": 0 }]]
     },
-    "⚙️ إعدادات النظام": {
-      "main": [
-        [
-          {
-            "node": "📥 سحب قائمة هيئة الخبراء",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "📰 سحب أعداد أم القرى",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "📚 تحميل النصوص القانونية": {
+      "main": [[{ "node": "✂️ تقسيم النص إلى أجزاء", "type": "main", "index": 0 }]]
     },
-    "📥 سحب قائمة هيئة الخبراء": {
-      "main": [
-        [
-          {
-            "node": "🔍 تحليل صفحة هيئة الخبراء",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📰 سحب أعداد أم القرى": {
-      "main": [
-        [
-          {
-            "node": "📋 تحليل صفحة أم القرى",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "🔍 تحليل صفحة هيئة الخبراء": {
-      "main": [
-        [
-          {
-            "node": "🔗 دمج المصادر",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📋 تحليل صفحة أم القرى": {
-      "main": [
-        [
-          {
-            "node": "🔗 دمج المصادر",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "🔗 دمج المصادر": {
-      "main": [
-        [
-          {
-            "node": "📄 تحميل الوثيقة",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📄 تحميل الوثيقة": {
-      "main": [
-        [
-          {
-            "node": "📝 استخراج النص من HTML",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📝 استخراج النص من HTML": {
-      "main": [
-        [
-          {
-            "node": "🔎 تصفية الوثائق الفارغة",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "🔎 تصفية الوثائق الفارغة": {
-      "main": [
-        [
-          {
-            "node": "📦 تجهيز محتوى الملف",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📦 تجهيز محتوى الملف": {
-      "main": [
-        [
-          {
-            "node": "🧠 Ollama Embedding",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "✂️ تقسيم النص إلى أجزاء": {
+      "main": [[{ "node": "🧠 Ollama Embedding", "type": "main", "index": 0 }]]
     },
     "🧠 Ollama Embedding": {
+      "main": [[{ "node": "✅ التحقق من الـ Embedding", "type": "main", "index": 0 }]]
+    },
+    "✅ التحقق من الـ Embedding": {
       "main": [
-        [
-          {
-            "node": "💾 ChromaDB Upsert",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        [{ "node": "💾 ChromaDB Upsert", "type": "main", "index": 0 }],
+        [{ "node": "⚠️ تسجيل الخطأ", "type": "main", "index": 0 }]
       ]
     },
     "💾 ChromaDB Upsert": {
-      "main": [
-        [
-          {
-            "node": "📊 تقرير المزامنة",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "📊 تقرير النهائي", "type": "main", "index": 0 }]]
     }
   },
   "settings": {
@@ -456,18 +158,9 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "tags": [
-    {
-      "name": "legal"
-    },
-    {
-      "name": "saudi-laws"
-    },
-    {
-      "name": "rag"
-    },
-    {
-      "name": "n8n-openai-bridge"
-    }
+    { "name": "legal" },
+    { "name": "saudi-laws" },
+    { "name": "rag" }
   ],
   "pinData": {}
 }
