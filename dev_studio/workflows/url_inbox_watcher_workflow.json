@@ -46,7 +46,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// تحويل قائمة الملفات إلى عناصر منفصلة\nconst files = $input.first().json.files || [];\nif (files.length === 0) {\n  return [{ json: { skip: true } }];\n}\nreturn files.map(f => ({ json: f }));"
+        "jsCode": "// تحويل قائمة الملفات إلى عناصر منفصلة\n// الـ API يُرجع { files: [...], count: N }\n// كل ملف يحتوي على { fileName, filePath, size, modified }\nconst response = $input.first().json;\nconst files = response.files || [];\n\nif (files.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد ملفات' } }];\n}\n\n// إرجاع كل ملف كعنصر منفصل مع التأكد من وجود filePath\nreturn files.map(f => ({\n  json: {\n    fileName: f.fileName || f.name,\n    filePath: f.filePath || f.path,\n    size: f.size,\n    modified: f.modified\n  }\n}));"
       },
       "id": "split-files",
       "name": "🔀 تقسيم الملفات",
@@ -56,24 +56,34 @@
     },
     {
       "parameters": {
-        "url": "=http://host.docker.internal:8765/read?path={{ encodeURIComponent($json.filePath) }}",
+        "jsCode": "// قراءة محتوى الملف عبر File API واستخراج الروابط\n// نستخدم Code بدلاً من HTTP Request لتجنب مشاكل URL encoding\nconst { fileName, filePath } = $input.first().json;\n\nif (!filePath) {\n  return [{ json: { skip: true, reason: 'filePath غير موجود', fileName } }];\n}\n\n// بناء URL القراءة\nconst encodedPath = encodeURIComponent(filePath);\nconst apiUrl = `http://host.docker.internal:8765/read?path=${encodedPath}`;\n\nreturn [{ json: {\n  fileName,\n  filePath,\n  apiUrl,\n  _readReady: true\n}}];"
+      },
+      "id": "prepare-read",
+      "name": "🔧 تجهيز قراءة الملف",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.apiUrl }}",
         "options": { "timeout": 10000 }
       },
       "id": "read-file",
       "name": "📖 قراءة محتوى الملف",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 200]
+      "position": [1340, 200]
     },
     {
       "parameters": {
-        "jsCode": "const fileData = $input.first().json;\nconst { content, fileName, filePath } = fileData;\n\n// استخراج الروابط من الملف (سطر واحد = رابط واحد)\nconst lines = (content || '').split('\\n').map(l => l.trim()).filter(l => l.length > 0);\nconst urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\nif (urls.length === 0) {\n  return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n}\n\nconst title = (fileName || 'untitled').replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\nreturn urls.map((url, i) => ({\n  json: {\n    url,\n    title: urls.length > 1 ? `${title} (${i + 1})` : title,\n    fileName,\n    filePath,\n    totalUrls: urls.length\n  }\n}));"
+        "jsCode": "// استخراج الروابط من محتوى الملف\n// الـ API يُرجع { content, fileName, filePath, size }\nconst fileData = $input.first().json;\nconst prevData = $('🔧 تجهيز قراءة الملف').first().json;\n\nconst content = fileData.content || '';\nconst fileName = fileData.fileName || prevData.fileName;\nconst filePath = fileData.filePath || prevData.filePath;\n\n// استخراج الروابط (كل رابط في سطر)\nconst lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\nconst urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\nif (urls.length === 0) {\n  return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n}\n\nconst title = (fileName || 'untitled').replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\nreturn urls.map((url, i) => ({\n  json: {\n    url,\n    title: urls.length > 1 ? `${title} (${i + 1})` : title,\n    fileName,\n    filePath,\n    totalUrls: urls.length\n  }\n}));"
       },
       "id": "extract-urls",
       "name": "🔗 استخراج الروابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1340, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
@@ -83,7 +93,7 @@
       "name": "🔍 تحديد نوع الرابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1560, 200]
+      "position": [1780, 200]
     },
     {
       "parameters": {
@@ -103,7 +113,7 @@
       "name": "🌐 جلب المحتوى (Jina Premium)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1780, 200]
+      "position": [2000, 200]
     },
     {
       "parameters": {
@@ -117,7 +127,7 @@
       "name": "🤖 تلخيص بـ AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2000, 200]
+      "position": [2220, 200]
     },
     {
       "parameters": {
@@ -127,7 +137,7 @@
       "name": "📝 بناء Markdown",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2220, 200]
+      "position": [2440, 200]
     },
     {
       "parameters": {
@@ -141,7 +151,7 @@
       "name": "💾 حفظ في knowledge_inbox",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2440, 200]
+      "position": [2660, 200]
     },
     {
       "parameters": {
@@ -155,7 +165,7 @@
       "name": "📦 نقل إلى url_processed",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2660, 200]
+      "position": [2880, 200]
     },
     {
       "parameters": {
@@ -165,7 +175,7 @@
       "name": "✅ تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2880, 200]
+      "position": [3100, 200]
     }
   ],
   "connections": {
@@ -182,6 +192,9 @@
       ]
     },
     "🔀 تقسيم الملفات": {
+      "main": [[{ "node": "🔧 تجهيز قراءة الملف", "type": "main", "index": 0 }]]
+    },
+    "🔧 تجهيز قراءة الملف": {
       "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
     },
     "📖 قراءة محتوى الملف": {
