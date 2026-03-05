@@ -116,16 +116,21 @@ Open WebUI → Pipelines :9099 (saleh_legal_pipeline.py)
 
 ---
 
-## تدفق أدوات MCP
+## تدفق n8n_bridge — عرض workflows كنماذج
+
+> **المرجع:** `docker-compose.yml` السطر 321 — `image: ghcr.io/sveneisenschmidt/n8n-openai-bridge:latest`
+
+خدمة `n8n_bridge` تفحص n8n كل دقيقة وتعرض أي workflow يحمل tag اسمه `n8n-openai-bridge` كنموذج مباشر في Open WebUI. شرط ظهور الـ workflow: يجب أن يحتوي على عقدة **Chat Trigger** أو **Webhook**.
 
 ```
-المستخدم في Open WebUI
-      │
+Open WebUI :3000
+      │  (يرى نماذج إضافية)
       ▼
-Open WebUI → mcpo :8020 (REST API)
-      ├──► ollama_model_builder.py  → Ollama :11434 (إدارة النماذج)
-      ├──► legal_rag_mcp.py         → ChromaDB :8010 (بحث قانوني)
-      └──► n8n_builder.py           → n8n :5678 (إنشاء/تفعيل workflows)
+n8n_bridge :11435
+      │  (يفحص كل 60 ثانية)
+      ▼
+n8n :5678
+      └──► workflows ذات tag: n8n-openai-bridge + chatTrigger/Webhook
 ```
 
 ---
