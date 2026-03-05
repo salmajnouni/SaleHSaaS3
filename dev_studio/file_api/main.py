@@ -14,7 +14,7 @@ from typing import List, Optional
 app = FastAPI(title="File API for n8n", version="1.0.0")
 
 # المجلدات المسموح بها (للأمان)
-ALLOWED_BASE = "D:/SaleHSaaS3"
+ALLOWED_BASE = os.environ.get("ALLOWED_BASE", "/data")
 
 
 def validate_path(path: str) -> Path:
