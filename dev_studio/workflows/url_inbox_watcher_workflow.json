@@ -15,12 +15,20 @@
     },
     {
       "parameters": {
-        "jsCode": "// قراءة قائمة الملفات من File API ثم قراءة كل ملف واستخراج الروابط\nconst FILE_API = 'http://host.docker.internal:8765';\nconst INBOX_PATH = 'D:\\\\SaleHSaaS3\\\\url_inbox';\n\nlet listResponse;\ntry {\n  listResponse = await $helpers.httpRequest({\n    method: 'GET',\n    url: FILE_API + '/list',\n    qs: { path: INBOX_PATH, extensions: '.txt,.url,.md' }\n  });\n} catch(e) {\n  return [{ json: { skip: true, error: 'File API غير متاح: ' + e.message } }];\n}\n\nconst files = listResponse.files || [];\nif (files.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد ملفات في url_inbox' } }];\n}\n\nconst results = [];\nfor (const file of files) {\n  const fileName = file.fileName;\n  const filePath = file.filePath;\n  let readResponse;\n  try {\n    readResponse = await $helpers.httpRequest({\n      method: 'GET',\n      url: FILE_API + '/read',\n      qs: { path: filePath }\n    });\n  } catch(e) {\n    continue;\n  }\n  const content = readResponse.content || '';\n  const lines = content.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });\n  const urls = lines.filter(function(l) { return l.startsWith('http://') || l.startsWith('https://'); });\n  if (urls.length === 0) continue;\n  const title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n  for (let i = 0; i < urls.length; i++) {\n    results.push({\n      json: {\n        url: urls[i],\n        title: urls.length > 1 ? title + ' (' + (i + 1) + ')' : title,\n        fileName: fileName,\n        filePath: filePath,\n        totalUrls: urls.length\n      }\n    });\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد روابط صالحة في أي ملف' } }];\n}\n\nreturn results;"
+        "url": "http://host.docker.internal:8765/list",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "path", "value": "D:\\SaleHSaaS3\\url_inbox" },
+            { "name": "extensions", "value": ".txt,.url,.md" }
+          ]
+        },
+        "options": { "timeout": 10000 }
       },
-      "id": "scan-inbox",
-      "name": "🔍 فحص url_inbox واستخراج الروابط",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "list-files",
+      "name": "📋 قراءة ملفات url_inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [460, 300]
     },
     {
@@ -29,29 +37,66 @@
           "options": { "caseSensitive": false },
           "conditions": [
             {
-              "id": "not-skip",
-              "leftValue": "={{ $json.skip }}",
-              "rightValue": true,
-              "operator": { "type": "boolean", "operation": "notEquals" }
+              "id": "has-files",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
             }
           ]
         }
       },
-      "id": "check-urls",
-      "name": "📁 يوجد روابط؟",
+      "id": "check-files",
+      "name": "📁 يوجد ملفات؟",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [680, 300]
     },
     {
       "parameters": {
-        "jsCode": "const inputData = $input.first().json;\nif (inputData.skip || !inputData.url) {\n  return [{ json: { skip: true, reason: 'لا يوجد رابط' } }];\n}\nconst url = inputData.url;\nconst title = inputData.title || '';\nlet type = 'webpage';\nif (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1) type = 'youtube';\nelse if (url.indexOf('twitter.com') !== -1 || url.indexOf('x.com') !== -1) type = 'twitter';\nelse if (url.indexOf('linkedin.com') !== -1) type = 'linkedin';\nelse if (url.indexOf('facebook.com') !== -1 || url.indexOf('fb.com') !== -1) type = 'facebook';\nelse if (url.indexOf('instagram.com') !== -1) type = 'instagram';\nelse if (url.indexOf('tiktok.com') !== -1) type = 'tiktok';\nelse if (url.indexOf('reddit.com') !== -1) type = 'reddit';\nelse if (/\\.(mp3|wav|ogg|m4a|aac)$/i.test(url)) type = 'audio';\nelse if (/\\.(mp4|avi|mov|mkv|webm)$/i.test(url)) type = 'video';\nelse if (/\\.pdf$/i.test(url)) type = 'pdf';\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = (title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9 ]/g, '').trim().slice(0, 50);\nconst outputFilename = timestamp + '_' + safeTitle + '.md';\nreturn [{ json: Object.assign({}, inputData, { type: type, outputFilename: outputFilename, timestamp: timestamp }) }];"
+        "jsCode": "const files = $input.first().json.files || [];\nif (files.length === 0) return [{ json: { skip: true } }];\nreturn files.map(function(f) {\n  return { json: { fileName: f.fileName, filePath: f.filePath } };\n});"
+      },
+      "id": "split-files",
+      "name": "🔀 تقسيم الملفات",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/read",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "path", "value": "={{ $json.filePath }}" }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "read-file",
+      "name": "📖 قراءة محتوى الملف",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileData = $input.first().json;\nconst prevData = $('🔀 تقسيم الملفات').first().json;\nconst content = fileData.content || '';\nconst fileName = fileData.fileName || prevData.fileName;\nconst filePath = fileData.filePath || prevData.filePath;\nconst lines = content.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });\nconst urls = lines.filter(function(l) { return l.startsWith('http://') || l.startsWith('https://'); });\nif (urls.length === 0) return [{ json: { skip: true, fileName: fileName } }];\nconst title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\nreturn urls.map(function(url, i) {\n  return { json: {\n    url: url,\n    title: urls.length > 1 ? title + ' (' + (i+1) + ')' : title,\n    fileName: fileName,\n    filePath: filePath\n  }};\n});"
+      },
+      "id": "extract-urls",
+      "name": "🔗 استخراج الروابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nif (d.skip || !d.url) return [{ json: { skip: true } }];\nconst url = d.url;\nlet type = 'webpage';\nif (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1) type = 'youtube';\nelse if (url.indexOf('twitter.com') !== -1 || url.indexOf('x.com') !== -1) type = 'twitter';\nelse if (url.indexOf('linkedin.com') !== -1) type = 'linkedin';\nelse if (url.indexOf('facebook.com') !== -1) type = 'facebook';\nelse if (url.indexOf('instagram.com') !== -1) type = 'instagram';\nelse if (url.indexOf('tiktok.com') !== -1) type = 'tiktok';\nelse if (url.indexOf('reddit.com') !== -1) type = 'reddit';\nelse if (/\\.(mp3|wav|ogg|aac)$/i.test(url)) type = 'audio';\nelse if (/\\.(mp4|avi|mov|mkv)$/i.test(url)) type = 'video';\nelse if (/\\.pdf$/i.test(url)) type = 'pdf';\nconst ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safe = (d.title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9 ]/g, '').trim().slice(0, 50);\nreturn [{ json: Object.assign({}, d, { type: type, outputFilename: ts + '_' + safe + '.md', timestamp: ts }) }];"
       },
       "id": "detect-type",
       "name": "🔍 تحديد نوع الرابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
@@ -71,75 +116,125 @@
       "name": "🌐 جلب المحتوى (Jina Premium)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1120, 200]
+      "position": [1780, 200]
     },
     {
       "parameters": {
-        "jsCode": "// استدعاء Ollama عبر helpers.httpRequest لتجنب مشاكل JSON في n8n\nconst typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst jinaData = $input.first().json;\nconst content = jinaData.body || jinaData.data || '';\nconst contentSlice = content.slice(0, 3000);\nconst prompt = 'أنت مساعد متخصص في تلخيص المحتوى. المصدر: ' + typeData.url + '\\n\\nالمهمة:\\n1. اكتب ملخصاً موجزاً (3-5 أسطر)\\n2. استخرج 5-7 نقاط رئيسية\\n3. حدد الكلمات المفتاحية\\n\\nالمحتوى:\\n' + contentSlice + '\\n\\nأجب بالعربية بصيغة Markdown.';\nlet summary = '';\ntry {\n  const ollamaResponse = await $helpers.httpRequest({\n    method: 'POST',\n    url: 'http://host.docker.internal:11434/api/generate',\n    body: {\n      model: 'qwen2.5:3b',\n      prompt: prompt,\n      stream: false,\n      options: { temperature: 0.3, num_predict: 800 }\n    },\n    json: true,\n    timeout: 120000\n  });\n  summary = ollamaResponse.response || '';\n} catch(e) {\n  summary = '(فشل التلخيص: ' + e.message + ')';\n}\nreturn [{ json: { jinaContent: content, summary: summary } }];"
+        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst jinaData = $input.first().json;\nconst content = jinaData.body || jinaData.data || '';\nconst prompt = 'أنت مساعد متخصص في تلخيص المحتوى. المصدر: ' + typeData.url + '\\n\\nالمهمة:\\n1. اكتب ملخصاً موجزاً (3-5 أسطر)\\n2. استخرج 5-7 نقاط رئيسية\\n3. حدد الكلمات المفتاحية\\n\\nالمحتوى:\\n' + content.slice(0, 3000) + '\\n\\nأجب بالعربية بصيغة Markdown.';\nreturn [{ json: { prompt: prompt, jinaContent: content } }];"
+      },
+      "id": "prepare-prompt",
+      "name": "🧠 تجهيز البرومبت",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\"model\":\"qwen2.5:3b\",\"prompt\":{{ JSON.stringify($json.prompt) }},\"stream\":false,\"options\":{\"temperature\":0.3,\"num_predict\":800}}",
+        "options": { "timeout": 120000 }
       },
       "id": "ai-summarize",
       "name": "🤖 تلخيص بـ AI",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1340, 200]
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 200]
     },
     {
       "parameters": {
-        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst aiData = $input.first().json;\nconst content = aiData.jinaContent || '';\nconst summary = aiData.summary || '';\nconst wordCount = content.split(/\\s+/).length;\nconst dateStr = new Date().toLocaleDateString('ar-SA');\nconst markdown = '---\\ntitle: \"' + (typeData.title || typeData.url) + '\"\\nurl: ' + typeData.url + '\\ntype: ' + typeData.type + '\\ndate: ' + typeData.timestamp + '\\nwords: ' + wordCount + '\\nsource_file: ' + typeData.fileName + '\\n---\\n\\n# ' + (typeData.title || 'محتوى من: ' + typeData.url) + '\\n\\n**المصدر:** ' + typeData.url + '  \\n**النوع:** ' + typeData.type + '  \\n**التاريخ:** ' + dateStr + '  \\n**الملف الأصلي:** ' + typeData.fileName + '\\n\\n---\\n\\n## الملخص الذكي\\n\\n' + summary + '\\n\\n---\\n\\n## المحتوى الكامل\\n\\n' + content + '\\n';\nreturn [{ json: Object.assign({}, typeData, { markdown: markdown, wordCount: wordCount }) }];"
+        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst prepData = $('🧠 تجهيز البرومبت').first().json;\nconst aiData = $input.first().json;\nconst content = prepData.jinaContent || '';\nconst summary = aiData.response || '';\nconst wordCount = content.split(/\\s+/).length;\nconst dateStr = new Date().toLocaleDateString('ar-SA');\nconst md = '---\\ntitle: \"' + (typeData.title || typeData.url) + '\"\\nurl: ' + typeData.url + '\\ntype: ' + typeData.type + '\\ndate: ' + typeData.timestamp + '\\nwords: ' + wordCount + '\\nsource_file: ' + typeData.fileName + '\\n---\\n\\n# ' + (typeData.title || typeData.url) + '\\n\\n**المصدر:** ' + typeData.url + '  \\n**النوع:** ' + typeData.type + '  \\n**التاريخ:** ' + dateStr + '  \\n**الملف الأصلي:** ' + typeData.fileName + '\\n\\n---\\n\\n## الملخص الذكي\\n\\n' + summary + '\\n\\n---\\n\\n## المحتوى الكامل\\n\\n' + content + '\\n';\nreturn [{ json: Object.assign({}, typeData, { markdown: md, wordCount: wordCount }) }];"
       },
       "id": "build-markdown",
       "name": "📝 بناء Markdown",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1560, 200]
+      "position": [2440, 200]
     },
     {
       "parameters": {
-        "jsCode": "const FILE_API = 'http://host.docker.internal:8765';\nconst data = $input.first().json;\nconst markdown = data.markdown;\nconst outputFilename = data.outputFilename;\nconst filePath = data.filePath;\nconst fileName = data.fileName;\n\ntry {\n  await $helpers.httpRequest({\n    method: 'POST',\n    url: FILE_API + '/write',\n    body: {\n      path: 'D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\' + outputFilename,\n      content: markdown\n    },\n    json: true\n  });\n} catch(e) {\n  throw new Error('فشل حفظ ملف Markdown: ' + e.message);\n}\n\ntry {\n  await $helpers.httpRequest({\n    method: 'POST',\n    url: FILE_API + '/move',\n    body: {\n      source: filePath,\n      destination: 'D:\\\\SaleHSaaS3\\\\url_processed\\\\' + fileName\n    },\n    json: true\n  });\n} catch(e) {\n  console.log('تحذير: فشل نقل الملف: ' + e.message);\n}\n\nreturn [{ json: Object.assign({}, data, {\n  savedTo: 'D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\' + outputFilename,\n  movedFrom: filePath,\n  success: true\n}) }];"
+        "url": "http://host.docker.internal:8765/write",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\"path\":\"D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\{{ $json.outputFilename }}\",\"content\":{{ JSON.stringify($json.markdown) }}}",
+        "options": { "timeout": 15000 }
       },
-      "id": "save-and-move",
-      "name": "💾 حفظ ونقل الملفات",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1780, 200]
+      "id": "save-knowledge",
+      "name": "💾 حفظ في knowledge_inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 200]
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json;\nconsole.log('تمت معالجة: ' + data.fileName + ' -> ' + data.outputFilename);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  savedTo: data.savedTo,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n} }];"
+        "url": "http://host.docker.internal:8765/move",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\"source\":{{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\"destination\":\"D:\\\\SaleHSaaS3\\\\url_processed\\\\{{ $('📝 بناء Markdown').first().json.fileName }}\"}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "move-processed",
+      "name": "📦 نقل إلى url_processed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2880, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('📝 بناء Markdown').first().json;\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n} }];"
       },
       "id": "log-success",
       "name": "✅ تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2000, 200]
+      "position": [3100, 200]
     }
   ],
   "connections": {
     "⏱️ كل دقيقة": {
-      "main": [[{ "node": "🔍 فحص url_inbox واستخراج الروابط", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "📋 قراءة ملفات url_inbox", "type": "main", "index": 0 }]]
     },
-    "🔍 فحص url_inbox واستخراج الروابط": {
-      "main": [[{ "node": "📁 يوجد روابط؟", "type": "main", "index": 0 }]]
+    "📋 قراءة ملفات url_inbox": {
+      "main": [[{ "node": "📁 يوجد ملفات؟", "type": "main", "index": 0 }]]
     },
-    "📁 يوجد روابط؟": {
+    "📁 يوجد ملفات؟": {
       "main": [
-        [{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }],
+        [{ "node": "🔀 تقسيم الملفات", "type": "main", "index": 0 }],
         []
       ]
+    },
+    "🔀 تقسيم الملفات": {
+      "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
+    },
+    "📖 قراءة محتوى الملف": {
+      "main": [[{ "node": "🔗 استخراج الروابط", "type": "main", "index": 0 }]]
+    },
+    "🔗 استخراج الروابط": {
+      "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
     },
     "🔍 تحديد نوع الرابط": {
       "main": [[{ "node": "🌐 جلب المحتوى (Jina Premium)", "type": "main", "index": 0 }]]
     },
     "🌐 جلب المحتوى (Jina Premium)": {
+      "main": [[{ "node": "🧠 تجهيز البرومبت", "type": "main", "index": 0 }]]
+    },
+    "🧠 تجهيز البرومبت": {
       "main": [[{ "node": "🤖 تلخيص بـ AI", "type": "main", "index": 0 }]]
     },
     "🤖 تلخيص بـ AI": {
       "main": [[{ "node": "📝 بناء Markdown", "type": "main", "index": 0 }]]
     },
     "📝 بناء Markdown": {
-      "main": [[{ "node": "💾 حفظ ونقل الملفات", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
     },
-    "💾 حفظ ونقل الملفات": {
+    "💾 حفظ في knowledge_inbox": {
+      "main": [[{ "node": "📦 نقل إلى url_processed", "type": "main", "index": 0 }]]
+    },
+    "📦 نقل إلى url_processed": {
       "main": [[{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]]
     }
   },
