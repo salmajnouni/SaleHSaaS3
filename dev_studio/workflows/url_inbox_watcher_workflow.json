@@ -11,21 +11,17 @@
       "name": "⏱️ كل دقيقة",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [240, 300],
-      "notes": "يفحص المجلد كل دقيقة — يمكن تغييره إلى 5 دقائق"
+      "position": [240, 300]
     },
     {
       "parameters": {
-        "operation": "list",
-        "path": "D:\\SaleHSaaS3\\url_inbox",
-        "options": {}
+        "jsCode": "// قراءة قائمة الملفات من مجلد url_inbox باستخدام Node.js\nconst fs = require('fs');\nconst path = require('path');\n\nconst inboxDir = 'D:\\\\SaleHSaaS3\\\\url_inbox';\n\ntry {\n  if (!fs.existsSync(inboxDir)) {\n    return [{ json: { files: [], count: 0, message: 'المجلد غير موجود: ' + inboxDir } }];\n  }\n\n  const allFiles = fs.readdirSync(inboxDir);\n  const txtFiles = allFiles.filter(f => {\n    const ext = path.extname(f).toLowerCase();\n    return ext === '.txt' || ext === '.url' || ext === '.md';\n  });\n\n  if (txtFiles.length === 0) {\n    return [{ json: { files: [], count: 0, message: 'لا توجد ملفات للمعالجة' } }];\n  }\n\n  return txtFiles.map(fileName => ({\n    json: {\n      fileName,\n      filePath: path.join(inboxDir, fileName),\n      count: txtFiles.length\n    }\n  }));\n\n} catch (err) {\n  return [{ json: { files: [], count: 0, error: err.message } }];\n}"
       },
-      "id": "list-files",
+      "id": "list-and-filter",
       "name": "📋 قراءة ملفات url_inbox",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [460, 300],
-      "notes": "يقرأ كل الملفات في مجلد url_inbox"
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
     },
     {
       "parameters": {
@@ -34,9 +30,9 @@
           "conditions": [
             {
               "id": "has-files",
-              "leftValue": "={{ $input.all().length }}",
-              "rightValue": 0,
-              "operator": { "type": "number", "operation": "gt" }
+              "leftValue": "={{ $json.fileName !== undefined && $json.fileName !== null && $json.fileName !== '' }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
             }
           ]
         }
@@ -49,47 +45,23 @@
     },
     {
       "parameters": {
-        "jsCode": "// فلترة الملفات .txt و .url فقط\nconst files = $input.all();\nconst validFiles = files.filter(f => {\n  const name = (f.json.name || f.json.fileName || '').toLowerCase();\n  return name.endsWith('.txt') || name.endsWith('.url') || name.endsWith('.md');\n});\n\nif (validFiles.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد ملفات نصية' } }];\n}\n\nreturn validFiles.map(f => ({ json: {\n  fileName: f.json.name || f.json.fileName,\n  filePath: f.json.path || `D:\\\\SaleHSaaS3\\\\url_inbox\\\\${f.json.name || f.json.fileName}`\n}}));"
+        "jsCode": "// قراءة محتوى الملف واستخراج الروابط\nconst fs = require('fs');\n\nconst { fileName, filePath } = $input.first().json;\n\ntry {\n  const content = fs.readFileSync(filePath, 'utf8');\n  const lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\n  const urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\n  if (urls.length === 0) {\n    return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n  }\n\n  const title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\n  return urls.map((url, i) => ({\n    json: {\n      url,\n      title: urls.length > 1 ? `${title} (${i + 1})` : title,\n      fileName,\n      filePath,\n      totalUrls: urls.length\n    }\n  }));\n\n} catch (err) {\n  return [{ json: { skip: true, fileName, reason: 'خطأ في قراءة الملف: ' + err.message } }];\n}"
       },
-      "id": "filter-txt",
-      "name": "🔍 فلترة ملفات .txt",
+      "id": "read-and-extract",
+      "name": "📖 قراءة واستخراج الروابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [900, 200]
     },
     {
       "parameters": {
-        "operation": "read",
-        "fileName": "={{ $json.filePath }}",
-        "options": { "encoding": "utf8" }
-      },
-      "id": "read-file",
-      "name": "📖 قراءة محتوى الملف",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [1120, 200],
-      "notes": "يقرأ محتوى الملف — يجب أن يحتوي على رابط واحد في كل سطر"
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = $input.first().json;\nconst content = data.data || data.content || '';\nconst fileName = $('🔍 فلترة ملفات .txt').first().json.fileName;\nconst filePath = $('🔍 فلترة ملفات .txt').first().json.filePath;\n\n// استخراج الروابط من الملف (سطر واحد = رابط واحد)\nconst lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\nconst urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\n// استخدام اسم الملف كعنوان\nconst title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\nif (urls.length === 0) {\n  return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n}\n\n// معالجة أول رابط (أو كل الروابط إذا كانت متعددة)\nreturn urls.map((url, i) => ({ json: {\n  url,\n  title: urls.length > 1 ? `${title} (${i+1})` : title,\n  fileName,\n  filePath,\n  totalUrls: urls.length\n}}));"
-      },
-      "id": "extract-urls",
-      "name": "🔗 استخراج الروابط",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1340, 200],
-      "notes": "يدعم ملف يحتوي على رابط واحد أو روابط متعددة (كل رابط في سطر)"
-    },
-    {
-      "parameters": {
-        "jsCode": "const { url, title } = $input.first().json;\n\n// تحديد نوع الرابط\nlet type = 'webpage';\nif (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';\nelse if (url.includes('twitter.com') || url.includes('x.com')) type = 'twitter';\nelse if (url.includes('linkedin.com')) type = 'linkedin';\nelse if (url.includes('facebook.com') || url.includes('fb.com')) type = 'facebook';\nelse if (url.includes('instagram.com')) type = 'instagram';\nelse if (url.includes('tiktok.com')) type = 'tiktok';\nelse if (url.includes('reddit.com')) type = 'reddit';\nelse if (url.match(/\\.(mp3|wav|ogg|m4a|aac)$/i)) type = 'audio';\nelse if (url.match(/\\.(mp4|avi|mov|mkv|webm)$/i)) type = 'video';\nelse if (url.match(/\\.(pdf)$/i)) type = 'pdf';\n\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = (title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9\\s]/g, '').trim().slice(0, 50);\nconst outputFilename = `${timestamp}_${safeTitle}.md`;\n\nreturn [{ json: { ...$input.first().json, type, outputFilename, timestamp } }];"
+        "jsCode": "const { url, title } = $input.first().json;\n\n// تحديد نوع الرابط\nlet type = 'webpage';\nif (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';\nelse if (url.includes('twitter.com') || url.includes('x.com')) type = 'twitter';\nelse if (url.includes('linkedin.com')) type = 'linkedin';\nelse if (url.includes('facebook.com') || url.includes('fb.com')) type = 'facebook';\nelse if (url.includes('instagram.com')) type = 'instagram';\nelse if (url.includes('tiktok.com')) type = 'tiktok';\nelse if (url.includes('reddit.com')) type = 'reddit';\nelse if (url.match(/\\.(mp3|wav|ogg|m4a|aac)$/i)) type = 'audio';\nelse if (url.match(/\\.(mp4|avi|mov|mkv|webm)$/i)) type = 'video';\nelse if (url.match(/\\.pdf$/i)) type = 'pdf';\n\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = (title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9\\s]/g, '').trim().slice(0, 50);\nconst outputFilename = `${timestamp}_${safeTitle}.md`;\n\nreturn [{ json: { ...$input.first().json, type, outputFilename, timestamp } }];"
       },
       "id": "detect-type",
       "name": "🔍 تحديد نوع الرابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1560, 200]
+      "position": [1120, 200]
     },
     {
       "parameters": {
@@ -109,8 +81,7 @@
       "name": "🌐 جلب المحتوى (Jina Premium)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1780, 200],
-      "notes": "Jina.ai Reader Premium — يعمل مع كل أنواع الروابط"
+      "position": [1340, 200]
     },
     {
       "parameters": {
@@ -124,7 +95,7 @@
       "name": "🤖 تلخيص بـ AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2000, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
@@ -134,42 +105,27 @@
       "name": "📝 بناء Markdown",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2220, 200]
+      "position": [1780, 200]
     },
     {
       "parameters": {
-        "operation": "write",
-        "fileName": "=D:\\SaleHSaaS3\\knowledge_inbox\\{{ $json.outputFilename }}",
-        "dataPropertyName": "markdown",
-        "encoding": "utf8",
-        "options": {}
+        "jsCode": "// حفظ ملف Markdown في knowledge_inbox ونقل الملف الأصلي إلى url_processed\nconst fs = require('fs');\nconst path = require('path');\n\nconst { markdown, outputFilename, filePath, fileName } = $input.first().json;\n\nconst knowledgeInboxDir = 'D:\\\\SaleHSaaS3\\\\knowledge_inbox';\nconst urlProcessedDir = 'D:\\\\SaleHSaaS3\\\\url_processed';\n\n// إنشاء المجلدات إذا لم تكن موجودة\nif (!fs.existsSync(knowledgeInboxDir)) {\n  fs.mkdirSync(knowledgeInboxDir, { recursive: true });\n}\nif (!fs.existsSync(urlProcessedDir)) {\n  fs.mkdirSync(urlProcessedDir, { recursive: true });\n}\n\n// حفظ ملف Markdown\nconst outputPath = path.join(knowledgeInboxDir, outputFilename);\nfs.writeFileSync(outputPath, markdown, 'utf8');\n\n// نقل الملف الأصلي إلى url_processed\nconst destPath = path.join(urlProcessedDir, fileName);\ntry {\n  fs.renameSync(filePath, destPath);\n} catch (e) {\n  // إذا فشل rename (مثلاً بسبب اختلاف القرص) استخدم copy+delete\n  fs.copyFileSync(filePath, destPath);\n  fs.unlinkSync(filePath);\n}\n\nreturn [{ json: {\n  ...($input.first().json),\n  savedTo: outputPath,\n  movedFrom: filePath,\n  movedTo: destPath,\n  success: true\n}}];"
       },
-      "id": "save-to-knowledge",
-      "name": "💾 حفظ في knowledge_inbox",
-      "type": "n8n-nodes-base.writeBinaryFile",
-      "typeVersion": 1,
-      "position": [2440, 200]
+      "id": "save-and-move",
+      "name": "💾 حفظ ونقل الملفات",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 200]
     },
     {
       "parameters": {
-        "command": "=powershell -Command \"Move-Item -Path '{{ $('📝 بناء Markdown').first().json.filePath }}' -Destination 'D:\\SaleHSaaS3\\url_processed\\{{ $('📝 بناء Markdown').first().json.fileName }}' -Force\""
-      },
-      "id": "move-to-processed",
-      "name": "📦 نقل إلى url_processed",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [2660, 200],
-      "notes": "ينقل الملف الأصلي إلى url_processed بعد المعالجة الناجحة"
-    },
-    {
-      "parameters": {
-        "jsCode": "// تسجيل في السجل\nconst data = $('📝 بناء Markdown').first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
+        "jsCode": "// تسجيل في السجل\nconst data = $input.first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  savedTo: data.savedTo,\n  movedTo: data.movedTo,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
       },
       "id": "log-success",
       "name": "✅ تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2880, 200]
+      "position": [2220, 200]
     }
   ],
   "connections": {
@@ -181,17 +137,11 @@
     },
     "📁 يوجد ملفات؟": {
       "main": [
-        [{ "node": "🔍 فلترة ملفات .txt", "type": "main", "index": 0 }],
+        [{ "node": "📖 قراءة واستخراج الروابط", "type": "main", "index": 0 }],
         []
       ]
     },
-    "🔍 فلترة ملفات .txt": {
-      "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
-    },
-    "📖 قراءة محتوى الملف": {
-      "main": [[{ "node": "🔗 استخراج الروابط", "type": "main", "index": 0 }]]
-    },
-    "🔗 استخراج الروابط": {
+    "📖 قراءة واستخراج الروابط": {
       "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
     },
     "🔍 تحديد نوع الرابط": {
@@ -204,12 +154,9 @@
       "main": [[{ "node": "📝 بناء Markdown", "type": "main", "index": 0 }]]
     },
     "📝 بناء Markdown": {
-      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "💾 حفظ ونقل الملفات", "type": "main", "index": 0 }]]
     },
-    "💾 حفظ في knowledge_inbox": {
-      "main": [[{ "node": "📦 نقل إلى url_processed", "type": "main", "index": 0 }]]
-    },
-    "📦 نقل إلى url_processed": {
+    "💾 حفظ ونقل الملفات": {
       "main": [[{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]]
     }
   },
