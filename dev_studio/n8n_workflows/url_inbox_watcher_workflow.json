@@ -170,7 +170,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// نقل الملف الأصلي فقط بعد معالجة آخر رابط فيه\nconst markdownData = $('📝 بناء Markdown').first().json;\nconst isLastUrl = markdownData.urlIndex === markdownData.urlTotal;\n\nif (!isLastUrl) {\n  // ليس آخر رابط — لا ننقل الملف بعد\n  return [{ json: Object.assign({}, markdownData, { moved: false, reason: 'انتظار معالجة باقي الروابط (' + markdownData.urlIndex + '/' + markdownData.urlTotal + ')' }) }];\n}\n\n// آخر رابط — نمرر البيانات لعقدة النقل\nreturn [{ json: Object.assign({}, markdownData, { moved: true, readyToMove: true }) }];"
+        "jsCode": "// نقل الملف الأصلي فقط بعد معالجة آخر رابط فيه\nconst markdownData = $('📝 بناء Markdown').first().json;\nconst isLastUrl = markdownData.urlIndex === markdownData.urlTotal;\n\n// بناء filePath من fileName مباشرة لضمان وجوده دائماً\nconst fileName = markdownData.fileName || '';\nconst filePath = fileName ? '/data/url_inbox/' + fileName : markdownData.filePath || '';\n\nif (!isLastUrl) {\n  return [{ json: Object.assign({}, markdownData, { moved: false, readyToMove: false, filePath: filePath, fileName: fileName, reason: 'انتظار معالجة باقي الروابط (' + markdownData.urlIndex + '/' + markdownData.urlTotal + ')' }) }];\n}\n\n// آخر رابط — نمرر البيانات لعقدة النقل\nreturn [{ json: Object.assign({}, markdownData, { moved: true, readyToMove: true, filePath: filePath, fileName: fileName }) }];"
       },
       "id": "check-last-url",
       "name": "🔄 هل آخر رابط؟",
@@ -204,7 +204,7 @@
         "method": "POST",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ source: '/data/url_inbox/' + $json.fileName, destination: '/data/url_processed/' + $json.fileName }) }}",
+        "jsonBody": "={{ JSON.stringify({ source: $json.filePath || ('/data/url_inbox/' + $json.fileName), destination: '/data/url_processed/' + $json.fileName }) }}",
         "options": { "timeout": 10000 }
       },
       "id": "move-processed",
