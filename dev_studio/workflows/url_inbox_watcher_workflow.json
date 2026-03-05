@@ -156,10 +156,10 @@
     {
       "parameters": {
         "url": "http://host.docker.internal:8765/write",
+        "method": "POST",
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\"path\":\"/data/knowledge_inbox/{{ $json.outputFilename }}\",\"content\":{{ JSON.stringify($json.markdown) }}}",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ path: '/data/knowledge_inbox/' + $json.outputFilename, content: $json.markdown }) }}",
         "options": { "timeout": 15000 }
       },
       "id": "save-knowledge",
@@ -171,10 +171,10 @@
     {
       "parameters": {
         "url": "http://host.docker.internal:8765/move",
+        "method": "POST",
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\"source\":{{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\"destination\":\"/data/url_processed/{{ $('📝 بناء Markdown').first().json.fileName }}\"}",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: $('📝 بناء Markdown').first().json.filePath, destination: '/data/url_processed/' + $('📝 بناء Markdown').first().json.fileName }) }}",
         "options": { "timeout": 10000 }
       },
       "id": "move-processed",
