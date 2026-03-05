@@ -174,7 +174,7 @@
         "method": "POST",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ source: $('📝 بناء Markdown').first().json.filePath, destination: '/data/url_processed/' + $('📝 بناء Markdown').first().json.fileName }) }}",
+        "jsonBody": "={{ JSON.stringify({ source: '/data/url_inbox/' + $('📝 بناء Markdown').first().json.fileName, destination: '/data/url_processed/' + $('📝 بناء Markdown').first().json.fileName }) }}",
         "options": { "timeout": 10000 }
       },
       "id": "move-processed",
