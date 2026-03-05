@@ -15,13 +15,12 @@
     },
     {
       "parameters": {
-        "url": "http://host.docker.internal:8765/list?path=D%3A%5CSaleHSaaS3%5Curl_inbox&extensions=.txt,.url,.md",
-        "options": { "timeout": 10000 }
+        "jsCode": "// ===== المرحلة 1: قراءة قائمة الملفات من File API =====\n// نستخدم $helpers.httpRequest المتاحة في n8n\nconst FILE_API = 'http://host.docker.internal:8765';\nconst INBOX_PATH = 'D:\\\\SaleHSaaS3\\\\url_inbox';\n\nlet listResponse;\ntry {\n  listResponse = await $helpers.httpRequest({\n    method: 'GET',\n    url: `${FILE_API}/list`,\n    qs: { path: INBOX_PATH, extensions: '.txt,.url,.md' }\n  });\n} catch(e) {\n  return [{ json: { skip: true, error: 'File API غير متاح: ' + e.message } }];\n}\n\nconst files = listResponse.files || [];\nif (files.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد ملفات في url_inbox' } }];\n}\n\n// ===== المرحلة 2: قراءة كل ملف واستخراج الروابط =====\nconst results = [];\n\nfor (const file of files) {\n  const fileName = file.fileName;\n  const filePath = file.filePath;\n  \n  // قراءة محتوى الملف\n  let readResponse;\n  try {\n    readResponse = await $helpers.httpRequest({\n      method: 'GET',\n      url: `${FILE_API}/read`,\n      qs: { path: filePath }\n    });\n  } catch(e) {\n    continue; // تجاهل الملف إذا فشلت القراءة\n  }\n  \n  const content = readResponse.content || '';\n  const lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\n  const urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n  \n  if (urls.length === 0) continue;\n  \n  const title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n  \n  for (let i = 0; i < urls.length; i++) {\n    results.push({\n      json: {\n        url: urls[i],\n        title: urls.length > 1 ? `${title} (${i + 1})` : title,\n        fileName,\n        filePath,\n        totalUrls: urls.length\n      }\n    });\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد روابط صالحة في أي ملف' } }];\n}\n\nreturn results;"
       },
-      "id": "list-files",
-      "name": "📋 قراءة ملفات url_inbox",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "id": "scan-inbox",
+      "name": "🔍 فحص url_inbox واستخراج الروابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [460, 300]
     },
     {
@@ -30,60 +29,19 @@
           "options": { "caseSensitive": false },
           "conditions": [
             {
-              "id": "has-files",
-              "leftValue": "={{ $json.count }}",
-              "rightValue": 0,
-              "operator": { "type": "number", "operation": "gt" }
+              "id": "not-skip",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "notEquals" }
             }
           ]
         }
       },
-      "id": "check-files",
-      "name": "📁 يوجد ملفات؟",
+      "id": "check-urls",
+      "name": "📁 يوجد روابط؟",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [680, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "// تحويل قائمة الملفات إلى عناصر منفصلة\n// الـ API يُرجع { files: [...], count: N }\n// كل ملف يحتوي على { fileName, filePath, size, modified }\nconst response = $input.first().json;\nconst files = response.files || [];\n\nif (files.length === 0) {\n  return [{ json: { skip: true, message: 'لا توجد ملفات' } }];\n}\n\n// إرجاع كل ملف كعنصر منفصل مع التأكد من وجود filePath\nreturn files.map(f => ({\n  json: {\n    fileName: f.fileName || f.name,\n    filePath: f.filePath || f.path,\n    size: f.size,\n    modified: f.modified\n  }\n}));"
-      },
-      "id": "split-files",
-      "name": "🔀 تقسيم الملفات",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [900, 200]
-    },
-    {
-      "parameters": {
-        "jsCode": "// قراءة محتوى الملف عبر File API واستخراج الروابط\n// نستخدم Code بدلاً من HTTP Request لتجنب مشاكل URL encoding\nconst { fileName, filePath } = $input.first().json;\n\nif (!filePath) {\n  return [{ json: { skip: true, reason: 'filePath غير موجود', fileName } }];\n}\n\n// بناء URL القراءة\nconst encodedPath = encodeURIComponent(filePath);\nconst apiUrl = `http://host.docker.internal:8765/read?path=${encodedPath}`;\n\nreturn [{ json: {\n  fileName,\n  filePath,\n  apiUrl,\n  _readReady: true\n}}];"
-      },
-      "id": "prepare-read",
-      "name": "🔧 تجهيز قراءة الملف",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1120, 200]
-    },
-    {
-      "parameters": {
-        "url": "={{ $json.apiUrl }}",
-        "options": { "timeout": 10000 }
-      },
-      "id": "read-file",
-      "name": "📖 قراءة محتوى الملف",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [1340, 200]
-    },
-    {
-      "parameters": {
-        "jsCode": "// استخراج الروابط من محتوى الملف\n// الـ API يُرجع { content, fileName, filePath, size }\nconst fileData = $input.first().json;\nconst prevData = $('🔧 تجهيز قراءة الملف').first().json;\n\nconst content = fileData.content || '';\nconst fileName = fileData.fileName || prevData.fileName;\nconst filePath = fileData.filePath || prevData.filePath;\n\n// استخراج الروابط (كل رابط في سطر)\nconst lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\nconst urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\nif (urls.length === 0) {\n  return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n}\n\nconst title = (fileName || 'untitled').replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\nreturn urls.map((url, i) => ({\n  json: {\n    url,\n    title: urls.length > 1 ? `${title} (${i + 1})` : title,\n    fileName,\n    filePath,\n    totalUrls: urls.length\n  }\n}));"
-      },
-      "id": "extract-urls",
-      "name": "🔗 استخراج الروابط",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1560, 200]
     },
     {
       "parameters": {
@@ -93,7 +51,7 @@
       "name": "🔍 تحديد نوع الرابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1780, 200]
+      "position": [900, 200]
     },
     {
       "parameters": {
@@ -113,7 +71,7 @@
       "name": "🌐 جلب المحتوى (Jina Premium)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2000, 200]
+      "position": [1120, 200]
     },
     {
       "parameters": {
@@ -127,7 +85,7 @@
       "name": "🤖 تلخيص بـ AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2220, 200]
+      "position": [1340, 200]
     },
     {
       "parameters": {
@@ -137,71 +95,41 @@
       "name": "📝 بناء Markdown",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2440, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
-        "url": "http://host.docker.internal:8765/write",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"path\": \"D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\{{ $json.outputFilename }}\",\n  \"content\": {{ JSON.stringify($json.markdown) }}\n}",
-        "options": { "timeout": 15000 }
+        "jsCode": "// حفظ ملف Markdown ونقل الملف الأصلي عبر File API\nconst FILE_API = 'http://host.docker.internal:8765';\nconst { markdown, outputFilename, filePath, fileName } = $input.first().json;\n\n// حفظ ملف Markdown في knowledge_inbox\ntry {\n  await $helpers.httpRequest({\n    method: 'POST',\n    url: `${FILE_API}/write`,\n    body: {\n      path: `D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\${outputFilename}`,\n      content: markdown\n    },\n    json: true\n  });\n} catch(e) {\n  throw new Error('فشل حفظ ملف Markdown: ' + e.message);\n}\n\n// نقل الملف الأصلي إلى url_processed\ntry {\n  await $helpers.httpRequest({\n    method: 'POST',\n    url: `${FILE_API}/move`,\n    body: {\n      source: filePath,\n      destination: `D:\\\\SaleHSaaS3\\\\url_processed\\\\${fileName}`\n    },\n    json: true\n  });\n} catch(e) {\n  // تسجيل الخطأ لكن لا نوقف التنفيذ\n  console.log('تحذير: فشل نقل الملف: ' + e.message);\n}\n\nreturn [{ json: {\n  ...($input.first().json),\n  savedTo: `D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\${outputFilename}`,\n  movedFrom: filePath,\n  success: true\n}}];"
       },
-      "id": "save-to-knowledge",
-      "name": "💾 حفظ في knowledge_inbox",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2660, 200]
+      "id": "save-and-move",
+      "name": "💾 حفظ ونقل الملفات",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1780, 200]
     },
     {
       "parameters": {
-        "url": "http://host.docker.internal:8765/move",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"source\": {{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\n  \"destination\": \"D:\\\\SaleHSaaS3\\\\url_processed\\\\{{ $('📝 بناء Markdown').first().json.fileName }}\"\n}",
-        "options": { "timeout": 10000 }
-      },
-      "id": "move-to-processed",
-      "name": "📦 نقل إلى url_processed",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2880, 200]
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = $('📝 بناء Markdown').first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
+        "jsCode": "const data = $input.first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  savedTo: data.savedTo,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
       },
       "id": "log-success",
       "name": "✅ تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [3100, 200]
+      "position": [2000, 200]
     }
   ],
   "connections": {
     "⏱️ كل دقيقة": {
-      "main": [[{ "node": "📋 قراءة ملفات url_inbox", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "🔍 فحص url_inbox واستخراج الروابط", "type": "main", "index": 0 }]]
     },
-    "📋 قراءة ملفات url_inbox": {
-      "main": [[{ "node": "📁 يوجد ملفات؟", "type": "main", "index": 0 }]]
+    "🔍 فحص url_inbox واستخراج الروابط": {
+      "main": [[{ "node": "📁 يوجد روابط؟", "type": "main", "index": 0 }]]
     },
-    "📁 يوجد ملفات؟": {
+    "📁 يوجد روابط؟": {
       "main": [
-        [{ "node": "🔀 تقسيم الملفات", "type": "main", "index": 0 }],
+        [{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }],
         []
       ]
-    },
-    "🔀 تقسيم الملفات": {
-      "main": [[{ "node": "🔧 تجهيز قراءة الملف", "type": "main", "index": 0 }]]
-    },
-    "🔧 تجهيز قراءة الملف": {
-      "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
-    },
-    "📖 قراءة محتوى الملف": {
-      "main": [[{ "node": "🔗 استخراج الروابط", "type": "main", "index": 0 }]]
-    },
-    "🔗 استخراج الروابط": {
-      "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
     },
     "🔍 تحديد نوع الرابط": {
       "main": [[{ "node": "🌐 جلب المحتوى (Jina Premium)", "type": "main", "index": 0 }]]
@@ -213,12 +141,9 @@
       "main": [[{ "node": "📝 بناء Markdown", "type": "main", "index": 0 }]]
     },
     "📝 بناء Markdown": {
-      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "💾 حفظ ونقل الملفات", "type": "main", "index": 0 }]]
     },
-    "💾 حفظ في knowledge_inbox": {
-      "main": [[{ "node": "📦 نقل إلى url_processed", "type": "main", "index": 0 }]]
-    },
-    "📦 نقل إلى url_processed": {
+    "💾 حفظ ونقل الملفات": {
       "main": [[{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]]
     }
   },
