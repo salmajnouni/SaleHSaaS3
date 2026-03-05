@@ -15,12 +15,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// قراءة قائمة الملفات من مجلد url_inbox باستخدام Node.js\nconst fs = require('fs');\nconst path = require('path');\n\nconst inboxDir = 'D:\\\\SaleHSaaS3\\\\url_inbox';\n\ntry {\n  if (!fs.existsSync(inboxDir)) {\n    return [{ json: { files: [], count: 0, message: 'المجلد غير موجود: ' + inboxDir } }];\n  }\n\n  const allFiles = fs.readdirSync(inboxDir);\n  const txtFiles = allFiles.filter(f => {\n    const ext = path.extname(f).toLowerCase();\n    return ext === '.txt' || ext === '.url' || ext === '.md';\n  });\n\n  if (txtFiles.length === 0) {\n    return [{ json: { files: [], count: 0, message: 'لا توجد ملفات للمعالجة' } }];\n  }\n\n  return txtFiles.map(fileName => ({\n    json: {\n      fileName,\n      filePath: path.join(inboxDir, fileName),\n      count: txtFiles.length\n    }\n  }));\n\n} catch (err) {\n  return [{ json: { files: [], count: 0, error: err.message } }];\n}"
+        "url": "http://host.docker.internal:8765/list?path=D%3A%5CSaleHSaaS3%5Curl_inbox&extensions=.txt,.url,.md",
+        "options": { "timeout": 10000 }
       },
-      "id": "list-and-filter",
+      "id": "list-files",
       "name": "📋 قراءة ملفات url_inbox",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [460, 300]
     },
     {
@@ -30,9 +31,9 @@
           "conditions": [
             {
               "id": "has-files",
-              "leftValue": "={{ $json.fileName !== undefined && $json.fileName !== null && $json.fileName !== '' }}",
-              "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
             }
           ]
         }
@@ -45,23 +46,44 @@
     },
     {
       "parameters": {
-        "jsCode": "// قراءة محتوى الملف واستخراج الروابط\nconst fs = require('fs');\n\nconst { fileName, filePath } = $input.first().json;\n\ntry {\n  const content = fs.readFileSync(filePath, 'utf8');\n  const lines = content.split('\\n').map(l => l.trim()).filter(l => l.length > 0);\n  const urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\n  if (urls.length === 0) {\n    return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n  }\n\n  const title = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\n  return urls.map((url, i) => ({\n    json: {\n      url,\n      title: urls.length > 1 ? `${title} (${i + 1})` : title,\n      fileName,\n      filePath,\n      totalUrls: urls.length\n    }\n  }));\n\n} catch (err) {\n  return [{ json: { skip: true, fileName, reason: 'خطأ في قراءة الملف: ' + err.message } }];\n}"
+        "jsCode": "// تحويل قائمة الملفات إلى عناصر منفصلة\nconst files = $input.first().json.files || [];\nif (files.length === 0) {\n  return [{ json: { skip: true } }];\n}\nreturn files.map(f => ({ json: f }));"
       },
-      "id": "read-and-extract",
-      "name": "📖 قراءة واستخراج الروابط",
+      "id": "split-files",
+      "name": "🔀 تقسيم الملفات",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [900, 200]
     },
     {
       "parameters": {
-        "jsCode": "const { url, title } = $input.first().json;\n\n// تحديد نوع الرابط\nlet type = 'webpage';\nif (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';\nelse if (url.includes('twitter.com') || url.includes('x.com')) type = 'twitter';\nelse if (url.includes('linkedin.com')) type = 'linkedin';\nelse if (url.includes('facebook.com') || url.includes('fb.com')) type = 'facebook';\nelse if (url.includes('instagram.com')) type = 'instagram';\nelse if (url.includes('tiktok.com')) type = 'tiktok';\nelse if (url.includes('reddit.com')) type = 'reddit';\nelse if (url.match(/\\.(mp3|wav|ogg|m4a|aac)$/i)) type = 'audio';\nelse if (url.match(/\\.(mp4|avi|mov|mkv|webm)$/i)) type = 'video';\nelse if (url.match(/\\.pdf$/i)) type = 'pdf';\n\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = (title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9\\s]/g, '').trim().slice(0, 50);\nconst outputFilename = `${timestamp}_${safeTitle}.md`;\n\nreturn [{ json: { ...$input.first().json, type, outputFilename, timestamp } }];"
+        "url": "=http://host.docker.internal:8765/read?path={{ encodeURIComponent($json.filePath) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "read-file",
+      "name": "📖 قراءة محتوى الملف",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileData = $input.first().json;\nconst { content, fileName, filePath } = fileData;\n\n// استخراج الروابط من الملف (سطر واحد = رابط واحد)\nconst lines = (content || '').split('\\n').map(l => l.trim()).filter(l => l.length > 0);\nconst urls = lines.filter(l => l.startsWith('http://') || l.startsWith('https://'));\n\nif (urls.length === 0) {\n  return [{ json: { skip: true, fileName, reason: 'لا توجد روابط صالحة في الملف' } }];\n}\n\nconst title = (fileName || 'untitled').replace(/\\.(txt|url|md)$/i, '').replace(/[_-]/g, ' ');\n\nreturn urls.map((url, i) => ({\n  json: {\n    url,\n    title: urls.length > 1 ? `${title} (${i + 1})` : title,\n    fileName,\n    filePath,\n    totalUrls: urls.length\n  }\n}));"
+      },
+      "id": "extract-urls",
+      "name": "🔗 استخراج الروابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { url, title } = $input.first().json;\n\nlet type = 'webpage';\nif (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';\nelse if (url.includes('twitter.com') || url.includes('x.com')) type = 'twitter';\nelse if (url.includes('linkedin.com')) type = 'linkedin';\nelse if (url.includes('facebook.com') || url.includes('fb.com')) type = 'facebook';\nelse if (url.includes('instagram.com')) type = 'instagram';\nelse if (url.includes('tiktok.com')) type = 'tiktok';\nelse if (url.includes('reddit.com')) type = 'reddit';\nelse if (url.match(/\\.(mp3|wav|ogg|m4a|aac)$/i)) type = 'audio';\nelse if (url.match(/\\.(mp4|avi|mov|mkv|webm)$/i)) type = 'video';\nelse if (url.match(/\\.pdf$/i)) type = 'pdf';\n\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safeTitle = (title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9\\s]/g, '').trim().slice(0, 50);\nconst outputFilename = `${timestamp}_${safeTitle}.md`;\n\nreturn [{ json: { ...$input.first().json, type, outputFilename, timestamp } }];"
       },
       "id": "detect-type",
       "name": "🔍 تحديد نوع الرابط",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1120, 200]
+      "position": [1560, 200]
     },
     {
       "parameters": {
@@ -81,11 +103,11 @@
       "name": "🌐 جلب المحتوى (Jina Premium)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1340, 200]
+      "position": [1780, 200]
     },
     {
       "parameters": {
-        "url": "=http://host.docker.internal:11434/api/generate",
+        "url": "http://host.docker.internal:11434/api/generate",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"model\": \"qwen2.5:3b\",\n  \"prompt\": \"أنت مساعد متخصص في تلخيص المحتوى. المصدر: {{ $('🔍 تحديد نوع الرابط').first().json.url }}\\n\\nالمهمة:\\n1. اكتب ملخصاً موجزاً (3-5 أسطر)\\n2. استخرج 5-7 نقاط رئيسية\\n3. حدد الكلمات المفتاحية\\n\\nالمحتوى:\\n{{ $json.body ? $json.body.slice(0, 3000) : $json.data ? $json.data.slice(0, 3000) : 'لا يوجد محتوى' }}\\n\\nأجب بالعربية بصيغة Markdown.\",\n  \"stream\": false,\n  \"options\": { \"temperature\": 0.3, \"num_predict\": 800 }\n}",
@@ -95,37 +117,55 @@
       "name": "🤖 تلخيص بـ AI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1560, 200]
+      "position": [2000, 200]
     },
     {
       "parameters": {
-        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst jinaData = $('🌐 جلب المحتوى (Jina Premium)').first().json;\nconst aiData = $input.first().json;\n\nconst content = jinaData.body || jinaData.data || '';\nconst summary = aiData.response || '';\nconst wordCount = content.split(/\\s+/).length;\n\nconst markdown = `---\ntitle: \"${typeData.title || typeData.url}\"\nurl: ${typeData.url}\ntype: ${typeData.type}\ndate: ${typeData.timestamp}\nwords: ${wordCount}\nsource_file: ${typeData.fileName}\n---\n\n# ${typeData.title || 'محتوى من: ' + typeData.url}\n\n**المصدر:** ${typeData.url}  \n**النوع:** ${typeData.type}  \n**التاريخ:** ${new Date(typeData.timestamp).toLocaleDateString('ar-SA')}  \n**الملف الأصلي:** ${typeData.fileName}\n\n---\n\n## 📋 الملخص الذكي\n\n${summary}\n\n---\n\n## 📄 المحتوى الكامل\n\n${content}\n`;\n\nreturn [{ json: {\n  ...typeData,\n  markdown,\n  wordCount\n}}];"
+        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst jinaData = $('🌐 جلب المحتوى (Jina Premium)').first().json;\nconst aiData = $input.first().json;\n\nconst content = jinaData.body || jinaData.data || '';\nconst summary = aiData.response || '';\nconst wordCount = content.split(/\\s+/).length;\n\nconst markdown = `---\ntitle: \"${typeData.title || typeData.url}\"\nurl: ${typeData.url}\ntype: ${typeData.type}\ndate: ${typeData.timestamp}\nwords: ${wordCount}\nsource_file: ${typeData.fileName}\n---\n\n# ${typeData.title || 'محتوى من: ' + typeData.url}\n\n**المصدر:** ${typeData.url}  \n**النوع:** ${typeData.type}  \n**التاريخ:** ${new Date(typeData.timestamp).toLocaleDateString('ar-SA')}  \n**الملف الأصلي:** ${typeData.fileName}\n\n---\n\n## 📋 الملخص الذكي\n\n${summary}\n\n---\n\n## 📄 المحتوى الكامل\n\n${content}\n`;\n\nreturn [{ json: { ...typeData, markdown, wordCount } }];"
       },
       "id": "build-markdown",
       "name": "📝 بناء Markdown",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1780, 200]
+      "position": [2220, 200]
     },
     {
       "parameters": {
-        "jsCode": "// حفظ ملف Markdown في knowledge_inbox ونقل الملف الأصلي إلى url_processed\nconst fs = require('fs');\nconst path = require('path');\n\nconst { markdown, outputFilename, filePath, fileName } = $input.first().json;\n\nconst knowledgeInboxDir = 'D:\\\\SaleHSaaS3\\\\knowledge_inbox';\nconst urlProcessedDir = 'D:\\\\SaleHSaaS3\\\\url_processed';\n\n// إنشاء المجلدات إذا لم تكن موجودة\nif (!fs.existsSync(knowledgeInboxDir)) {\n  fs.mkdirSync(knowledgeInboxDir, { recursive: true });\n}\nif (!fs.existsSync(urlProcessedDir)) {\n  fs.mkdirSync(urlProcessedDir, { recursive: true });\n}\n\n// حفظ ملف Markdown\nconst outputPath = path.join(knowledgeInboxDir, outputFilename);\nfs.writeFileSync(outputPath, markdown, 'utf8');\n\n// نقل الملف الأصلي إلى url_processed\nconst destPath = path.join(urlProcessedDir, fileName);\ntry {\n  fs.renameSync(filePath, destPath);\n} catch (e) {\n  // إذا فشل rename (مثلاً بسبب اختلاف القرص) استخدم copy+delete\n  fs.copyFileSync(filePath, destPath);\n  fs.unlinkSync(filePath);\n}\n\nreturn [{ json: {\n  ...($input.first().json),\n  savedTo: outputPath,\n  movedFrom: filePath,\n  movedTo: destPath,\n  success: true\n}}];"
+        "url": "http://host.docker.internal:8765/write",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"path\": \"D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\{{ $json.outputFilename }}\",\n  \"content\": {{ JSON.stringify($json.markdown) }}\n}",
+        "options": { "timeout": 15000 }
       },
-      "id": "save-and-move",
-      "name": "💾 حفظ ونقل الملفات",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [2000, 200]
+      "id": "save-to-knowledge",
+      "name": "💾 حفظ في knowledge_inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2440, 200]
     },
     {
       "parameters": {
-        "jsCode": "// تسجيل في السجل\nconst data = $input.first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  savedTo: data.savedTo,\n  movedTo: data.movedTo,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
+        "url": "http://host.docker.internal:8765/move",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source\": {{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\n  \"destination\": \"D:\\\\SaleHSaaS3\\\\url_processed\\\\{{ $('📝 بناء Markdown').first().json.fileName }}\"\n}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "move-to-processed",
+      "name": "📦 نقل إلى url_processed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('📝 بناء Markdown').first().json;\nconsole.log(`✅ تمت معالجة: ${data.fileName} → ${data.outputFilename} (${data.wordCount} كلمة)`);\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  timestamp: new Date().toISOString()\n}}];"
       },
       "id": "log-success",
       "name": "✅ تسجيل النجاح",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2220, 200]
+      "position": [2880, 200]
     }
   ],
   "connections": {
@@ -137,11 +177,17 @@
     },
     "📁 يوجد ملفات؟": {
       "main": [
-        [{ "node": "📖 قراءة واستخراج الروابط", "type": "main", "index": 0 }],
+        [{ "node": "🔀 تقسيم الملفات", "type": "main", "index": 0 }],
         []
       ]
     },
-    "📖 قراءة واستخراج الروابط": {
+    "🔀 تقسيم الملفات": {
+      "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
+    },
+    "📖 قراءة محتوى الملف": {
+      "main": [[{ "node": "🔗 استخراج الروابط", "type": "main", "index": 0 }]]
+    },
+    "🔗 استخراج الروابط": {
       "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
     },
     "🔍 تحديد نوع الرابط": {
@@ -154,9 +200,12 @@
       "main": [[{ "node": "📝 بناء Markdown", "type": "main", "index": 0 }]]
     },
     "📝 بناء Markdown": {
-      "main": [[{ "node": "💾 حفظ ونقل الملفات", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
     },
-    "💾 حفظ ونقل الملفات": {
+    "💾 حفظ في knowledge_inbox": {
+      "main": [[{ "node": "📦 نقل إلى url_processed", "type": "main", "index": 0 }]]
+    },
+    "📦 نقل إلى url_processed": {
       "main": [[{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]]
     }
   },
