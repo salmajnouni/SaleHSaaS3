@@ -131,10 +131,10 @@
     {
       "parameters": {
         "url": "http://host.docker.internal:11434/api/generate",
+        "method": "POST",
         "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={\"model\":\"qwen2.5:3b\",\"prompt\":{{ JSON.stringify($json.prompt) }},\"stream\":false,\"options\":{\"temperature\":0.3,\"num_predict\":800}}",
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:3b', prompt: $json.prompt, stream: false, options: { temperature: 0.3, num_predict: 800 } }) }}",
         "options": { "timeout": 120000 }
       },
       "id": "ai-summarize",
