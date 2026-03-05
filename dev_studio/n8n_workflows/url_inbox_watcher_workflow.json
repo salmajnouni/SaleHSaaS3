@@ -53,7 +53,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const files = $input.first().json.files || [];\nif (files.length === 0) return [{ json: { skip: true } }];\nreturn files.map(function(f) {\n  return { json: { fileName: f.fileName, filePath: f.filePath } };\n});"
+        "jsCode": "const files = $input.first().json.files || [];\n// فلترة الملفات التي لها fileName وfilePath صالحَين فقط\nconst validFiles = files.filter(function(f) { return f.fileName && f.filePath; });\nif (validFiles.length === 0) {\n  // لا توجد ملفات صالحة — أوقف التنفيذ بإرجاع مصفوفة فارغة\n  return [];\n}\nreturn validFiles.map(function(f) {\n  return { json: { fileName: f.fileName, filePath: f.filePath } };\n});"
       },
       "id": "split-files",
       "name": "🔀 تقسيم الملفات",
@@ -80,7 +80,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// استخراج جميع الروابط من الملف ومعالجتها بالتوالي\nconst fileData = $input.first().json;\n// fileName وfilePath يأتيان من file_api مباشرة في response\nconst fileName = fileData.fileName || '';\nconst filePath = fileData.filePath || '';\nconst content = fileData.content || '';\n\n// استخراج جميع الأسطر وتنظيفها\nconst lines = content.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });\n\n// استخراج الروابط فقط\nconst urls = lines.filter(function(l) { return l.startsWith('http://') || l.startsWith('https://'); });\n\nif (urls.length === 0) return [{ json: { skip: true, fileName: fileName, filePath: filePath, reason: 'لا توجد روابط في الملف' } }];\n\n// إنتاج عنصر لكل رابط مع رقم تسلسلي\nconst baseName = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_\\-]/g, ' ').trim();\n\nreturn urls.map(function(url, i) {\n  const title = urls.length > 1 ? baseName + ' (' + (i + 1) + ' من ' + urls.length + ')' : baseName;\n  return { json: {\n    url: url,\n    title: title,\n    fileName: fileName,\n    filePath: filePath,\n    urlIndex: i + 1,\n    urlTotal: urls.length\n  }};\n});"
+        "jsCode": "// استخراج جميع الروابط من الملف ومعالجتها بالتوالي\nconst fileData = $input.first().json;\n// إذا كان skip=true أو لا يوجد fileName، أوقف التنفيذ\nif (fileData.skip || !fileData.fileName) return [];\n// fileName وfilePath يأتيان من file_api مباشرة في response\nconst fileName = fileData.fileName || '';\nconst filePath = fileData.filePath || '';\nconst content = fileData.content || '';\n\n// استخراج جميع الأسطر وتنظيفها\nconst lines = content.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });\n\n// استخراج الروابط فقط\nconst urls = lines.filter(function(l) { return l.startsWith('http://') || l.startsWith('https://'); });\n\nif (urls.length === 0) return [{ json: { skip: true, fileName: fileName, filePath: filePath, reason: 'لا توجد روابط في الملف' } }];\n\n// إنتاج عنصر لكل رابط مع رقم تسلسلي\nconst baseName = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_\\-]/g, ' ').trim();\n\nreturn urls.map(function(url, i) {\n  const title = urls.length > 1 ? baseName + ' (' + (i + 1) + ' من ' + urls.length + ')' : baseName;\n  return { json: {\n    url: url,\n    title: title,\n    fileName: fileName,\n    filePath: filePath,\n    urlIndex: i + 1,\n    urlTotal: urls.length\n  }};\n});"
       },
       "id": "extract-urls",
       "name": "🔗 استخراج الروابط",
