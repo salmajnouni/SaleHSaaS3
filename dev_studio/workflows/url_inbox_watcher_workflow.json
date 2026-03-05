@@ -19,7 +19,7 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "path", "value": "D:\\SaleHSaaS3\\url_inbox" },
+            { "name": "path", "value": "/data/url_inbox" },
             { "name": "extensions", "value": ".txt,.url,.md" }
           ]
         },
@@ -159,7 +159,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={\"path\":\"D:\\\\SaleHSaaS3\\\\knowledge_inbox\\\\{{ $json.outputFilename }}\",\"content\":{{ JSON.stringify($json.markdown) }}}",
+        "body": "={\"path\":\"/data/knowledge_inbox/{{ $json.outputFilename }}\",\"content\":{{ JSON.stringify($json.markdown) }}}",
         "options": { "timeout": 15000 }
       },
       "id": "save-knowledge",
@@ -174,7 +174,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={\"source\":{{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\"destination\":\"D:\\\\SaleHSaaS3\\\\url_processed\\\\{{ $('📝 بناء Markdown').first().json.fileName }}\"}",
+        "body": "={\"source\":{{ JSON.stringify($('📝 بناء Markdown').first().json.filePath) }},\"destination\":\"/data/url_processed/{{ $('📝 بناء Markdown').first().json.fileName }}\"}",
         "options": { "timeout": 10000 }
       },
       "id": "move-processed",
