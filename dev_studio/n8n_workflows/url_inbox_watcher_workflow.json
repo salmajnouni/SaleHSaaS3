@@ -1,0 +1,297 @@
+{
+  "name": "📂 URL Inbox Watcher — مراقبة مجلد الروابط",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 1 }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "⏱️ كل دقيقة",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/list",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "path", "value": "/data/url_inbox" },
+            { "name": "extensions", "value": ".txt,.url,.md" }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "list-files",
+      "name": "📋 قراءة ملفات url_inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "has-files",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ]
+        }
+      },
+      "id": "check-files",
+      "name": "📁 يوجد ملفات؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const files = $input.first().json.files || [];\nif (files.length === 0) return [{ json: { skip: true } }];\nreturn files.map(function(f) {\n  return { json: { fileName: f.fileName, filePath: f.filePath } };\n});"
+      },
+      "id": "split-files",
+      "name": "🔀 تقسيم الملفات",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/read",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "path", "value": "={{ $json.filePath }}" }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "read-file",
+      "name": "📖 قراءة محتوى الملف",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// استخراج جميع الروابط من الملف ومعالجتها بالتوالي\nconst fileData = $input.first().json;\nconst prevData = $('🔀 تقسيم الملفات').first().json;\nconst content = fileData.content || '';\nconst fileName = fileData.fileName || prevData.fileName;\nconst filePath = fileData.filePath || prevData.filePath;\n\n// استخراج جميع الأسطر وتنظيفها\nconst lines = content.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });\n\n// استخراج الروابط فقط\nconst urls = lines.filter(function(l) { return l.startsWith('http://') || l.startsWith('https://'); });\n\nif (urls.length === 0) return [{ json: { skip: true, fileName: fileName, reason: 'لا توجد روابط في الملف' } }];\n\n// إنتاج عنصر لكل رابط مع رقم تسلسلي\nconst baseName = fileName.replace(/\\.(txt|url|md)$/i, '').replace(/[_\\-]/g, ' ').trim();\n\nreturn urls.map(function(url, i) {\n  const title = urls.length > 1 ? baseName + ' (' + (i + 1) + ' من ' + urls.length + ')' : baseName;\n  return { json: {\n    url: url,\n    title: title,\n    fileName: fileName,\n    filePath: filePath,\n    urlIndex: i + 1,\n    urlTotal: urls.length\n  }};\n});"
+      },
+      "id": "extract-urls",
+      "name": "🔗 استخراج الروابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.first().json;\nif (d.skip || !d.url) return [{ json: { skip: true } }];\nconst url = d.url;\nlet type = 'webpage';\nif (url.indexOf('youtube.com') !== -1 || url.indexOf('youtu.be') !== -1) type = 'youtube';\nelse if (url.indexOf('twitter.com') !== -1 || url.indexOf('x.com') !== -1) type = 'twitter';\nelse if (url.indexOf('linkedin.com') !== -1) type = 'linkedin';\nelse if (url.indexOf('facebook.com') !== -1) type = 'facebook';\nelse if (url.indexOf('instagram.com') !== -1) type = 'instagram';\nelse if (url.indexOf('tiktok.com') !== -1) type = 'tiktok';\nelse if (url.indexOf('reddit.com') !== -1) type = 'reddit';\nelse if (/\\.(mp3|wav|ogg|aac)$/i.test(url)) type = 'audio';\nelse if (/\\.(mp4|avi|mov|mkv)$/i.test(url)) type = 'video';\nelse if (/\\.pdf$/i.test(url)) type = 'pdf';\nconst ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);\nconst safe = (d.title || type).replace(/[^\\u0600-\\u06FFa-zA-Z0-9 ]/g, '').trim().slice(0, 50);\nreturn [{ json: Object.assign({}, d, { type: type, outputFilename: ts + '_' + safe + '.md', timestamp: ts }) }];"
+      },
+      "id": "detect-type",
+      "name": "🔍 تحديد نوع الرابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Accept", "value": "text/plain" },
+            { "name": "X-Return-Format", "value": "markdown" },
+            { "name": "Authorization", "value": "Bearer jina_dc99ce20ea034f5a9c8295a654d1128bHX6fO6j6_c93ytgTSdqWi3iaQD8B" },
+            { "name": "X-Timeout", "value": "30" }
+          ]
+        },
+        "options": { "timeout": 35000 }
+      },
+      "id": "jina-fetch",
+      "name": "🌐 جلب المحتوى (Jina Premium)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst jinaData = $input.first().json;\nlet rawContent = jinaData.body || jinaData.data || '';\n\n// تنظيف المحتوى حسب نوع الرابط\nlet cleanContent = rawContent;\n\nif (typeData.type === 'tiktok') {\n  // استخراج وصف الفيديو والهاشتاقات فقط من TikTok\n  const lines = rawContent.split('\\n');\n  const relevantLines = [];\n  let foundDescription = false;\n  \n  for (let i = 0; i < lines.length; i++) {\n    const line = lines[i].trim();\n    // تخطي الأسطر الفارغة في البداية وعناصر التنقل\n    if (!foundDescription && (line === '' || line === 'Log in' || line === 'Search' || \n        line === 'For You' || line === 'Shop' || line === 'Explore' || \n        line === 'Following' || line === 'LIVE' || line === 'Upload' || \n        line === 'Profile' || line === 'More' || line.startsWith('©'))) {\n      continue;\n    }\n    // ابدأ التقاط المحتوى من أول سطر يحتوي على نص حقيقي\n    if (!foundDescription && line.length > 10 && !line.startsWith('[![') && !line.startsWith('[**')) {\n      foundDescription = true;\n    }\n    if (foundDescription) {\n      // توقف عند قسم التعليقات أو الفيديوهات المقترحة\n      if (line === 'Comments' || line === 'You may like' || line === 'Log in' ||\n          line.startsWith('Introducing keyboard') || line.startsWith('Go to previous')) {\n        break;\n      }\n      // تخطي روابط الصور والفيديوهات المقترحة\n      if (line.startsWith('[![') || (line.startsWith('[') && line.includes('ago'))) {\n        continue;\n      }\n      if (line.length > 0) {\n        relevantLines.push(line);\n      }\n    }\n  }\n  cleanContent = relevantLines.join('\\n').trim();\n  // إذا كان المحتوى قصيراً جداً، استخدم المحتوى الأصلي\n  if (cleanContent.length < 50) {\n    cleanContent = rawContent.slice(0, 2000);\n  }\n} else if (typeData.type === 'youtube') {\n  // لـ YouTube: استخرج الوصف والعنوان فقط\n  const descMatch = rawContent.match(/Description[:\\s]+([\\s\\S]{0,1500})/);\n  cleanContent = descMatch ? descMatch[1].trim() : rawContent.slice(0, 3000);\n} else {\n  // للمواقع العادية: اقتطع بذكاء\n  cleanContent = rawContent.slice(0, 4000);\n}\n\nconst prompt = 'أنت مساعد متخصص في تلخيص المحتوى الرقمي. النوع: ' + typeData.type + '\\nالمصدر: ' + typeData.url + '\\n\\nالمهمة:\\n1. اكتب ملخصاً موجزاً (3-5 أسطر)\\n2. استخرج 5 نقاط رئيسية\\n3. حدد 5 كلمات مفتاحية\\n\\nالمحتوى:\\n' + cleanContent.slice(0, 3000) + '\\n\\nأجب بالعربية بصيغة Markdown مع عناوين واضحة.';\n\nreturn [{ json: { prompt: prompt, jinaContent: cleanContent, rawContent: rawContent } }];"
+      },
+      "id": "prepare-prompt",
+      "name": "🧠 تجهيز البرومبت",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2000, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:11434/api/generate",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:3b', prompt: $json.prompt, stream: false, options: { temperature: 0.3, num_predict: 800 } }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "ai-summarize",
+      "name": "🤖 تلخيص بـ AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const typeData = $('🔍 تحديد نوع الرابط').first().json;\nconst prepData = $('🧠 تجهيز البرومبت').first().json;\nconst aiData = $input.first().json;\nconst content = prepData.jinaContent || '';\nconst summary = aiData.response || '';\nconst wordCount = content.split(/\\s+/).filter(function(w) { return w.length > 0; }).length;\nconst dateStr = new Date().toLocaleDateString('ar-SA');\n\n// معلومات الرابط المتعدد\nconst urlInfo = typeData.urlTotal > 1 ? '\\n**الرابط:** ' + typeData.urlIndex + ' من ' + typeData.urlTotal : '';\n\nconst md = '---\\ntitle: \"' + (typeData.title || typeData.url) + '\"\\nurl: ' + typeData.url + '\\ntype: ' + typeData.type + '\\ndate: ' + typeData.timestamp + '\\nwords: ' + wordCount + '\\nsource_file: ' + typeData.fileName + '\\n---\\n\\n# ' + (typeData.title || typeData.url) + '\\n\\n**المصدر:** ' + typeData.url + '  \\n**النوع:** ' + typeData.type + '  \\n**التاريخ:** ' + dateStr + urlInfo + '  \\n**الملف الأصلي:** ' + typeData.fileName + '\\n\\n---\\n\\n## الملخص الذكي\\n\\n' + summary + '\\n\\n---\\n\\n## المحتوى المُنظَّف\\n\\n' + content + '\\n';\nreturn [{ json: Object.assign({}, typeData, { markdown: md, wordCount: wordCount }) }];"
+      },
+      "id": "build-markdown",
+      "name": "📝 بناء Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2440, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/write",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ path: '/data/knowledge_inbox/' + $json.outputFilename, content: $json.markdown }) }}",
+        "options": { "timeout": 15000 }
+      },
+      "id": "save-knowledge",
+      "name": "💾 حفظ في knowledge_inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// نقل الملف الأصلي فقط بعد معالجة آخر رابط فيه\nconst markdownData = $('📝 بناء Markdown').first().json;\nconst isLastUrl = markdownData.urlIndex === markdownData.urlTotal;\n\nif (!isLastUrl) {\n  // ليس آخر رابط — لا ننقل الملف بعد\n  return [{ json: Object.assign({}, markdownData, { moved: false, reason: 'انتظار معالجة باقي الروابط (' + markdownData.urlIndex + '/' + markdownData.urlTotal + ')' }) }];\n}\n\n// آخر رابط — نمرر البيانات لعقدة النقل\nreturn [{ json: Object.assign({}, markdownData, { moved: true, readyToMove: true }) }];"
+      },
+      "id": "check-last-url",
+      "name": "🔄 هل آخر رابط؟",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2880, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "id": "is-last",
+              "leftValue": "={{ $json.readyToMove }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "if-last-url",
+      "name": "📌 آخر رابط؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [3100, 200]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8765/move",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: '/data/url_inbox/' + $json.fileName, destination: '/data/url_processed/' + $json.fileName }) }}",
+        "options": { "timeout": 10000 }
+      },
+      "id": "move-processed",
+      "name": "📦 نقل إلى url_processed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3320, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('📌 آخر رابط؟').first().json;\nreturn [{ json: {\n  success: true,\n  sourceFile: data.fileName,\n  outputFile: data.outputFilename,\n  url: data.url,\n  type: data.type,\n  words: data.wordCount,\n  urlIndex: data.urlIndex,\n  urlTotal: data.urlTotal,\n  timestamp: new Date().toISOString()\n} }];"
+      },
+      "id": "log-success",
+      "name": "✅ تسجيل النجاح",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3540, 200]
+    }
+  ],
+  "connections": {
+    "⏱️ كل دقيقة": {
+      "main": [[{ "node": "📋 قراءة ملفات url_inbox", "type": "main", "index": 0 }]]
+    },
+    "📋 قراءة ملفات url_inbox": {
+      "main": [[{ "node": "📁 يوجد ملفات؟", "type": "main", "index": 0 }]]
+    },
+    "📁 يوجد ملفات؟": {
+      "main": [
+        [{ "node": "🔀 تقسيم الملفات", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "🔀 تقسيم الملفات": {
+      "main": [[{ "node": "📖 قراءة محتوى الملف", "type": "main", "index": 0 }]]
+    },
+    "📖 قراءة محتوى الملف": {
+      "main": [[{ "node": "🔗 استخراج الروابط", "type": "main", "index": 0 }]]
+    },
+    "🔗 استخراج الروابط": {
+      "main": [[{ "node": "🔍 تحديد نوع الرابط", "type": "main", "index": 0 }]]
+    },
+    "🔍 تحديد نوع الرابط": {
+      "main": [[{ "node": "🌐 جلب المحتوى (Jina Premium)", "type": "main", "index": 0 }]]
+    },
+    "🌐 جلب المحتوى (Jina Premium)": {
+      "main": [[{ "node": "🧠 تجهيز البرومبت", "type": "main", "index": 0 }]]
+    },
+    "🧠 تجهيز البرومبت": {
+      "main": [[{ "node": "🤖 تلخيص بـ AI", "type": "main", "index": 0 }]]
+    },
+    "🤖 تلخيص بـ AI": {
+      "main": [[{ "node": "📝 بناء Markdown", "type": "main", "index": 0 }]]
+    },
+    "📝 بناء Markdown": {
+      "main": [[{ "node": "💾 حفظ في knowledge_inbox", "type": "main", "index": 0 }]]
+    },
+    "💾 حفظ في knowledge_inbox": {
+      "main": [[{ "node": "🔄 هل آخر رابط؟", "type": "main", "index": 0 }]]
+    },
+    "🔄 هل آخر رابط؟": {
+      "main": [[{ "node": "📌 آخر رابط؟", "type": "main", "index": 0 }]]
+    },
+    "📌 آخر رابط؟": {
+      "main": [
+        [{ "node": "📦 نقل إلى url_processed", "type": "main", "index": 0 }],
+        [{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]
+      ]
+    },
+    "📦 نقل إلى url_processed": {
+      "main": [[{ "node": "✅ تسجيل النجاح", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "salehsaas"
+  },
+  "tags": [
+    { "name": "knowledge", "createdAt": "2026-03-05" },
+    { "name": "automation", "createdAt": "2026-03-05" },
+    { "name": "file-watcher", "createdAt": "2026-03-05" },
+    { "name": "rag", "createdAt": "2026-03-05" }
+  ]
+}
