@@ -112,8 +112,8 @@
     },
     {
       "parameters": {
-        "toolDescription": "Execute JavaScript code for data processing, building n8n workflow JSON structures, calculations, or any logic needed. Returns the result of the last expression.",
-        "jsCode": "={{ $fromAI('code', 'JavaScript code to execute. Use return statement for output.', 'string') }}"
+        "toolDescription": "Build and return n8n workflow JSON structures, process data, or perform calculations. Describe what you need and this tool will generate the appropriate JavaScript result.",
+        "jsCode": "// Helper: build a minimal n8n workflow JSON skeleton\nconst workflowSkeleton = (name) => ({\n  name: name || 'New Workflow',\n  nodes: [],\n  connections: {},\n  settings: { executionOrder: 'v1' }\n});\n\n// Helper: build a simple HTTP Request node\nconst httpNode = (id, name, url, method = 'GET', x = 240, y = 300) => ({\n  id, name,\n  type: 'n8n-nodes-base.httpRequest',\n  position: [x, y],\n  typeVersion: 4.2,\n  parameters: { url, method, options: {} }\n});\n\n// Helper: build a Schedule Trigger node\nconst scheduleTrigger = (id, name, cronExpression = '0 9 * * 1-5', x = 240, y = 300) => ({\n  id, name,\n  type: 'n8n-nodes-base.scheduleTrigger',\n  position: [x, y],\n  typeVersion: 1.2,\n  parameters: {\n    rule: { interval: [{ field: 'cronExpression', expression: cronExpression }] }\n  }\n});\n\n// Return available helpers info\nreturn {\n  available_helpers: ['workflowSkeleton(name)', 'httpNode(id, name, url, method)', 'scheduleTrigger(id, name, cronExpression)'],\n  message: 'Code Tool ready. Use n8n Builder MCP to create actual workflows.'\n};"
       },
       "id": "tool-code",
       "name": "Code Tool",
