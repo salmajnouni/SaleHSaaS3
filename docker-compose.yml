@@ -333,6 +333,10 @@ services:
       - AUTO_DISCOVERY_TAG=n8n-openai-bridge
       - AUTO_DISCOVERY_POLL_INTERVAL=60
       - LOG_REQUESTS=false
+    volumes:
+      # mount ملف .env الخارجي فوق الملف الداخلي في الـ image
+      # هذا يضمن قراءة الـ API Key الصحيح وليس القيم الافتراضية
+      - ./n8n_bridge.env:/app/.env:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.60
