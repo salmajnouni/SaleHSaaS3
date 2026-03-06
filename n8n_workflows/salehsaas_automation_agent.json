@@ -1,0 +1,137 @@
+{
+  "name": "SaleHSaaS Automation Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "مرحباً! أنا وكيل الأتمتة الذكي لنظام SaleHSaaS.\n\nأستطيع مساعدتك في:\n⚙️ إدارة workflows في n8n (عرض، إنشاء، تشغيل، إيقاف)\n🤖 إدارة نماذج Ollama (عرض النماذج، معلوماتها)\n📁 إدارة الملفات (قراءة، قوائم)\n🔍 البحث في الويب عبر SearXNG\n💻 معالجة البيانات وحساباتها\n\nصف لي ما تريد وسأنفذه.",
+        "options": {
+          "inputPlaceholder": "صف مهمتك...",
+          "showWelcomeScreen": false,
+          "subtitle": "وكيل الأتمتة - SaleHSaaS",
+          "title": "SaleHSaaS Automation Agent",
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "chat-trigger",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [240, 300],
+      "webhookId": "salehsaas-auto-agent-v2",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت وكيل الأتمتة الذكي لنظام SaleHSaaS.\n\n## الأدوات المتاحة\n\n### 1. n8n API — إدارة كاملة لـ n8n\nاستخدم HTTP Request مع:\n- GET  http://n8n:5678/api/v1/workflows  — عرض كل الـ workflows\n- GET  http://n8n:5678/api/v1/workflows/{id}  — تفاصيل workflow\n- POST http://n8n:5678/api/v1/workflows  — إنشاء workflow جديد\n- PATCH http://n8n:5678/api/v1/workflows/{id}  — تعديل workflow\n- POST http://n8n:5678/api/v1/workflows/{id}/activate  — تفعيل\n- POST http://n8n:5678/api/v1/workflows/{id}/deactivate  — إيقاف\n- DELETE http://n8n:5678/api/v1/workflows/{id}  — حذف\n- GET  http://n8n:5678/api/v1/executions  — سجل التنفيذ\nHeader مطلوب: X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA\n\n### 2. Ollama API — إدارة النماذج\n- GET  http://host.docker.internal:11434/api/tags  — عرض النماذج المثبتة\n- POST http://host.docker.internal:11434/api/show  — معلومات نموذج (body: {\"name\":\"model_name\"})\n- POST http://host.docker.internal:11434/api/pull  — تحميل نموذج جديد (body: {\"name\":\"model_name\"})\n\n### 3. File API — إدارة الملفات\n- GET  http://file_api:8765/list?dir=/data/knowledge_inbox  — قائمة الملفات\n- GET  http://file_api:8765/read?path=/data/knowledge_inbox/file.txt  — قراءة ملف\n- GET  http://file_api:8765/list?dir=/data/knowledge_processed  — الملفات المعالجة\n\n### 4. SearXNG — البحث في الويب\n- GET  http://searxng:8080/search?q=QUERY&format=json  — بحث ويب\n\n### 5. Code Tool — معالجة البيانات\nلمعالجة البيانات، بناء JSON، حسابات.\n\n## قواعد العمل\n1. قبل الحذف: اطلب تأكيداً صريحاً\n2. عند الخطأ: اشرح السبب واقترح الحل\n3. الرد دائماً بالعربية مع تفاصيل واضحة\n4. عند إنشاء workflow: استخدم Code Tool لبناء JSON أولاً ثم أرسله لـ n8n API\n\nالوقت الحالي: {{ $now }}"
+        }
+      },
+      "id": "automation-agent",
+      "name": "Automation Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [560, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.1,
+          "numCtx": 8192
+        }
+      },
+      "id": "ollama-model",
+      "name": "Ollama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [240, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 40
+      },
+      "id": "memory",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [400, 560],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call n8n REST API or Ollama API or File API or SearXNG. Use this for ALL HTTP operations.\n\nExamples:\n- List n8n workflows: GET http://n8n:5678/api/v1/workflows (add header X-N8N-API-KEY)\n- List Ollama models: GET http://host.docker.internal:11434/api/tags\n- List files: GET http://file_api:8765/list?dir=/data/knowledge_inbox\n- Search web: GET http://searxng:8080/search?q=your+query&format=json",
+        "url": "={{ $fromAI('url', 'The full URL to call', 'string') }}",
+        "method": "={{ $fromAI('method', 'HTTP method: GET, POST, PATCH, DELETE', 'string') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "={{ $fromAI('header_name', 'Header name, e.g. X-N8N-API-KEY or Content-Type', 'string') }}",
+              "value": "={{ $fromAI('header_value', 'Header value', 'string') }}"
+            }
+          ]
+        },
+        "sendBody": "={{ $fromAI('has_body', 'true if POST/PATCH with body, false otherwise', 'boolean') }}",
+        "contentType": "json",
+        "body": "={{ $fromAI('body', 'JSON body string for POST/PATCH requests, empty string for GET', 'string') }}",
+        "options": {}
+      },
+      "id": "http-tool",
+      "name": "HTTP Request Tool",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [560, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "name": "data_processor",
+        "description": "Process data, build n8n workflow JSON, perform calculations, or transform data structures using JavaScript.",
+        "jsCode": "// ── دوال مساعدة لبناء n8n workflows ──\n\n// هيكل workflow فارغ\nconst workflow = (name, nodes = [], connections = {}) => ({\n  name,\n  nodes,\n  connections,\n  settings: { executionOrder: 'v1' }\n});\n\n// node: Schedule Trigger\nconst scheduleTrigger = (id, cron = '0 9 * * 1-5') => ({\n  id, name: 'Schedule Trigger',\n  type: 'n8n-nodes-base.scheduleTrigger',\n  position: [240, 300], typeVersion: 1.2,\n  parameters: { rule: { interval: [{ field: 'cronExpression', expression: cron }] } }\n});\n\n// node: HTTP Request\nconst httpRequest = (id, name, url, method = 'GET') => ({\n  id, name,\n  type: 'n8n-nodes-base.httpRequest',\n  position: [460, 300], typeVersion: 4.2,\n  parameters: { url, method, options: {} }\n});\n\n// node: Code\nconst codeNode = (id, name, code) => ({\n  id, name,\n  type: 'n8n-nodes-base.code',\n  position: [680, 300], typeVersion: 2,\n  parameters: { jsCode: code }\n});\n\n// connection helper\nconst connect = (from, to) => ({ [from]: { main: [[{ node: to, type: 'main', index: 0 }]] } });\n\nreturn { workflow, scheduleTrigger, httpRequest, codeNode, connect, message: 'Helpers ready' };"
+      },
+      "id": "code-tool",
+      "name": "Code Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [760, 560],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [{"node": "Automation Agent", "type": "main", "index": 0}]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [{"node": "Automation Agent", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [{"node": "Automation Agent", "type": "ai_memory", "index": 0}]
+      ]
+    },
+    "HTTP Request Tool": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [
+    {"name": "n8n-openai-bridge"},
+    {"name": "salehsaas"},
+    {"name": "automation"}
+  ]
+}
