@@ -34,21 +34,21 @@
     },
     {
       "parameters": {
-        "model": "qwen2.5-coder:14b",
+        "model": "n8n-expert",
         "options": {
-          "temperature": 0.1,
-          "numCtx": 8192
+          "temperature": 0.3,
+          "maxTokens": 4096
         }
       },
-      "id": "ollama-model",
-      "name": "Ollama Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "id": "openai-model",
+      "name": "n8n Expert Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "position": [240, 560],
-      "typeVersion": 1,
+      "typeVersion": 1.2,
       "credentials": {
-        "ollamaApi": {
-          "id": "ollama-local",
-          "name": "Ollama Local"
+        "openAiApi": {
+          "id": "n8n-bridge-api",
+          "name": "n8n Bridge (OpenWebUI)"
         }
       }
     },
@@ -106,7 +106,7 @@
         [{"node": "Automation Agent", "type": "main", "index": 0}]
       ]
     },
-    "Ollama Model": {
+    "n8n Expert Model": {
       "ai_languageModel": [
         [{"node": "Automation Agent", "type": "ai_languageModel", "index": 0}]
       ]
