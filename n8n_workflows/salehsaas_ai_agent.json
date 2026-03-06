@@ -1,0 +1,188 @@
+{
+  "name": "SaleHSaaS AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "مرحباً! 👋\nأنا مساعدك الذكي في نظام SaleHSaaS.\nيمكنني مساعدتك في:\n- معرفة حالة الطقس\n- آخر الأخبار\n- أي سؤال آخر!",
+        "options": {
+          "inputPlaceholder": "اكتب رسالتك هنا...",
+          "showWelcomeScreen": false,
+          "subtitle": "مساعد SaleHSaaS الذكي",
+          "title": "SaleHSaaS AI Agent",
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "95421925-c5ad-48bd-9638-c84ff5b5e3c6",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        944,
+        432
+      ],
+      "webhookId": "e5616171-e3b5-4c39-81d4-67409f9fa60a",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت مساعد ذكي متخصص في نظام SaleHSaaS. مهمتك مساعدة المستخدمين بأسلوب احترافي وواضح.\n\nقواعد:\n- الرد دائماً بالعربية\n- استخدم الأدوات المتاحة عند الحاجة (الطقس، الأخبار)\n- كن موجزاً ودقيقاً\n\nالتاريخ والوقت الحالي: {{ $now }}"
+        }
+      },
+      "id": "332af12a-45ab-4e5d-8dab-da21ba2111f9",
+      "name": "SaleHSaaS AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1312,
+        432
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 30
+      },
+      "id": "56d2684a-7f83-4ffd-8501-3253d999b4c6",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        1344,
+        720
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "c218a5da-bec7-4034-8d2b-f4bca34e551e",
+      "name": "Ollama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [
+        944,
+        720
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Gets the latest news from RSS feeds. Use for news, current events, and tech updates.",
+        "url": "={{ $fromAI('URL', `Use one of:\n- https://feeds.bbci.co.uk/news/world/rss.xml (BBC World)\n- https://www.aljazeera.com/xml/rss/all.xml (Al Jazeera)\n- https://techcrunch.com/feed/ (TechCrunch)`, 'string') }}",
+        "options": {}
+      },
+      "id": "24fc1fd5-ed10-43d9-9b35-8facb7f357d5",
+      "name": "Get News",
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "position": [
+        1776,
+        720
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get weather forecast for any location. Infer latitude and longitude automatically from city name.",
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $fromAI('latitude', 'Latitude of the location', 'string') }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $fromAI('longitude', 'Longitude of the location', 'string') }}"
+            },
+            {
+              "name": "current",
+              "value": "={{ $fromAI('current', 'Comma-separated current weather variables e.g. temperature_2m,windspeed_10m', 'string') }}"
+            },
+            {
+              "name": "temperature_unit",
+              "value": "celsius"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ac7d0dd1-8885-41c1-abda-f3742c838992",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [
+        1664,
+        720
+      ],
+      "typeVersion": 4.2
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get News": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "n8n-openai-bridge"
+    }
+  ]
+}
