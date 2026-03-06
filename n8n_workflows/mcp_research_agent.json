@@ -1,0 +1,195 @@
+{
+  "name": "salehsaas-research-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "research-trigger",
+      "name": "Workflow Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [240, 300],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت وكيل البحث المتخصص في نظام SaleHSaaS.\n\n## مهمتك\nالبحث وجمع المعلومات من مصادر متعددة والإجابة بدقة.\n\n## الأدوات المتاحة\n1. **Wikipedia** — للمعلومات الموسوعية والتاريخية\n2. **SearXNG (Web Search)** — للبحث في الإنترنت والأحداث الراهنة\n3. **Get Weather** — لحالة الطقس\n4. **Get News** — لآخر الأخبار\n5. **HTTP Request** — لاستدعاء APIs خارجية\n\n## استراتيجية البحث\n- للمعلومات الموسوعية: ابدأ بـ Wikipedia\n- للأحداث الراهنة: استخدم SearXNG\n- للطقس: استخدم Get Weather مباشرة\n- للأخبار: استخدم Get News مع اختيار المصدر المناسب\n- إذا لم تجد في مصدر، جرّب مصدراً آخر\n\n## تنسيق الإجابة\n- رد بالعربية دائماً\n- اذكر المصدر\n- كن موجزاً ودقيقاً\n- إذا لم تجد معلومات كافية، قل ذلك صراحةً\n\nالسؤال الوارد: {{ $json.query }}"
+        }
+      },
+      "id": "research-agent",
+      "name": "Research Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [560, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.3,
+          "numCtx": 6144
+        }
+      },
+      "id": "research-ollama",
+      "name": "Ollama (Research)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [240, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search Wikipedia for encyclopedic knowledge. Use for historical facts, scientific concepts, people, places, and general knowledge.",
+        "language": "ar"
+      },
+      "id": "research-wikipedia",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "position": [440, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the web using SearXNG (local private search engine). Use for current events, recent news, and any information not in Wikipedia. Returns web search results.",
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $fromAI('search_query', 'The search query to look up on the web', 'string') }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "language",
+              "value": "ar"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "research-searxng",
+      "name": "SearXNG Web Search",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [640, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get current weather and 3-day forecast for any city. Automatically determines coordinates from city name.",
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $fromAI('latitude', 'Latitude of the city', 'string') }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $fromAI('longitude', 'Longitude of the city', 'string') }}"
+            },
+            {
+              "name": "current",
+              "value": "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature"
+            },
+            {
+              "name": "daily",
+              "value": "temperature_2m_max,temperature_2m_min,precipitation_sum"
+            },
+            {
+              "name": "forecast_days",
+              "value": "3"
+            },
+            {
+              "name": "temperature_unit",
+              "value": "celsius"
+            },
+            {
+              "name": "timezone",
+              "value": "Asia/Riyadh"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "research-weather",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [840, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get latest news. Choose feed based on topic:\n- Al Jazeera Arabic: https://www.aljazeera.net/xml/rss/all.xml\n- BBC Arabic: https://feeds.bbci.co.uk/arabic/rss.xml\n- TechCrunch: https://techcrunch.com/feed/\n- Reuters: https://feeds.reuters.com/reuters/topNews",
+        "url": "={{ $fromAI('feed_url', 'RSS feed URL matching the news topic', 'string') }}",
+        "options": {}
+      },
+      "id": "research-news",
+      "name": "Get News",
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "position": [1040, 560],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "respondWith": "lastNode",
+        "options": {}
+      },
+      "id": "research-output",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [880, 300],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "Workflow Input": {
+      "main": [
+        [{"node": "Research Agent", "type": "main", "index": 0}]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [{"node": "Return Result", "type": "main", "index": 0}]
+      ]
+    },
+    "Ollama (Research)": {
+      "ai_languageModel": [
+        [{"node": "Research Agent", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [{"node": "Research Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "SearXNG Web Search": {
+      "ai_tool": [
+        [{"node": "Research Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Get Weather": {
+      "ai_tool": [
+        [{"node": "Research Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Get News": {
+      "ai_tool": [
+        [{"node": "Research Agent", "type": "ai_tool", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "salehsaas"}, {"name": "sub-agent"}, {"name": "research"}]
+}

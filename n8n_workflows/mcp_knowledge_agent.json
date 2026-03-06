@@ -1,0 +1,143 @@
+{
+  "name": "salehsaas-knowledge-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "know-trigger",
+      "name": "Workflow Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [240, 300],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت وكيل المعرفة المتخصص في نظام SaleHSaaS.\n\n## مهمتك\nالبحث في قاعدة المعرفة الداخلية والإجابة على الأسئلة القانونية والتقنية.\n\n## الأدوات المتاحة\n1. **saleh_legal_rag (MCP)** — البحث في قاعدة المعرفة القانونية:\n   - `search_legal_docs` — البحث في الوثائق القانونية السعودية\n   - `list_collections` — عرض المجموعات المتاحة\n\n2. **ChromaDB Direct** — استعلام مباشر على قاعدة البيانات المتجهية\n\n3. **Wikipedia** — للمعلومات القانونية العامة\n\n## استراتيجية البحث\n1. ابحث أولاً في قاعدة المعرفة الداخلية (MCP)\n2. إذا لم تجد، جرّب Wikipedia\n3. دائماً اذكر المصدر في الإجابة\n4. إذا لم تجد معلومات كافية، أخبر المستخدم بذلك\n\n## تنسيق الإجابة\n- رد بالعربية\n- اذكر المصدر (اسم الوثيقة أو المرجع)\n- قدّم الإجابة بشكل منظم\n- إذا كانت المعلومات قانونية، أضف تنبيه: \"هذه معلومات عامة وليست استشارة قانونية\"\n\nالسؤال الوارد: {{ $json.question }}"
+        }
+      },
+      "id": "know-agent",
+      "name": "Knowledge Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [560, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.2,
+          "numCtx": 8192
+        }
+      },
+      "id": "know-ollama",
+      "name": "Ollama (Knowledge)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [240, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search the SaleHSaaS legal knowledge base using RAG. Contains Saudi legal documents, regulations, and internal knowledge. Use for any legal or regulatory questions.",
+        "sseEndpoint": "http://mcpo:8000/saleh_legal_rag/sse",
+        "authentication": "none",
+        "include": "all"
+      },
+      "id": "know-mcp-rag",
+      "name": "Legal RAG (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [440, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search Wikipedia for general legal and encyclopedic knowledge. Use as fallback when internal knowledge base doesn't have the answer.",
+        "language": "ar"
+      },
+      "id": "know-wikipedia",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "position": [640, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Query ChromaDB vector database directly for semantic search. POST to http://chromadb:8000/api/v1/collections/{collection_name}/query",
+        "url": "={{ $fromAI('url', 'ChromaDB API URL, e.g. http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/query', 'string') }}",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query_texts",
+              "value": "={{ [$fromAI('query', 'Search query text', 'string')] }}"
+            },
+            {
+              "name": "n_results",
+              "value": "=5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "know-chromadb",
+      "name": "ChromaDB Search",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [840, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "respondWith": "lastNode",
+        "options": {}
+      },
+      "id": "know-output",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [880, 300],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "Workflow Input": {
+      "main": [
+        [{"node": "Knowledge Agent", "type": "main", "index": 0}]
+      ]
+    },
+    "Knowledge Agent": {
+      "main": [
+        [{"node": "Return Result", "type": "main", "index": 0}]
+      ]
+    },
+    "Ollama (Knowledge)": {
+      "ai_languageModel": [
+        [{"node": "Knowledge Agent", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "Legal RAG (MCP)": {
+      "ai_tool": [
+        [{"node": "Knowledge Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [{"node": "Knowledge Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "ChromaDB Search": {
+      "ai_tool": [
+        [{"node": "Knowledge Agent", "type": "ai_tool", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "salehsaas"}, {"name": "sub-agent"}, {"name": "knowledge"}]
+}

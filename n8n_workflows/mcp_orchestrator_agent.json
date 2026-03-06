@@ -1,0 +1,191 @@
+{
+  "name": "SaleHSaaS Orchestrator Agent (MCP)",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "مرحباً! أنا المنسق الذكي لنظام SaleHSaaS.\n\nأملك فريقاً من الوكلاء المتخصصين:\n🔬 وكيل البحث — ويب + ويكيبيديا + أخبار\n⚙️ وكيل الأتمتة — إنشاء وإدارة workflows في n8n\n📚 وكيل المعرفة — البحث في قاعدة المعرفة القانونية\n🤖 وكيل النماذج — إدارة نماذج Ollama\n\nكيف يمكنني مساعدتك؟",
+        "options": {
+          "inputPlaceholder": "اكتب طلبك...",
+          "showWelcomeScreen": false,
+          "subtitle": "نظام متعدد الوكلاء - مدعوم بـ MCP",
+          "title": "SaleHSaaS Orchestrator",
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "orch-chat-trigger",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [240, 300],
+      "webhookId": "salehsaas-orchestrator-webhook-001",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت المنسق الرئيسي (Orchestrator) لنظام SaleHSaaS متعدد الوكلاء.\n\n## مهمتك\nتحليل طلب المستخدم وتوجيهه للوكيل المتخصص المناسب.\n\n## الوكلاء المتاحة\n\n### 1. وكيل البحث (Research Agent)\n- **استخدم عند:** أسئلة عامة، أخبار، طقس، معلومات موسوعية، بحث ويب\n- **الأداة:** `call_research_agent`\n\n### 2. وكيل الأتمتة (Automation Agent)\n- **استخدم عند:** إنشاء workflow، تعديله، تشغيله، إدارة n8n\n- **الأداة:** `call_automation_agent`\n\n### 3. وكيل المعرفة (Knowledge Agent)\n- **استخدم عند:** أسئلة قانونية، البحث في الوثائق، الأنظمة السعودية\n- **الأداة:** `call_knowledge_agent`\n\n### 4. وكيل النماذج (Models Agent)\n- **استخدم عند:** إدارة نماذج Ollama، تحميل نموذج، عرض النماذج المتاحة\n- **الأداة:** `call_models_agent`\n\n## قواعد التنسيق\n- دائماً رد بالعربية\n- إذا كان الطلب يحتاج أكثر من وكيل، نسّق بينهم بالتسلسل\n- أعد صياغة النتيجة بشكل واضح ومنظم للمستخدم\n- لا تخمّن — استخدم الوكيل المناسب دائماً\n\nالتاريخ والوقت: {{ $now }}"
+        }
+      },
+      "id": "orch-agent",
+      "name": "Orchestrator Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [560, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.2,
+          "numCtx": 8192
+        }
+      },
+      "id": "orch-ollama",
+      "name": "Ollama (Orchestrator)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [240, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 40
+      },
+      "id": "orch-memory",
+      "name": "Orchestrator Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [440, 560],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call the Research Agent to search the web, get news, weather, and encyclopedic information. Pass the user's question as-is.",
+        "workflowId": {
+          "__rl": true,
+          "value": "salehsaas-research-agent",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $fromAI('query', 'The research question or topic to investigate', 'string') }}"
+          }
+        }
+      },
+      "id": "tool-research",
+      "name": "call_research_agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [640, 560],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call the Automation Agent to create, update, run, or manage n8n workflows. Describe the automation task in detail.",
+        "workflowId": {
+          "__rl": true,
+          "value": "salehsaas-automation-agent",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "task": "={{ $fromAI('task', 'Detailed description of the automation task to perform in n8n', 'string') }}"
+          }
+        }
+      },
+      "id": "tool-automation",
+      "name": "call_automation_agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [840, 560],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call the Knowledge Agent to search the legal knowledge base and internal documents. Use for legal questions, Saudi regulations, and document retrieval.",
+        "workflowId": {
+          "__rl": true,
+          "value": "salehsaas-knowledge-agent",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "question": "={{ $fromAI('question', 'The legal or knowledge question to search for', 'string') }}"
+          }
+        }
+      },
+      "id": "tool-knowledge",
+      "name": "call_knowledge_agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [1040, 560],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call the Models Agent to manage Ollama models: list available models, get model info, or pull new models.",
+        "workflowId": {
+          "__rl": true,
+          "value": "salehsaas-models-agent",
+          "mode": "name"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "action": "={{ $fromAI('action', 'The model management action: list, info, or pull', 'string') }}",
+            "model_name": "={{ $fromAI('model_name', 'Optional: specific model name for info or pull actions', 'string') }}"
+          }
+        }
+      },
+      "id": "tool-models",
+      "name": "call_models_agent",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [1240, 560],
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [{"node": "Orchestrator Agent", "type": "main", "index": 0}]
+      ]
+    },
+    "Ollama (Orchestrator)": {
+      "ai_languageModel": [
+        [{"node": "Orchestrator Agent", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "Orchestrator Memory": {
+      "ai_memory": [
+        [{"node": "Orchestrator Agent", "type": "ai_memory", "index": 0}]
+      ]
+    },
+    "call_research_agent": {
+      "ai_tool": [
+        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "call_automation_agent": {
+      "ai_tool": [
+        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "call_knowledge_agent": {
+      "ai_tool": [
+        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "call_models_agent": {
+      "ai_tool": [
+        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "n8n-openai-bridge"}, {"name": "salehsaas"}, {"name": "orchestrator"}]
+}

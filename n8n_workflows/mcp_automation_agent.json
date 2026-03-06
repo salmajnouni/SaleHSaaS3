@@ -1,0 +1,148 @@
+{
+  "name": "salehsaas-automation-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "auto-trigger",
+      "name": "Workflow Input",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [240, 300],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "أنت وكيل الأتمتة المتخصص في نظام SaleHSaaS.\n\n## مهمتك\nإنشاء وإدارة workflows في n8n بناءً على طلب المستخدم.\n\n## الأدوات المتاحة (عبر MCP)\n1. **n8n_builder** — أدوات إدارة n8n الكاملة:\n   - `list_workflows` — عرض كل الـ workflows\n   - `get_workflow` — تفاصيل workflow معين\n   - `create_workflow` — إنشاء workflow جديد\n   - `update_workflow` — تعديل workflow موجود\n   - `activate_workflow` — تفعيل workflow\n   - `deactivate_workflow` — إيقاف workflow\n   - `execute_workflow` — تشغيل workflow\n   - `delete_workflow` — حذف workflow\n   - `list_executions` — عرض سجل التنفيذ\n\n2. **file_api** — إدارة الملفات:\n   - رفع ملفات للمعالجة\n   - قراءة محتوى الملفات\n\n## قواعد العمل\n- قبل إنشاء workflow، اسأل عن الغرض والأدوات المطلوبة\n- عند إنشاء workflow، استخدم بنية JSON صحيحة لـ n8n\n- دائماً أكّد قبل الحذف\n- رد بالعربية مع تفاصيل ما تم تنفيذه\n\nالمهمة الواردة: {{ $json.task }}"
+        }
+      },
+      "id": "auto-agent",
+      "name": "Automation Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [560, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.1,
+          "numCtx": 8192
+        }
+      },
+      "id": "auto-ollama",
+      "name": "Ollama (Automation)",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [240, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Access n8n workflow management tools via MCP. Available tools: list_workflows, get_workflow, create_workflow, update_workflow, activate_workflow, deactivate_workflow, execute_workflow, delete_workflow, list_executions.",
+        "sseEndpoint": "http://mcpo:8000/n8n_builder/sse",
+        "authentication": "none",
+        "include": "all"
+      },
+      "id": "auto-mcp-n8n",
+      "name": "n8n Builder (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [440, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Manage Ollama models via MCP. Available tools: list_local_models, get_model_info, pull_model.",
+        "sseEndpoint": "http://mcpo:8000/ollama_model_builder/sse",
+        "authentication": "none",
+        "include": "all"
+      },
+      "id": "auto-mcp-ollama",
+      "name": "Ollama Manager (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [640, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Manage files: upload files to knowledge_inbox for processing, list files, or read file contents. Base URL: http://file_api:8765",
+        "url": "={{ $fromAI('url', 'Full URL for file API operation, e.g. http://file_api:8765/list or http://file_api:8765/read?path=/data/knowledge_inbox/file.txt', 'string') }}",
+        "method": "={{ $fromAI('method', 'HTTP method: GET or POST', 'string') }}",
+        "options": {}
+      },
+      "id": "auto-file-api",
+      "name": "File API",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [840, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Execute JavaScript code for data processing, JSON generation, or complex logic needed for workflow creation.",
+        "jsCode": "={{ $fromAI('code', 'JavaScript code to execute', 'string') }}"
+      },
+      "id": "auto-code",
+      "name": "Code Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [1040, 560],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "respondWith": "lastNode",
+        "options": {}
+      },
+      "id": "auto-output",
+      "name": "Return Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [880, 300],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "Workflow Input": {
+      "main": [
+        [{"node": "Automation Agent", "type": "main", "index": 0}]
+      ]
+    },
+    "Automation Agent": {
+      "main": [
+        [{"node": "Return Result", "type": "main", "index": 0}]
+      ]
+    },
+    "Ollama (Automation)": {
+      "ai_languageModel": [
+        [{"node": "Automation Agent", "type": "ai_languageModel", "index": 0}]
+      ]
+    },
+    "n8n Builder (MCP)": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Ollama Manager (MCP)": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "File API": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {"executionOrder": "v1"},
+  "tags": [{"name": "salehsaas"}, {"name": "sub-agent"}, {"name": "automation"}]
+}
