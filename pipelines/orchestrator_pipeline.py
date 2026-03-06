@@ -1,10 +1,100 @@
+
+# ── Embedded Conversation Logger ─────────────────────────────────────────────
+import threading, time, json as _json, uuid as _uuid, os as _os
+
+try:
+    import psycopg2 as _pg
+    import psycopg2.extras as _pgx
+    _PG_OK = True
+except ImportError:
+    _PG_OK = False
+
+class _Logger:
+    """تسجيل المحادثات في PostgreSQL — غير متزامن، لا يؤثر على الأداء"""
+    _inst = None
+
+    def __init__(self):
+        self._conn = None
+        self._lock = threading.Lock()
+        self._cfg = {
+            "host":     _os.getenv("POSTGRES_HOST",     "postgres"),
+            "port":     int(_os.getenv("POSTGRES_PORT", "5432")),
+            "dbname":   _os.getenv("POSTGRES_DB",       "salehsaas"),
+            "user":     _os.getenv("POSTGRES_USER",     "salehsaas"),
+            "password": _os.getenv("POSTGRES_PASSWORD", "salehsaas_pass"),
+            "connect_timeout": 3,
+        }
+
+    @classmethod
+    def get(cls):
+        if cls._inst is None:
+            cls._inst = cls()
+        return cls._inst
+
+    def _conn_ok(self):
+        if not _PG_OK: return None
+        try:
+            if self._conn is None or self._conn.closed:
+                self._conn = _pg.connect(**self._cfg)
+                self._conn.autocommit = True
+            return self._conn
+        except Exception as e:
+            print(f"[Logger] DB error: {e}")
+            self._conn = None
+            return None
+
+    def log(self, *, user_message, assistant_reply, expert_domain, model_used,
+            prompt_version="2.1.0", rag_used=False, rag_docs=None,
+            response_time_ms=None, tokens_used=None, extra=None):
+        if not _PG_OK: return
+        rag_score_avg = None
+        if rag_docs:
+            scores = [d.get("score", 0) for d in rag_docs if "score" in d]
+            if scores: rag_score_avg = round(sum(scores)/len(scores), 4)
+        if tokens_used is None:
+            tokens_used = (len(user_message) + len(assistant_reply)) // 4
+        rid = str(_uuid.uuid4())
+        threading.Thread(target=self._insert, daemon=True, args=(
+            rid, user_message, assistant_reply, expert_domain, model_used,
+            prompt_version, rag_used, rag_docs, rag_score_avg,
+            response_time_ms, tokens_used, extra,
+        )).start()
+
+    def _insert(self, rid, user_message, assistant_reply, expert_domain, model_used,
+                prompt_version, rag_used, rag_docs, rag_score_avg,
+                response_time_ms, tokens_used, extra):
+        with self._lock:
+            conn = self._conn_ok()
+            if conn is None: return
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO conversation_logs (
+                            id, user_message, assistant_reply,
+                            expert_domain, model_used, prompt_version,
+                            rag_used, rag_docs, rag_score_avg,
+                            response_time_ms, tokens_used, extra
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """, (
+                        rid, user_message[:10000], assistant_reply[:20000],
+                        expert_domain, model_used, prompt_version,
+                        rag_used, _json.dumps(rag_docs or []),
+                        rag_score_avg, response_time_ms, tokens_used,
+                        _json.dumps(extra or {}),
+                    ))
+            except Exception as e:
+                print(f"[Logger] Insert error: {e}")
+                self._conn = None
+
+class _Timer:
+    def __init__(self): self._s = time.monotonic()
+    def ms(self): return int((time.monotonic() - self._s) * 1000)
+# ─────────────────────────────────────────────────────────────────────────────
 """
-Orchestrator Pipeline v2.1.0
-Architecture: Intent Classification → Expert Routing → Specialized Response
-Models: qwen2.5:7b (routing + general) | deepseek-r1:7b (n8n + cybersecurity)
-Logging: PostgreSQL conversation_logs
+Orchestrator Pipeline v2.1.0 — SaleHSaaS
+Routes to the right expert automatically
+Models: qwen2.5:7b (routing+general) | deepseek-r1:7b (n8n+cybersecurity)
 """
-from typing import Generator, Iterator
 from pydantic import BaseModel
 import requests, json
 
@@ -17,16 +107,16 @@ EXPERT_PROMPTS = {
 استند دائماً إلى النص القانوني واذكر رقم المادة. نبّه أن هذه مشورة عامة وليست استشارة رسمية.""",
 
     "financial": """أنت خبير مالي ومحاسبي في البيئة السعودية (SOCPA، ZATCA، VAT 15%، IFRS).
-تحقق من كل حساب، اذكر المعيار المستند إليه، وضّح الفرق بين المشورة العامة والاستشارة الرسمية.""",
+تحقق من كل حساب، اذكر المعيار المستند إليه.""",
 
     "hr": """أنت خبير موارد بشرية متخصص في نظام العمل السعودي (GOSI، نطاقات، مكافأة نهاية الخدمة).
-اذكر المادة القانونية، تحقق من حسابات الرواتب، وضّح الفرق بين القطاع الحكومي والخاص.""",
+اذكر المادة القانونية، تحقق من حسابات الرواتب.""",
 
     "cybersecurity": """أنت خبير أمن سيبراني متخصص في المعايير السعودية والدولية (NCA-ECC، ISO 27001، OWASP).
-فكّر خطوة بخطوة، صنّف المخاطر، اذكر رقم الضابط المرجعي، لا تقدّم أدوات اختراق غير مصرح به.""",
+فكّر خطوة بخطوة، صنّف المخاطر، اذكر رقم الضابط المرجعي.""",
 
     "social_media": """أنت خبير تسويق رقمي للسوق السعودي والخليجي (LinkedIn، X، Instagram، TikTok، Snapchat).
-احترم القيم الإسلامية، اقترح أفضل أوقات النشر، قدّم هاشتاقات مناسبة.""",
+احترم القيم الإسلامية، اقترح أفضل أوقات النشر.""",
 
     "general": """أنت مساعد ذكي متعدد التخصصات في نظام SaleHSaaS للأعمال السعودية.
 أجب بشكل شامل ودقيق، وأحِل للمتخصص المناسب عند الحاجة.""",
@@ -47,15 +137,14 @@ Rules:
 Respond with ONE word only."""
 
 COLLECTION_MAP = {
-    "n8n":          "n8n_knowledge",
-    "legal":        "saleh_legal_knowledge",
-    "financial":    "financial_knowledge",
-    "hr":           "hr_knowledge",
-    "cybersecurity":"cybersecurity_knowledge",
-    "social_media": "social_media_knowledge",
-    "general":      "general_knowledge",
+    "n8n":           "n8n_knowledge",
+    "legal":         "saleh_legal_knowledge",
+    "financial":     "financial_knowledge",
+    "hr":            "hr_knowledge",
+    "cybersecurity": "cybersecurity_knowledge",
+    "social_media":  "social_media_knowledge",
+    "general":       "general_knowledge",
 }
-
 REASONING_DOMAINS = {"n8n", "cybersecurity"}
 
 class Pipeline:
@@ -148,8 +237,7 @@ class Pipeline:
             docs      = data.get("documents", [[]])[0]
             metas     = data.get("metadatas", [[]])[0]
             distances = data.get("distances", [[]])[0]
-            relevant_text = []
-            rag_docs_meta = []
+            relevant_text, rag_docs_meta = [], []
             for doc, meta, dist in zip(docs, metas, distances):
                 score = round(1 - dist, 4)
                 if score >= self.valves.RAG_MIN_SCORE:
@@ -161,9 +249,8 @@ class Pipeline:
             return "", []
 
     def pipe(self, user_message: str, model_id: str, messages: list, body: dict):
-        from conversation_logger import get_logger, Timer
-        timer  = Timer()
-        logger = get_logger()
+        timer  = _Timer()
+        logger = _Logger.get()
 
         domain     = self._route(user_message)
         model      = self.valves.REASONING_MODEL if domain in REASONING_DOMAINS else self.valves.DEFAULT_MODEL
@@ -186,7 +273,7 @@ class Pipeline:
                 enriched.append(rag_msg)
 
         routing_suffix = (
-            f"\n\n---\n*🎯 Domain: **{domain.upper()}** | Model: `{model}`*"
+            f"\n\n---\n*Domain: **{domain.upper()}** | Model: `{model}`*"
             if self.valves.SHOW_ROUTING else ""
         )
 
@@ -212,8 +299,7 @@ class Pipeline:
                 def _stream():
                     full_reply = []
                     for line in r.iter_lines():
-                        if not line:
-                            continue
+                        if not line: continue
                         try:
                             chunk   = json.loads(line)
                             content = chunk.get("message", {}).get("content", "")
@@ -231,7 +317,7 @@ class Pipeline:
                                     prompt_version=self.valves.PROMPT_VERSION,
                                     rag_used=bool(rag_docs_meta),
                                     rag_docs=rag_docs_meta,
-                                    response_time_ms=timer.elapsed_ms(),
+                                    response_time_ms=timer.ms(),
                                     extra={"routed_by": "orchestrator"},
                                 )
                                 break
@@ -248,7 +334,7 @@ class Pipeline:
                     prompt_version=self.valves.PROMPT_VERSION,
                     rag_used=bool(rag_docs_meta),
                     rag_docs=rag_docs_meta,
-                    response_time_ms=timer.elapsed_ms(),
+                    response_time_ms=timer.ms(),
                     extra={"routed_by": "orchestrator"},
                 )
                 return reply + routing_suffix
