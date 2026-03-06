@@ -1,141 +1,119 @@
 """
-HR Expert Pipeline - خبير الموارد البشرية
-==========================================
-Pipeline مخصصة لـ Open WebUI تقوم بـ:
-1. تمرير الطلبات لنموذج hr-expert مع RAG على سياسات الموارد البشرية
-2. حقن سياق نظام العمل السعودي تلقائياً
-3. الظهور في /v1/models لاستخدامه من n8n وأي تطبيق
-4. دعم Streaming للردود الطويلة
+HR Expert Pipeline — خبير الموارد البشرية
+=========================================
+Pipeline صحيحة تستدعي Ollama مباشرة (وليس Open WebUI).
+تظهر في Open WebUI كنموذج "External" باسم "👥 HR & Workforce Expert".
+
+البنية الصحيحة (من الوثائق الرسمية):
+    المستخدم → Open WebUI → Pipelines Server (هنا) → Ollama → النموذج
+
+المرجع: https://github.com/open-webui/pipelines
 """
-from typing import List, Optional, Generator, Iterator, Union
+
+from typing import List, Union, Generator, Iterator
 from pydantic import BaseModel
 import requests
 import json
-import os
 
 
 class Pipeline:
+
     class Valves(BaseModel):
-        OPENWEBUI_BASE_URL: str = "http://open-webui:8080"
-        OPENWEBUI_API_KEY: str = os.getenv("OPENWEBUI_API_KEY", "")
-        HR_EXPERT_MODEL_ID: str = "hr-expert"
-        ENABLE_HR_CONTEXT: bool = True
-        DEFAULT_TEMPERATURE: float = 0.3
-        MAX_TOKENS: int = 8192
+        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
+        MODEL_ID: str = "llama3.1:8b"
+        TEMPERATURE: float = 0.3
+        MAX_TOKENS: int = 4096
+        ENABLE_EXPERT_CONTEXT: bool = True
 
     def __init__(self):
-        self.name = "👥 HR Management Expert"
-        self.id = "hr-expert-pipeline"
+        self.name = "👥 HR & Workforce Expert"
+        self.id = "hr-expert"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print(f"✅ HR Expert Pipeline جاهزة — النموذج: {self.valves.HR_EXPERT_MODEL_ID}")
+        print(f"[hr-expert] تشغيل — النموذج: {self.valves.MODEL_ID} على {self.valves.OLLAMA_BASE_URL}")
 
     async def on_shutdown(self):
-        print("⏹️ HR Expert Pipeline أُوقفت")
+        print(f"[hr-expert] إيقاف")
 
-    def _build_headers(self) -> dict:
-        headers = {"Content-Type": "application/json"}
-        if self.valves.OPENWEBUI_API_KEY:
-            headers["Authorization"] = f"Bearer {self.valves.OPENWEBUI_API_KEY}"
-        return headers
+    EXPERT_SYSTEM_PROMPT = """أنت "خبير الموارد البشرية" في نظام SaleHSaaS، متخصص في بيئة العمل السعودية.
 
-    def _inject_hr_context(self, messages: List[dict]) -> List[dict]:
-        """حقن سياق الموارد البشرية ونظام العمل السعودي"""
-        if not self.valves.ENABLE_HR_CONTEXT:
+## مجالات خبرتك
+- نظام العمل السعودي: العقود، الإجازات، ساعات العمل، الفصل التعسفي
+- نظام التأمينات الاجتماعية (GOSI): الاشتراكات، التسجيل، المطالبات
+- برنامج نطاقات والسعودة: النسب، الحسابات، التصنيفات
+- تصاريح العمل والإقامة للعمالة الوافدة
+- الرواتب والمزايا: مكافأة نهاية الخدمة، بدل السكن، بدل النقل
+- التوظيف والاختيار: الوصف الوظيفي، المقابلات، التقييم
+- إدارة الأداء: KPIs، التقييم السنوي، خطط التطوير
+
+## قواعد الإجابة
+1. استند لنظام العمل السعودي مع ذكر المادة
+2. احسب المستحقات المالية بدقة عند الطلب
+3. قدّم نماذج العقود والسياسات بتنسيق جاهز للاستخدام
+4. أجب بالعربية دائماً"""
+
+    def _inject_context(self, messages: List[dict]) -> List[dict]:
+        if not self.valves.ENABLE_EXPERT_CONTEXT:
             return messages
-
-        has_system = any(m.get("role") == "system" for m in messages)
-        if has_system:
+        if any(m.get("role") == "system" for m in messages):
             return messages
-
-        hr_context = {
-            "role": "system",
-            "content": (
-                "أنت \"خبير الموارد البشرية\" في نظام SaleHSaaS، متخصص في إدارة الموارد البشرية وفق نظام العمل السعودي.\n\n"
-                "## الحدود القانونية الأساسية (نظام العمل السعودي)\n"
-                "- ساعات العمل القصوى: 48 ساعة/أسبوع (36 في رمضان)\n"
-                "- الإجازة السنوية: 21 يوماً (أقل من 5 سنوات) / 30 يوماً (5 سنوات فأكثر)\n"
-                "- إجازة الأمومة: 10 أسابيع (4 قبل + 6 بعد الولادة)\n"
-                "- مكافأة نهاية الخدمة: نصف راتب شهري لكل سنة (أول 5 سنوات) + راتب كامل بعدها\n"
-                "- الفصل التعسفي: يستوجب تعويضاً لا يقل عن أجر شهرين عن كل سنة خدمة\n\n"
-                "## مجالات خبرتك\n"
-                "- **التوظيف والاختيار**: إجراءات التوظيف، المقابلات، التقييم\n"
-                "- **إدارة الأداء**: KPIs، تقييمات الأداء، خطط التطوير\n"
-                "- **الرواتب والمزايا**: الهياكل الراتبية، البدلات، المكافآت\n"
-                "- **التدريب والتطوير**: خطط التدريب، تقييم الاحتياجات\n"
-                "- **الامتثال العمالي**: نظام العمل، نظام التأمينات الاجتماعية، السعودة\n"
-                "- **إدارة الإجازات**: أنواع الإجازات، الحسابات، الأرصدة\n\n"
-                "## قواعد الإجابة\n"
-                "1. استند دائماً إلى نظام العمل السعودي عند الإجابة على الأسئلة القانونية\n"
-                "2. أجب بالعربية دائماً\n"
-                "3. قدّم حسابات دقيقة عند طلب الرواتب أو المكافآت\n"
-                "4. راجع قاعدة المعرفة الداخلية لسياسات الشركة المحلية"
-            )
-        }
-        return [hr_context] + messages
+        return [{"role": "system", "content": self.EXPERT_SYSTEM_PROMPT}] + messages
 
     def pipe(
         self,
         user_message: str,
         model_id: str,
         messages: List[dict],
-        body: dict
+        body: dict,
     ) -> Union[str, Generator, Iterator]:
-        """المعالج الرئيسي — يمرر الطلب لـ hr-expert في Open WebUI"""
+        """الاستدعاء المباشر لـ Ollama — الطريقة الصحيحة"""
 
-        enriched_messages = self._inject_hr_context(messages)
+        enriched = self._inject_context(messages)
         stream = body.get("stream", False)
 
         payload = {
-            "model": self.valves.HR_EXPERT_MODEL_ID,
-            "messages": enriched_messages,
+            "model": self.valves.MODEL_ID,
+            "messages": enriched,
             "stream": stream,
-            "temperature": body.get("temperature", self.valves.DEFAULT_TEMPERATURE),
-            "max_tokens": body.get("max_tokens", self.valves.MAX_TOKENS),
+            "options": {
+                "temperature": body.get("temperature", self.valves.TEMPERATURE),
+                "num_predict": body.get("max_tokens", self.valves.MAX_TOKENS),
+            },
         }
 
         try:
-            response = requests.post(
-                f"{self.valves.OPENWEBUI_BASE_URL}/api/chat/completions",
-                headers=self._build_headers(),
+            r = requests.post(
+                f"{self.valves.OLLAMA_BASE_URL}/api/chat",
                 json=payload,
-                timeout=180,
-                stream=stream
+                timeout=300,
+                stream=stream,
             )
-            response.raise_for_status()
+            r.raise_for_status()
 
             if stream:
-                def stream_generator():
-                    for line in response.iter_lines():
-                        if line:
-                            decoded = line.decode("utf-8")
-                            if decoded.startswith("data: "):
-                                decoded = decoded[6:]
-                            if decoded == "[DONE]":
+                def _stream():
+                    for line in r.iter_lines():
+                        if not line:
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                            content = chunk.get("message", {}).get("content", "")
+                            if content:
+                                yield content
+                            if chunk.get("done"):
                                 break
-                            try:
-                                chunk = json.loads(decoded)
-                                delta = chunk.get("choices", [{}])[0].get("delta", {})
-                                content = delta.get("content", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                pass
-                return stream_generator()
+                        except json.JSONDecodeError:
+                            pass
+                return _stream()
             else:
-                data = response.json()
-                if "choices" in data and len(data["choices"]) > 0:
-                    return data["choices"][0]["message"]["content"]
-                else:
-                    return "⚠️ لم يُعد النموذج أي رد."
+                return r.json().get("message", {}).get("content", "⚠️ لم يُعد الرد.")
 
         except requests.exceptions.ConnectionError:
-            return (
-                "❌ تعذّر الاتصال بـ Open WebUI.\n"
-                f"تحقق من أن الخدمة تعمل على: {self.valves.OPENWEBUI_BASE_URL}"
-            )
+            return f"❌ تعذّر الاتصال بـ Ollama على {self.valves.OLLAMA_BASE_URL}\nتحقق من تشغيل Ollama."
         except requests.exceptions.Timeout:
-            return "⏱️ انتهت مهلة الاتصال (180 ثانية)."
+            return "⏱️ انتهت مهلة الانتظار (300 ثانية)."
+        except requests.exceptions.HTTPError as e:
+            return f"❌ خطأ HTTP: {e.response.status_code} — {e.response.text[:200]}"
         except Exception as e:
             return f"❌ خطأ غير متوقع: {str(e)}"

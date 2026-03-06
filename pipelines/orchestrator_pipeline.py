@@ -1,198 +1,118 @@
 """
-Orchestrator Pipeline - المنسق الرئيسي لكل الوكلاء
-====================================================
-Pipeline مخصصة لـ Open WebUI تقوم بـ:
-1. تحليل الطلب وتوجيهه للخبير المناسب تلقائياً
-2. تنسيق العمل بين عدة خبراء عند الحاجة
-3. الظهور في /v1/models كنقطة دخول موحدة
-4. دعم Streaming للردود الطويلة
+Orchestrator Pipeline — المنسق الرئيسي للنماذج الخبيرة
+======================================================
+Pipeline صحيحة تستدعي Ollama مباشرة (وليس Open WebUI).
+تظهر في Open WebUI كنموذج "External" باسم "🎯 SaleHSaaS Orchestrator".
 
-الخبراء المتاحون:
-- n8n-expert-pipeline: خبير أتمتة n8n
-- legal-expert-pipeline: خبير الامتثال القانوني
-- financial-expert-pipeline: خبير الذكاء المالي
-- hr-expert-pipeline: خبير الموارد البشرية
-- cybersecurity-expert-pipeline: خبير الأمن السيبراني
-- social-media-expert-pipeline: خبير وسائل التواصل
+البنية الصحيحة (من الوثائق الرسمية):
+    المستخدم → Open WebUI → Pipelines Server (هنا) → Ollama → النموذج
+
+المرجع: https://github.com/open-webui/pipelines
 """
-from typing import List, Optional, Generator, Iterator, Union
+
+from typing import List, Union, Generator, Iterator
 from pydantic import BaseModel
 import requests
 import json
-import os
-import re
 
 
 class Pipeline:
-    class Valves(BaseModel):
-        OPENWEBUI_BASE_URL: str = "http://open-webui:8080"
-        OPENWEBUI_API_KEY: str = os.getenv("OPENWEBUI_API_KEY", "")
-        # نموذج التوجيه (خفيف وسريع)
-        ROUTER_MODEL_ID: str = "llama3.1:8b"
-        # النموذج الافتراضي عند عدم التعرف
-        DEFAULT_EXPERT_MODEL: str = "n8n-expert"
-        DEFAULT_TEMPERATURE: float = 0.3
-        MAX_TOKENS: int = 8192
 
-    # خريطة الكلمات المفتاحية للخبراء
-    EXPERT_KEYWORDS = {
-        "n8n-expert": [
-            "n8n", "workflow", "أتمتة", "automation", "trigger", "node",
-            "webhook", "schedule", "cron", "سير عمل", "مهمة مجدولة",
-            "json workflow", "تكامل", "integration"
-        ],
-        "legal-expert": [
-            "قانون", "نظام", "تشريع", "عقد", "امتثال", "مخالفة",
-            "نظام العمل", "pdpl", "nca", "جريمة", "محكمة", "دعوى",
-            "لائحة", "مرسوم", "حقوق", "واجبات", "legal", "compliance"
-        ],
-        "financial-expert": [
-            "مالي", "محاسبة", "ميزانية", "ربح", "خسارة", "إيرادات",
-            "مصروفات", "ضريبة", "vat", "قيمة مضافة", "تدفق نقدي",
-            "قوائم مالية", "تحليل مالي", "financial", "accounting"
-        ],
-        "hr-expert": [
-            "موارد بشرية", "موظف", "راتب", "إجازة", "توظيف", "فصل",
-            "تقييم أداء", "تدريب", "hr", "human resources", "عمالة",
-            "مكافأة نهاية خدمة", "تأمينات", "سعودة"
-        ],
-        "cybersecurity-expert": [
-            "أمن", "سيبراني", "اختراق", "ثغرة", "هجوم", "حماية",
-            "تشفير", "جدار حماية", "firewall", "security", "cyber",
-            "nca", "iso 27001", "owasp", "siem", "soc"
-        ],
-        "social-media-expert": [
-            "تويتر", "انستغرام", "لينكدإن", "سناب", "تيك توك",
-            "محتوى", "منشور", "هاشتاق", "تسويق", "social media",
-            "marketing", "content", "إعلان", "متابعون", "تفاعل"
-        ]
-    }
+    class Valves(BaseModel):
+        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
+        MODEL_ID: str = "llama3.1:8b"
+        TEMPERATURE: float = 0.3
+        MAX_TOKENS: int = 4096
+        ENABLE_EXPERT_CONTEXT: bool = True
 
     def __init__(self):
         self.name = "🎯 SaleHSaaS Orchestrator"
-        self.id = "orchestrator-pipeline"
+        self.id = "orchestrator"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print("✅ Orchestrator Pipeline جاهزة — المنسق الرئيسي لكل الوكلاء")
+        print(f"[orchestrator] تشغيل — النموذج: {self.valves.MODEL_ID} على {self.valves.OLLAMA_BASE_URL}")
 
     async def on_shutdown(self):
-        print("⏹️ Orchestrator Pipeline أُوقفت")
+        print(f"[orchestrator] إيقاف")
 
-    def _build_headers(self) -> dict:
-        headers = {"Content-Type": "application/json"}
-        if self.valves.OPENWEBUI_API_KEY:
-            headers["Authorization"] = f"Bearer {self.valves.OPENWEBUI_API_KEY}"
-        return headers
+    EXPERT_SYSTEM_PROMPT = """أنت "المنسق الرئيسي" لنظام SaleHSaaS. مهمتك تحليل طلب المستخدم وتقديم أفضل إجابة.
 
-    def _detect_expert(self, user_message: str) -> str:
-        """كشف الخبير المناسب بناءً على الكلمات المفتاحية"""
-        message_lower = user_message.lower()
-        scores = {}
+## النماذج الخبيرة المتاحة
+- n8n-expert: أتمتة n8n، workflows، تكامل الخدمات
+- legal-expert: الأنظمة السعودية، PDPL، نظام العمل
+- financial-expert: المحاسبة، VAT، الزكاة، التحليل المالي
+- hr-expert: الموارد البشرية، GOSI، نطاقات، الرواتب
+- cybersecurity-expert: الأمن السيبراني، NCA، ISO 27001
+- social-media-expert: التسويق الرقمي، المحتوى العربي
 
-        for expert, keywords in self.EXPERT_KEYWORDS.items():
-            score = sum(1 for kw in keywords if kw.lower() in message_lower)
-            if score > 0:
-                scores[expert] = score
+## تعليمات
+1. حلّل الطلب وحدّد المجال المناسب
+2. أجب بشكل شامل ومفيد
+3. إذا تداخلت المجالات، اجمع بين الخبرات
+4. أجب بالعربية دائماً"""
 
-        if scores:
-            return max(scores, key=scores.get)
-
-        return self.valves.DEFAULT_EXPERT_MODEL
-
-    def _build_routing_message(self, expert_id: str) -> str:
-        """بناء رسالة توضيحية عن التوجيه"""
-        expert_names = {
-            "n8n-expert": "🔄 خبير أتمتة n8n",
-            "legal-expert": "⚖️ خبير الامتثال القانوني",
-            "financial-expert": "💰 خبير الذكاء المالي",
-            "hr-expert": "👥 خبير الموارد البشرية",
-            "cybersecurity-expert": "🛡️ خبير الأمن السيبراني",
-            "social-media-expert": "📱 خبير وسائل التواصل",
-        }
-        return expert_names.get(expert_id, f"🤖 {expert_id}")
+    def _inject_context(self, messages: List[dict]) -> List[dict]:
+        if not self.valves.ENABLE_EXPERT_CONTEXT:
+            return messages
+        if any(m.get("role") == "system" for m in messages):
+            return messages
+        return [{"role": "system", "content": self.EXPERT_SYSTEM_PROMPT}] + messages
 
     def pipe(
         self,
         user_message: str,
         model_id: str,
         messages: List[dict],
-        body: dict
+        body: dict,
     ) -> Union[str, Generator, Iterator]:
-        """المعالج الرئيسي — يوجه الطلب للخبير المناسب"""
+        """الاستدعاء المباشر لـ Ollama — الطريقة الصحيحة"""
 
-        # كشف الخبير المناسب
-        target_expert = self._detect_expert(user_message)
-        expert_name = self._build_routing_message(target_expert)
+        enriched = self._inject_context(messages)
         stream = body.get("stream", False)
 
-        # إضافة system message للتوجيه
-        routing_system = {
-            "role": "system",
-            "content": (
-                f"أنت المنسق الرئيسي لنظام SaleHSaaS. لقد وجّهت هذا الطلب إلى {expert_name}.\n"
-                "أجب بالعربية دائماً وقدّم إجابة شاملة ومفيدة."
-            )
-        }
-
-        enriched_messages = messages.copy()
-        if not any(m.get("role") == "system" for m in enriched_messages):
-            enriched_messages = [routing_system] + enriched_messages
-
         payload = {
-            "model": target_expert,
-            "messages": enriched_messages,
+            "model": self.valves.MODEL_ID,
+            "messages": enriched,
             "stream": stream,
-            "temperature": body.get("temperature", self.valves.DEFAULT_TEMPERATURE),
-            "max_tokens": body.get("max_tokens", self.valves.MAX_TOKENS),
+            "options": {
+                "temperature": body.get("temperature", self.valves.TEMPERATURE),
+                "num_predict": body.get("max_tokens", self.valves.MAX_TOKENS),
+            },
         }
 
         try:
-            response = requests.post(
-                f"{self.valves.OPENWEBUI_BASE_URL}/api/chat/completions",
-                headers=self._build_headers(),
+            r = requests.post(
+                f"{self.valves.OLLAMA_BASE_URL}/api/chat",
                 json=payload,
-                timeout=180,
-                stream=stream
+                timeout=300,
+                stream=stream,
             )
-            response.raise_for_status()
+            r.raise_for_status()
 
             if stream:
-                # إرسال رسالة التوجيه أولاً
-                routing_info = f"*تم التوجيه إلى: {expert_name}*\n\n"
-
-                def stream_generator():
-                    yield routing_info
-                    for line in response.iter_lines():
-                        if line:
-                            decoded = line.decode("utf-8")
-                            if decoded.startswith("data: "):
-                                decoded = decoded[6:]
-                            if decoded == "[DONE]":
+                def _stream():
+                    for line in r.iter_lines():
+                        if not line:
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                            content = chunk.get("message", {}).get("content", "")
+                            if content:
+                                yield content
+                            if chunk.get("done"):
                                 break
-                            try:
-                                chunk = json.loads(decoded)
-                                delta = chunk.get("choices", [{}])[0].get("delta", {})
-                                content = delta.get("content", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                pass
-                return stream_generator()
+                        except json.JSONDecodeError:
+                            pass
+                return _stream()
             else:
-                data = response.json()
-                if "choices" in data and len(data["choices"]) > 0:
-                    content = data["choices"][0]["message"]["content"]
-                    return f"*تم التوجيه إلى: {expert_name}*\n\n{content}"
-                else:
-                    return "⚠️ لم يُعد النموذج أي رد."
+                return r.json().get("message", {}).get("content", "⚠️ لم يُعد الرد.")
 
         except requests.exceptions.ConnectionError:
-            return (
-                "❌ تعذّر الاتصال بـ Open WebUI.\n"
-                f"تحقق من أن الخدمة تعمل على: {self.valves.OPENWEBUI_BASE_URL}"
-            )
+            return f"❌ تعذّر الاتصال بـ Ollama على {self.valves.OLLAMA_BASE_URL}\nتحقق من تشغيل Ollama."
         except requests.exceptions.Timeout:
-            return "⏱️ انتهت مهلة الاتصال (180 ثانية)."
+            return "⏱️ انتهت مهلة الانتظار (300 ثانية)."
+        except requests.exceptions.HTTPError as e:
+            return f"❌ خطأ HTTP: {e.response.status_code} — {e.response.text[:200]}"
         except Exception as e:
             return f"❌ خطأ غير متوقع: {str(e)}"

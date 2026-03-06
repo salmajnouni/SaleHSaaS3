@@ -1,227 +1,216 @@
-# دليل تثبيت واستخدام الـ Pipelines في SaleHSaaS
+# دليل الـ Pipelines الاحترافي — SaleHSaaS
 
-## نظرة عامة
-
-الـ **Pipelines** هي الجسر الذي يربط نماذج Open WebUI الخبيرة بـ n8n وأي تطبيق خارجي. كل Pipeline تظهر كـ "نموذج" في `/v1/models` وتمرر الطلبات للنموذج الخبير المناسب مع حقن السياق المتخصص تلقائياً.
+> **ملاحظة مهمة**: تم إعادة كتابة جميع الـ Pipelines في مارس 2026 لتصحيح خطأ جذري.
+> الإصدار الجديد يستدعي **Ollama مباشرة** وليس Open WebUI.
 
 ---
 
-## الـ Pipelines المتاحة
+## التشخيص: ما كان خاطئاً وما تم تصحيحه
 
-| الملف | الاسم | النموذج الأساسي | التخصص |
-|-------|-------|-----------------|---------|
-| `n8n_expert_pipeline.py` | 🔄 n8n Automation Expert | deepseek-r1:7b | تصميم workflows، JSON، cron |
+### الخطأ الجذري في الإصدار السابق
+
+كانت الـ Pipelines تستدعي **Open WebUI** للحصول على نماذج لم تكن موجودة:
+
+```
+Pipeline → Open WebUI API → "n8n-expert" (غير موجود!) → فشل
+```
+
+هذا يخالف الوثائق الرسمية لـ Open WebUI Pipelines التي تنص صراحةً:
+
+> *"Pipes are standalone functions that process inputs and generate responses,
+> possibly by invoking one or more LLMs or external services."*
+> — [Open WebUI Pipes Documentation](https://docs.openwebui.com/features/extensibility/pipelines/pipes/)
+
+### البنية الصحيحة (المطبّقة الآن)
+
+```
+المستخدم
+    ↓
+Open WebUI (port 3000)
+    ↓ يرسل الطلب لـ Pipelines Server
+Pipelines Server (port 9099)  ← هنا تعمل الـ Pipeline
+    ↓ تستدعي Ollama مباشرة
+Ollama (host.docker.internal:11434)
+    ↓
+النموذج الفعلي (llama3.1:8b أو deepseek-r1:7b)
+```
+
+---
+
+## النماذج الخبيرة المتاحة
+
+| الـ Pipeline | الاسم في Open WebUI | النموذج | التخصص |
+|---|---|---|---|
+| `n8n_expert_pipeline.py` | 🔄 n8n Automation Expert | deepseek-r1:7b | أتمتة n8n، Workflows، JSON |
 | `legal_expert_pipeline.py` | ⚖️ Legal Compliance Expert | llama3.1:8b | الأنظمة السعودية، PDPL، NCA |
-| `financial_expert_pipeline.py` | 💰 Financial Intelligence Expert | llama3.1:8b | التحليل المالي، VAT، SOCPA |
-| `hr_expert_pipeline.py` | 👥 HR Management Expert | llama3.1:8b | نظام العمل، الرواتب، الإجازات |
+| `financial_expert_pipeline.py` | 💰 Financial Intelligence Expert | llama3.1:8b | VAT، الزكاة، SOCPA، التحليل المالي |
+| `hr_expert_pipeline.py` | 👥 HR & Workforce Expert | llama3.1:8b | نظام العمل، GOSI، نطاقات |
 | `cybersecurity_expert_pipeline.py` | 🛡️ Cybersecurity Expert | deepseek-r1:7b | NCA-ECC، ISO 27001، OWASP |
-| `social_media_expert_pipeline.py` | 📱 Social Media Expert | llama3.1:8b | المحتوى العربي، التسويق الرقمي |
-| `orchestrator_pipeline.py` | 🎯 SaleHSaaS Orchestrator | (توجيه ذكي) | يوجه للخبير المناسب تلقائياً |
+| `social_media_expert_pipeline.py` | 📱 Social Media & Marketing Expert | llama3.1:8b | المحتوى العربي، التسويق الرقمي |
+| `orchestrator_pipeline.py` | 🎯 SaleHSaaS Orchestrator | llama3.1:8b | منسق عام لكل المجالات |
 
 ---
 
-## خطوات التثبيت
+## خطوات التثبيت على جهازك
 
-### الخطوة 1: التأكد من تشغيل الخدمات
+### الخطوة 1: سحب آخر تحديث
 
 ```powershell
-# في مجلد D:\SaleHSaaS3
-docker-compose up -d open-webui pipelines
-docker-compose ps
+cd D:\SaleHSaaS3
+git pull origin salehsaas5
 ```
 
-### الخطوة 2: الحصول على API Key
-
-1. افتح `http://localhost:3000`
-2. اذهب إلى **Settings** > **Account** > **API Keys**
-3. انقر **Create new secret key**
-4. احفظ المفتاح
-
-### الخطوة 3: تثبيت الـ Pipelines
-
-#### الطريقة أ — Python (موصى به)
-
-```bash
-cd D:\SaleHSaaS3\pipelines
-python install_pipelines.py
-# أدخل API Key عند الطلب
-```
-
-#### الطريقة ب — PowerShell
+### الخطوة 2: التأكد من تشغيل الخدمات
 
 ```powershell
-cd D:\SaleHSaaS3\pipelines
-.\install_pipelines.ps1 -ApiKey "sk-your-api-key"
+docker compose ps
+# يجب أن تكون هذه الخدمات running:
+# - open-webui
+# - pipelines
 ```
 
-#### الطريقة ج — يدوياً من واجهة Open WebUI
+### الخطوة 3: ربط Pipelines Server بـ Open WebUI
 
-1. افتح `http://localhost:3000`
-2. اذهب إلى **Admin Panel** > **Pipelines**
-3. انقر **Upload a pipeline**
-4. ارفع كل ملف `.py` من مجلد `pipelines/`
+افتح Open WebUI في المتصفح (`http://localhost:3000`):
+1. اذهب إلى **Admin Panel > Settings > Connections**
+2. في قسم **Pipelines**، أدخل: `http://pipelines:9099`
+3. اضغط **Save**
 
-### الخطوة 4: إنشاء النماذج الخبيرة
+### الخطوة 4: رفع الـ Pipelines
 
-```bash
-cd D:\SaleHSaaS3\pipelines
-python create_expert_models.py
-# أدخل API Key عند الطلب
-```
+لكل ملف من الملفات السبعة:
+1. اذهب إلى **Admin Panel > Settings > Pipelines**
+2. اضغط **Upload a pipeline** (أيقونة الرفع)
+3. ارفع الملف (مثال: `n8n_expert_pipeline.py`)
+4. ستظهر في قائمة النماذج فوراً
+
+### الخطوة 5: التحقق من ظهور النماذج
+
+في Open WebUI، اضغط على قائمة النماذج — يجب أن تجد:
+- 🔄 n8n Automation Expert
+- ⚖️ Legal Compliance Expert
+- 💰 Financial Intelligence Expert
+- 👥 HR & Workforce Expert
+- 🛡️ Cybersecurity Expert
+- 📱 Social Media & Marketing Expert
+- 🎯 SaleHSaaS Orchestrator
+
+كل نموذج يظهر بعلامة **"External"** بجانبه.
 
 ---
 
-## التحقق من التثبيت
+## ضبط الـ Valves (الإعدادات)
 
-```bash
-# قائمة الـ Pipelines المثبتة
-curl -H "Authorization: Bearer YOUR_API_KEY" \
-     http://localhost:3000/api/v1/pipelines/list
+كل Pipeline تدعم تغيير الإعدادات من واجهة Open WebUI:
 
-# قائمة النماذج (تشمل الـ Pipelines)
-curl -H "Authorization: Bearer YOUR_API_KEY" \
-     http://localhost:3000/api/v1/models
-```
+1. اذهب إلى **Admin Panel > Settings > Pipelines**
+2. اضغط على أيقونة الإعدادات ⚙️ بجانب الـ Pipeline
+3. يمكنك تغيير:
 
----
-
-## الاستخدام من n8n
-
-### 1. إعداد Credentials في n8n
-
-في n8n، أضف Credential من نوع **OpenAI API**:
-- **Base URL**: `http://n8n_bridge:3333/v1`
-- **API Key**: `salehsaas-bridge-key`
-
-### 2. استخدام Pipeline في Workflow
-
-في عقدة **AI Agent** أو **OpenAI Chat Model**:
-- اختر الـ Credential المضافة
-- في حقل **Model**: اكتب اسم الـ Pipeline مثل `n8n-expert-pipeline`
-
-### 3. مثال على Workflow
-
-```json
-{
-  "nodes": [
-    {
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "parameters": {
-        "model": "n8n-expert-pipeline",
-        "messages": {
-          "values": [
-            {
-              "role": "user",
-              "content": "صمم workflow لإرسال تقرير يومي عبر البريد الإلكتروني"
-            }
-          ]
-        }
-      }
-    }
-  ]
-}
-```
+| الإعداد | الوصف | القيمة الافتراضية |
+|---|---|---|
+| `OLLAMA_BASE_URL` | عنوان Ollama | `http://host.docker.internal:11434` |
+| `MODEL_ID` | النموذج المستخدم | `llama3.1:8b` أو `deepseek-r1:7b` |
+| `TEMPERATURE` | درجة الإبداعية | `0.2` – `0.7` |
+| `MAX_TOKENS` | الحد الأقصى للرد | `4096` |
+| `ENABLE_EXPERT_CONTEXT` | تفعيل حقن السياق | `true` |
 
 ---
 
-## إعداد متغيرات البيئة للـ Pipelines
+## استخدام النماذج من n8n
 
-في ملف `.env` في مجلد `D:\SaleHSaaS3`:
+في عقدة **lmChatOpenAi** في n8n:
 
-```env
-# API Key لـ Open WebUI (يُستخدم من الـ Pipelines)
-OPENWEBUI_API_KEY=sk-your-api-key-here
-
-# عنوان Open WebUI الداخلي (للـ Pipelines داخل Docker)
-OPENWEBUI_BASE_URL=http://open-webui:8080
+```
+Credential Type: OpenAI API
+Base URL: http://n8n_bridge:3333/v1
+API Key: salehsaas-bridge-key
+Model: n8n-expert
 ```
 
-في `docker-compose.yml`، تأكد من وجود هذا في خدمة `pipelines`:
+**Pipeline IDs للاستخدام في n8n**:
 
-```yaml
-pipelines:
-  environment:
-    - OPENWEBUI_API_KEY=${OPENWEBUI_API_KEY}
-    - OPENWEBUI_BASE_URL=http://open-webui:8080
-```
+| النموذج الخبير | الـ ID |
+|---|---|
+| خبير n8n | `n8n-expert` |
+| خبير قانوني | `legal-expert` |
+| خبير مالي | `financial-expert` |
+| خبير موارد بشرية | `hr-expert` |
+| خبير أمن سيبراني | `cybersecurity-expert` |
+| خبير وسائل التواصل | `social-media-expert` |
+| المنسق العام | `orchestrator` |
 
 ---
 
-## بنية الـ Pipeline
+## الفرق بين المسارات الثلاثة في SaleHSaaS
 
-كل Pipeline تتبع نفس البنية:
-
-```python
-class Pipeline:
-    class Valves(BaseModel):
-        # إعدادات قابلة للتعديل من واجهة Open WebUI
-        OPENWEBUI_BASE_URL: str = "http://open-webui:8080"
-        OPENWEBUI_API_KEY: str = os.getenv("OPENWEBUI_API_KEY", "")
-        EXPERT_MODEL_ID: str = "expert-model-name"
-
-    def __init__(self):
-        self.name = "اسم الـ Pipeline"
-        self.id = "pipeline-id"
-
-    def pipe(self, user_message, model_id, messages, body):
-        # 1. حقن السياق المتخصص
-        # 2. إرسال الطلب لـ Open WebUI
-        # 3. إعادة الرد مع دعم Streaming
-```
-
----
-
-## الـ Orchestrator — المنسق الذكي
-
-الـ **Orchestrator Pipeline** يحلل الطلب تلقائياً ويوجهه للخبير المناسب:
-
-| الكلمات المفتاحية | الخبير الموجَّه |
-|------------------|----------------|
-| n8n، workflow، أتمتة | 🔄 n8n Expert |
-| قانون، نظام، امتثال | ⚖️ Legal Expert |
-| مالي، محاسبة، ضريبة | 💰 Financial Expert |
-| موارد بشرية، راتب، إجازة | 👥 HR Expert |
-| أمن، سيبراني، ثغرة | 🛡️ Cybersecurity Expert |
-| تويتر، محتوى، تسويق | 📱 Social Media Expert |
+| المسار | الأداة | الغرض | متى تستخدمه |
+|---|---|---|---|
+| **Pipeline** | `pipelines/*.py` | منطق Python مخصص + Ollama مباشرة | عندما تحتاج معالجة خاصة للبيانات |
+| **Custom Model** | Workspace > Models | System prompt فقط، بدون كود | عندما تريد شخصية محددة بسرعة |
+| **n8n Workflow** | n8n + Bridge | أتمتة كاملة مع tools وذاكرة | عندما تحتاج تسلسل خطوات معقد |
 
 ---
 
 ## استكشاف الأخطاء
 
-### المشكلة: الـ Pipeline لا تظهر في القائمة
+### المشكلة: النموذج لا يظهر في القائمة
 
-```bash
+```powershell
 # تحقق من سجلات خدمة pipelines
-docker-compose logs pipelines --tail=50
+docker compose logs pipelines --tail=50
 ```
 
-### المشكلة: خطأ في الاتصال بـ Open WebUI
+### المشكلة: "تعذّر الاتصال بـ Ollama"
 
-تأكد من:
-1. أن `OPENWEBUI_API_KEY` مضبوط في متغيرات البيئة
-2. أن `OPENWEBUI_BASE_URL` صحيح (`http://open-webui:8080` داخل Docker)
-
-### المشكلة: النموذج الخبير غير موجود
-
-```bash
-# تحقق من النماذج في Ollama
+```powershell
+# تحقق من Ollama
 curl http://localhost:11434/api/tags
 
-# ثم أنشئ النماذج الخبيرة
-python create_expert_models.py
+# إذا كنت داخل Docker، العنوان الصحيح هو:
+# http://host.docker.internal:11434
+```
+
+### المشكلة: "model not found" من Ollama
+
+```powershell
+# تحميل النماذج المطلوبة
+ollama pull llama3.1:8b
+ollama pull deepseek-r1:7b
+```
+
+### المشكلة: Pipelines Server لا يستجيب
+
+```powershell
+# تحقق من تشغيل الخدمة
+docker compose restart pipelines
+docker compose logs pipelines --tail=20
 ```
 
 ---
 
-## التطوير والتحسين
+## بنية الـ Pipeline الصحيحة (للمطورين)
 
-لإضافة Pipeline جديدة:
+```python
+class Pipeline:
+    class Valves(BaseModel):
+        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
+        MODEL_ID: str = "llama3.1:8b"
+        TEMPERATURE: float = 0.3
 
-1. انسخ أي Pipeline موجودة كقالب
-2. عدّل `self.name`، `self.id`، والـ `EXPERT_MODEL_ID`
-3. عدّل دالة `_inject_*_context()` لحقن السياق المناسب
-4. ارفع الملف عبر `install_pipelines.py`
+    def __init__(self):
+        self.name = "اسم النموذج"   # يظهر في قائمة النماذج
+        self.id = "model-id"         # يُستخدم في API calls
+
+    def pipe(self, user_message, model_id, messages, body):
+        # استدعاء Ollama مباشرة (وليس Open WebUI!)
+        r = requests.post(
+            f"{self.valves.OLLAMA_BASE_URL}/api/chat",
+            json={"model": self.valves.MODEL_ID, "messages": messages}
+        )
+        return r.json()["message"]["content"]
+```
 
 ---
 
-*آخر تحديث: مارس 2026 — SaleHSaaS v4.0*
+*آخر تحديث: مارس 2026 — SaleHSaaS v5 — بعد المراجعة الاحترافية الشاملة*

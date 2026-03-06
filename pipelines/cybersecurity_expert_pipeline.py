@@ -1,147 +1,120 @@
 """
-Cybersecurity Expert Pipeline - خبير الأمن السيبراني
-=====================================================
-Pipeline مخصصة لـ Open WebUI تقوم بـ:
-1. تمرير الطلبات لنموذج cybersecurity-expert مع RAG على وثائق NCA
-2. حقن سياق الأمن السيبراني والضوابط السعودية تلقائياً
-3. الظهور في /v1/models لاستخدامه من n8n وأي تطبيق
-4. دعم Streaming للردود الطويلة
+Cybersecurity Expert Pipeline — خبير الأمن السيبراني
+====================================================
+Pipeline صحيحة تستدعي Ollama مباشرة (وليس Open WebUI).
+تظهر في Open WebUI كنموذج "External" باسم "🛡️ Cybersecurity Expert".
+
+البنية الصحيحة (من الوثائق الرسمية):
+    المستخدم → Open WebUI → Pipelines Server (هنا) → Ollama → النموذج
+
+المرجع: https://github.com/open-webui/pipelines
 """
-from typing import List, Optional, Generator, Iterator, Union
+
+from typing import List, Union, Generator, Iterator
 from pydantic import BaseModel
 import requests
 import json
-import os
 
 
 class Pipeline:
+
     class Valves(BaseModel):
-        OPENWEBUI_BASE_URL: str = "http://open-webui:8080"
-        OPENWEBUI_API_KEY: str = os.getenv("OPENWEBUI_API_KEY", "")
-        CYBER_EXPERT_MODEL_ID: str = "cybersecurity-expert"
-        ENABLE_CYBER_CONTEXT: bool = True
-        DEFAULT_TEMPERATURE: float = 0.2
-        MAX_TOKENS: int = 8192
+        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
+        MODEL_ID: str = "deepseek-r1:7b"
+        TEMPERATURE: float = 0.2
+        MAX_TOKENS: int = 4096
+        ENABLE_EXPERT_CONTEXT: bool = True
 
     def __init__(self):
         self.name = "🛡️ Cybersecurity Expert"
-        self.id = "cybersecurity-expert-pipeline"
+        self.id = "cybersecurity-expert"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print(f"✅ Cybersecurity Expert Pipeline جاهزة — النموذج: {self.valves.CYBER_EXPERT_MODEL_ID}")
+        print(f"[cybersecurity-expert] تشغيل — النموذج: {self.valves.MODEL_ID} على {self.valves.OLLAMA_BASE_URL}")
 
     async def on_shutdown(self):
-        print("⏹️ Cybersecurity Expert Pipeline أُوقفت")
+        print(f"[cybersecurity-expert] إيقاف")
 
-    def _build_headers(self) -> dict:
-        headers = {"Content-Type": "application/json"}
-        if self.valves.OPENWEBUI_API_KEY:
-            headers["Authorization"] = f"Bearer {self.valves.OPENWEBUI_API_KEY}"
-        return headers
+    EXPERT_SYSTEM_PROMPT = """أنت "خبير الأمن السيبراني" في نظام SaleHSaaS، متخصص في الأمن السيبراني السعودي والدولي.
 
-    def _inject_cyber_context(self, messages: List[dict]) -> List[dict]:
-        """حقن سياق الأمن السيبراني والضوابط السعودية"""
-        if not self.valves.ENABLE_CYBER_CONTEXT:
+## مجالات خبرتك
+- الضوابط الأساسية للأمن السيبراني (NCA-ECC-1:2018)
+- إطار عمل NIST Cybersecurity Framework
+- معيار ISO/IEC 27001:2022
+- OWASP Top 10 وأمن تطبيقات الويب
+- تحليل الثغرات وتقييم المخاطر
+- الاستجابة للحوادث والتحقيق الجنائي الرقمي
+- أمن السحابة (AWS, Azure, GCP)
+- الامتثال لنظام مكافحة الجرائم المعلوماتية السعودي
+
+## قواعد الإجابة
+1. صنّف المخاطر وفق CVSS عند الحاجة
+2. قدّم خطوات العلاج بترتيب الأولوية
+3. اذكر الأدوات المفتوحة المصدر المناسبة
+4. أجب بالعربية مع المصطلح التقني الإنجليزي بين قوسين"""
+
+    def _inject_context(self, messages: List[dict]) -> List[dict]:
+        if not self.valves.ENABLE_EXPERT_CONTEXT:
             return messages
-
-        has_system = any(m.get("role") == "system" for m in messages)
-        if has_system:
+        if any(m.get("role") == "system" for m in messages):
             return messages
-
-        cyber_context = {
-            "role": "system",
-            "content": (
-                "أنت \"خبير الأمن السيبراني\" في نظام SaleHSaaS، متخصص في الأمن السيبراني والامتثال للضوابط السعودية.\n\n"
-                "## الأطر والمعايير التي تعمل بها\n"
-                "- **الضوابط الأساسية للأمن السيبراني (NCA-ECC)**: الإطار الوطني السعودي للأمن السيبراني\n"
-                "- **ضوابط الأمن السيبراني للحوسبة السحابية (NCA-CCC)**: متطلبات الأمن السحابي\n"
-                "- **نظام مكافحة الجرائم المعلوماتية**: الجرائم الإلكترونية والعقوبات في المملكة\n"
-                "- **ISO 27001/27002**: معايير إدارة أمن المعلومات\n"
-                "- **NIST Cybersecurity Framework**: إطار الأمن السيبراني الأمريكي\n"
-                "- **OWASP Top 10**: أهم ثغرات تطبيقات الويب\n\n"
-                "## مجالات خبرتك\n"
-                "- **تقييم المخاطر**: تحديد التهديدات، تقييم الثغرات، حساب المخاطر\n"
-                "- **حماية البنية التحتية**: جدران الحماية، IDS/IPS، تجزئة الشبكة\n"
-                "- **أمن التطبيقات**: مراجعة الكود، اختبار الاختراق، SAST/DAST\n"
-                "- **الاستجابة للحوادث**: SIEM، SOC، خطط الاستجابة\n"
-                "- **إدارة الهوية والوصول**: IAM، MFA، Zero Trust\n"
-                "- **التشفير**: البروتوكولات، إدارة المفاتيح، PKI\n\n"
-                "## قواعد الإجابة\n"
-                "1. قدّم توصيات أمنية عملية وقابلة للتطبيق\n"
-                "2. صنّف المخاطر حسب الخطورة (حرجة، عالية، متوسطة، منخفضة)\n"
-                "3. أجب بالعربية دائماً مع استخدام المصطلحات التقنية الصحيحة\n"
-                "4. عند الإجابة على أسئلة الامتثال: استند إلى ضوابط NCA تحديداً\n"
-                "5. راجع قاعدة المعرفة الداخلية لسياسات الأمن المحلية\n\n"
-                "## بيئة النظام\n"
-                "- الخدمات تعمل في Docker على Windows\n"
-                "- الشبكة الداخلية: salehsaas_network\n"
-                "- لا يُسمح بإرسال أي بيانات خارج البيئة المحلية"
-            )
-        }
-        return [cyber_context] + messages
+        return [{"role": "system", "content": self.EXPERT_SYSTEM_PROMPT}] + messages
 
     def pipe(
         self,
         user_message: str,
         model_id: str,
         messages: List[dict],
-        body: dict
+        body: dict,
     ) -> Union[str, Generator, Iterator]:
-        """المعالج الرئيسي — يمرر الطلب لـ cybersecurity-expert في Open WebUI"""
+        """الاستدعاء المباشر لـ Ollama — الطريقة الصحيحة"""
 
-        enriched_messages = self._inject_cyber_context(messages)
+        enriched = self._inject_context(messages)
         stream = body.get("stream", False)
 
         payload = {
-            "model": self.valves.CYBER_EXPERT_MODEL_ID,
-            "messages": enriched_messages,
+            "model": self.valves.MODEL_ID,
+            "messages": enriched,
             "stream": stream,
-            "temperature": body.get("temperature", self.valves.DEFAULT_TEMPERATURE),
-            "max_tokens": body.get("max_tokens", self.valves.MAX_TOKENS),
+            "options": {
+                "temperature": body.get("temperature", self.valves.TEMPERATURE),
+                "num_predict": body.get("max_tokens", self.valves.MAX_TOKENS),
+            },
         }
 
         try:
-            response = requests.post(
-                f"{self.valves.OPENWEBUI_BASE_URL}/api/chat/completions",
-                headers=self._build_headers(),
+            r = requests.post(
+                f"{self.valves.OLLAMA_BASE_URL}/api/chat",
                 json=payload,
-                timeout=180,
-                stream=stream
+                timeout=300,
+                stream=stream,
             )
-            response.raise_for_status()
+            r.raise_for_status()
 
             if stream:
-                def stream_generator():
-                    for line in response.iter_lines():
-                        if line:
-                            decoded = line.decode("utf-8")
-                            if decoded.startswith("data: "):
-                                decoded = decoded[6:]
-                            if decoded == "[DONE]":
+                def _stream():
+                    for line in r.iter_lines():
+                        if not line:
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                            content = chunk.get("message", {}).get("content", "")
+                            if content:
+                                yield content
+                            if chunk.get("done"):
                                 break
-                            try:
-                                chunk = json.loads(decoded)
-                                delta = chunk.get("choices", [{}])[0].get("delta", {})
-                                content = delta.get("content", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                pass
-                return stream_generator()
+                        except json.JSONDecodeError:
+                            pass
+                return _stream()
             else:
-                data = response.json()
-                if "choices" in data and len(data["choices"]) > 0:
-                    return data["choices"][0]["message"]["content"]
-                else:
-                    return "⚠️ لم يُعد النموذج أي رد."
+                return r.json().get("message", {}).get("content", "⚠️ لم يُعد الرد.")
 
         except requests.exceptions.ConnectionError:
-            return (
-                "❌ تعذّر الاتصال بـ Open WebUI.\n"
-                f"تحقق من أن الخدمة تعمل على: {self.valves.OPENWEBUI_BASE_URL}"
-            )
+            return f"❌ تعذّر الاتصال بـ Ollama على {self.valves.OLLAMA_BASE_URL}\nتحقق من تشغيل Ollama."
         except requests.exceptions.Timeout:
-            return "⏱️ انتهت مهلة الاتصال (180 ثانية)."
+            return "⏱️ انتهت مهلة الانتظار (300 ثانية)."
+        except requests.exceptions.HTTPError as e:
+            return f"❌ خطأ HTTP: {e.response.status_code} — {e.response.text[:200]}"
         except Exception as e:
             return f"❌ خطأ غير متوقع: {str(e)}"

@@ -1,144 +1,119 @@
 """
-Social Media Expert Pipeline - خبير وسائل التواصل الاجتماعي
-============================================================
-Pipeline مخصصة لـ Open WebUI تقوم بـ:
-1. تمرير الطلبات لنموذج social-media-expert مع RAG على استراتيجيات المحتوى
-2. حقن سياق التسويق الرقمي والمحتوى العربي تلقائياً
-3. الظهور في /v1/models لاستخدامه من n8n وأي تطبيق
-4. دعم Streaming للردود الطويلة
+Social Media Expert Pipeline — خبير وسائل التواصل الاجتماعي
+===========================================================
+Pipeline صحيحة تستدعي Ollama مباشرة (وليس Open WebUI).
+تظهر في Open WebUI كنموذج "External" باسم "📱 Social Media & Marketing Expert".
+
+البنية الصحيحة (من الوثائق الرسمية):
+    المستخدم → Open WebUI → Pipelines Server (هنا) → Ollama → النموذج
+
+المرجع: https://github.com/open-webui/pipelines
 """
-from typing import List, Optional, Generator, Iterator, Union
+
+from typing import List, Union, Generator, Iterator
 from pydantic import BaseModel
 import requests
 import json
-import os
 
 
 class Pipeline:
+
     class Valves(BaseModel):
-        OPENWEBUI_BASE_URL: str = "http://open-webui:8080"
-        OPENWEBUI_API_KEY: str = os.getenv("OPENWEBUI_API_KEY", "")
-        SOCIAL_EXPERT_MODEL_ID: str = "social-media-expert"
-        ENABLE_SOCIAL_CONTEXT: bool = True
-        DEFAULT_TEMPERATURE: float = 0.7
+        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
+        MODEL_ID: str = "llama3.1:8b"
+        TEMPERATURE: float = 0.7
         MAX_TOKENS: int = 4096
+        ENABLE_EXPERT_CONTEXT: bool = True
 
     def __init__(self):
-        self.name = "📱 Social Media Expert"
-        self.id = "social-media-expert-pipeline"
+        self.name = "📱 Social Media & Marketing Expert"
+        self.id = "social-media-expert"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print(f"✅ Social Media Expert Pipeline جاهزة — النموذج: {self.valves.SOCIAL_EXPERT_MODEL_ID}")
+        print(f"[social-media-expert] تشغيل — النموذج: {self.valves.MODEL_ID} على {self.valves.OLLAMA_BASE_URL}")
 
     async def on_shutdown(self):
-        print("⏹️ Social Media Expert Pipeline أُوقفت")
+        print(f"[social-media-expert] إيقاف")
 
-    def _build_headers(self) -> dict:
-        headers = {"Content-Type": "application/json"}
-        if self.valves.OPENWEBUI_API_KEY:
-            headers["Authorization"] = f"Bearer {self.valves.OPENWEBUI_API_KEY}"
-        return headers
+    EXPERT_SYSTEM_PROMPT = """أنت "خبير التسويق الرقمي ووسائل التواصل الاجتماعي" في نظام SaleHSaaS.
 
-    def _inject_social_context(self, messages: List[dict]) -> List[dict]:
-        """حقن سياق التسويق الرقمي ووسائل التواصل الاجتماعي"""
-        if not self.valves.ENABLE_SOCIAL_CONTEXT:
+## مجالات خبرتك
+- إنشاء المحتوى العربي: تويتر/X، إنستغرام، لينكدإن، تيك توك، سناب شات
+- استراتيجيات النمو العضوي والمدفوع في السوق السعودي والخليجي
+- تحليل البيانات: معدلات التفاعل، الوصول، التحويل
+- إدارة الأزمات الرقمية والسمعة الإلكترونية
+- تحسين محركات البحث (SEO) للمحتوى العربي
+- الإعلانات المدفوعة: Meta Ads, Google Ads, Snapchat Ads
+- التسويق بالمؤثرين في السوق السعودي
+
+## قواعد الإجابة
+1. اكتب المحتوى بلغة عربية جذابة تناسب الجمهور السعودي
+2. قدّم خطط المحتوى بجداول منظمة
+3. اقترح الهاشتاقات المناسبة للسوق المحلي
+4. راعِ الثقافة والقيم السعودية في كل المحتوى"""
+
+    def _inject_context(self, messages: List[dict]) -> List[dict]:
+        if not self.valves.ENABLE_EXPERT_CONTEXT:
             return messages
-
-        has_system = any(m.get("role") == "system" for m in messages)
-        if has_system:
+        if any(m.get("role") == "system" for m in messages):
             return messages
-
-        social_context = {
-            "role": "system",
-            "content": (
-                "أنت \"خبير وسائل التواصل الاجتماعي\" في نظام SaleHSaaS، متخصص في التسويق الرقمي وإدارة المحتوى.\n\n"
-                "## منصات التواصل التي تتخصص فيها\n"
-                "- **تويتر/X**: المحتوى القصير، الهاشتاقات، التفاعل الفوري\n"
-                "- **لينكدإن**: المحتوى المهني، بناء العلامة التجارية الشخصية\n"
-                "- **إنستغرام**: المحتوى البصري، الريلز، القصص\n"
-                "- **يوتيوب**: المحتوى المرئي الطويل، السيو، الصور المصغرة\n"
-                "- **سناب شات**: الجمهور السعودي الشاب، القصص، الإعلانات\n"
-                "- **تيك توك**: المحتوى الفيروسي، الترندات، التحديات\n\n"
-                "## مجالات خبرتك\n"
-                "- **استراتيجية المحتوى**: تخطيط المحتوى، التقويم التحريري، الهوية البصرية\n"
-                "- **كتابة المحتوى العربي**: الأسلوب الجذاب، الهاشتاقات، الـ CTA\n"
-                "- **تحليل البيانات**: معدلات التفاعل، الوصول، التحويلات\n"
-                "- **إدارة المجتمع**: الرد على التعليقات، إدارة الأزمات\n"
-                "- **الإعلانات المدفوعة**: استهداف الجمهور، تحسين الميزانية\n"
-                "- **التسويق بالمؤثرين**: اختيار المؤثرين، قياس الأثر\n\n"
-                "## قواعد الإجابة\n"
-                "1. أجب بالعربية دائماً مع مراعاة الثقافة السعودية والخليجية\n"
-                "2. عند كتابة محتوى: قدّم نسخاً متعددة للاختيار منها\n"
-                "3. اقترح الهاشتاقات المناسبة مع كل منشور\n"
-                "4. راعِ أوقات النشر الأمثل للجمهور السعودي\n"
-                "5. التزم بالقيم الإسلامية والثقافة السعودية في كل محتوى\n"
-                "6. راجع قاعدة المعرفة الداخلية لاستراتيجية العلامة التجارية المحلية"
-            )
-        }
-        return [social_context] + messages
+        return [{"role": "system", "content": self.EXPERT_SYSTEM_PROMPT}] + messages
 
     def pipe(
         self,
         user_message: str,
         model_id: str,
         messages: List[dict],
-        body: dict
+        body: dict,
     ) -> Union[str, Generator, Iterator]:
-        """المعالج الرئيسي — يمرر الطلب لـ social-media-expert في Open WebUI"""
+        """الاستدعاء المباشر لـ Ollama — الطريقة الصحيحة"""
 
-        enriched_messages = self._inject_social_context(messages)
+        enriched = self._inject_context(messages)
         stream = body.get("stream", False)
 
         payload = {
-            "model": self.valves.SOCIAL_EXPERT_MODEL_ID,
-            "messages": enriched_messages,
+            "model": self.valves.MODEL_ID,
+            "messages": enriched,
             "stream": stream,
-            "temperature": body.get("temperature", self.valves.DEFAULT_TEMPERATURE),
-            "max_tokens": body.get("max_tokens", self.valves.MAX_TOKENS),
+            "options": {
+                "temperature": body.get("temperature", self.valves.TEMPERATURE),
+                "num_predict": body.get("max_tokens", self.valves.MAX_TOKENS),
+            },
         }
 
         try:
-            response = requests.post(
-                f"{self.valves.OPENWEBUI_BASE_URL}/api/chat/completions",
-                headers=self._build_headers(),
+            r = requests.post(
+                f"{self.valves.OLLAMA_BASE_URL}/api/chat",
                 json=payload,
-                timeout=180,
-                stream=stream
+                timeout=300,
+                stream=stream,
             )
-            response.raise_for_status()
+            r.raise_for_status()
 
             if stream:
-                def stream_generator():
-                    for line in response.iter_lines():
-                        if line:
-                            decoded = line.decode("utf-8")
-                            if decoded.startswith("data: "):
-                                decoded = decoded[6:]
-                            if decoded == "[DONE]":
+                def _stream():
+                    for line in r.iter_lines():
+                        if not line:
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                            content = chunk.get("message", {}).get("content", "")
+                            if content:
+                                yield content
+                            if chunk.get("done"):
                                 break
-                            try:
-                                chunk = json.loads(decoded)
-                                delta = chunk.get("choices", [{}])[0].get("delta", {})
-                                content = delta.get("content", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                pass
-                return stream_generator()
+                        except json.JSONDecodeError:
+                            pass
+                return _stream()
             else:
-                data = response.json()
-                if "choices" in data and len(data["choices"]) > 0:
-                    return data["choices"][0]["message"]["content"]
-                else:
-                    return "⚠️ لم يُعد النموذج أي رد."
+                return r.json().get("message", {}).get("content", "⚠️ لم يُعد الرد.")
 
         except requests.exceptions.ConnectionError:
-            return (
-                "❌ تعذّر الاتصال بـ Open WebUI.\n"
-                f"تحقق من أن الخدمة تعمل على: {self.valves.OPENWEBUI_BASE_URL}"
-            )
+            return f"❌ تعذّر الاتصال بـ Ollama على {self.valves.OLLAMA_BASE_URL}\nتحقق من تشغيل Ollama."
         except requests.exceptions.Timeout:
-            return "⏱️ انتهت مهلة الاتصال (180 ثانية)."
+            return "⏱️ انتهت مهلة الانتظار (300 ثانية)."
+        except requests.exceptions.HTTPError as e:
+            return f"❌ خطأ HTTP: {e.response.status_code} — {e.response.text[:200]}"
         except Exception as e:
             return f"❌ خطأ غير متوقع: {str(e)}"
