@@ -65,7 +65,13 @@
         944,
         720
       ],
-      "typeVersion": 1
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
     },
     {
       "parameters": {
