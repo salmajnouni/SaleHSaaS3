@@ -73,7 +73,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "query": "={{ $fromAI('query', 'The research question or topic to investigate', 'string') }}"
+            "chatInput": "={{ $fromAI('query', 'The research question or topic to investigate', 'string') }}"
           }
         }
       },
@@ -94,7 +94,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "task": "={{ $fromAI('task', 'Detailed description of the automation task to perform in n8n', 'string') }}"
+            "chatInput": "={{ $fromAI('task', 'Detailed description of the automation task to perform in n8n', 'string') }}"
           }
         }
       },
@@ -115,7 +115,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "question": "={{ $fromAI('question', 'The legal or knowledge question to search for', 'string') }}"
+            "chatInput": "={{ $fromAI('question', 'The legal or knowledge question to search for', 'string') }}"
           }
         }
       },
@@ -136,7 +136,7 @@
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
-            "action": "={{ $fromAI('action', 'The model management action: list, info, or pull', 'string') }}",
+            "chatInput": "={{ $fromAI('action', 'The model management action or request about Ollama models', 'string') }}",
             "model_name": "={{ $fromAI('model_name', 'Optional: specific model name for info or pull actions', 'string') }}"
           }
         }
