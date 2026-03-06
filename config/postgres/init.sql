@@ -112,6 +112,47 @@ INSERT INTO data_connections (name, connection_type, host, port, database_name, 
 VALUES ('قاعدة البيانات المحلية', 'postgresql', 'postgres', 5432, 'salehsaas', 'salehsaas_user', true)
 ON CONFLICT DO NOTHING;
 
+-- ── Conversation Logs (Pipeline Monitoring & Continuous Improvement) ────────
+
+CREATE TABLE IF NOT EXISTS conversation_logs (
+    id               UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    session_id       UUID,
+    timestamp        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+
+    -- المحادثة
+    user_message     TEXT         NOT NULL,
+    assistant_reply  TEXT         NOT NULL,
+    expert_domain    VARCHAR(50)  NOT NULL,  -- n8n/legal/financial/hr/cybersecurity/social_media/general/orchestrator
+    model_used       VARCHAR(100) NOT NULL,  -- qwen2.5:7b / deepseek-r1:7b
+
+    -- إصدار البرومبت (للتحسين المستمر)
+    prompt_version   VARCHAR(20)  NOT NULL DEFAULT '2.1.0',
+
+    -- جودة RAG
+    rag_used         BOOLEAN      NOT NULL DEFAULT FALSE,
+    rag_docs         JSONB,                 -- [{source, score, snippet}]
+    rag_score_avg    FLOAT,                 -- متوسط درجة صلة الوثائق المسترجعة
+
+    -- الأداء
+    response_time_ms INTEGER,               -- وقت الاستجابة بالميلي ثانية
+    tokens_used      INTEGER,               -- عدد التوكنز (تقريبي)
+
+    -- تقييم المستخدم (يُملأ لاحقاً إذا أُضيف زر التقييم)
+    user_rating      SMALLINT,              -- 1 = جيد | -1 = سيء | NULL = لم يُقيَّم
+
+    -- بيانات إضافية سياقية
+    extra            JSONB
+);
+
+-- Indexes للاستعلامات الشائعة
+CREATE INDEX IF NOT EXISTS idx_conv_timestamp  ON conversation_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_conv_domain     ON conversation_logs(expert_domain);
+CREATE INDEX IF NOT EXISTS idx_conv_model      ON conversation_logs(model_used);
+CREATE INDEX IF NOT EXISTS idx_conv_prompt_ver ON conversation_logs(prompt_version);
+CREATE INDEX IF NOT EXISTS idx_conv_rag_used   ON conversation_logs(rag_used);
+CREATE INDEX IF NOT EXISTS idx_conv_rating     ON conversation_logs(user_rating) WHERE user_rating IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_conv_session    ON conversation_logs(session_id);
+
 -- ── n8n Database ────────────────────────────────────────────────────────────
 
 SELECT 'CREATE DATABASE n8n'

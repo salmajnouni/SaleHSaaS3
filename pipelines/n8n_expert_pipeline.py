@@ -1,27 +1,28 @@
 """
-n8n Expert Pipeline v2.0.0
+n8n Expert Pipeline v2.1.0
 Model: qwen2.5:7b | VRAM: 4.7GB (GTX 1660 Ti OK)
-RAG: n8n_knowledge collection
-Prompt: Persona + Domain + Output Constraints (Vanderbilt 2024)
+RAG: n8n_knowledge | Logging: PostgreSQL conversation_logs
 """
-from typing import List, Union, Generator, Iterator
+from typing import Generator, Iterator
 from pydantic import BaseModel
 import requests, json
 
 class Pipeline:
+    DOMAIN = "n8n"
+
     class Valves(BaseModel):
-        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
-        MODEL_ID: str = "qwen2.5:7b"
-        TEMPERATURE: float = 0.2
-        MAX_TOKENS: int = 4096
-        TIMEOUT: int = 300
-        ENABLE_RAG: bool = True
-        CHROMADB_URL: str = "http://chromadb:8000"
-        EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-        RAG_COLLECTION: str = "n8n_knowledge"
-        RAG_TOP_K: int = 5
-        RAG_MIN_SCORE: float = 0.25
-        PROMPT_VERSION: str = "2.0.0"
+        OLLAMA_BASE_URL:  str   = "http://host.docker.internal:11434"
+        MODEL_ID:         str   = "qwen2.5:7b"
+        TEMPERATURE:      float = 0.2
+        MAX_TOKENS:       int   = 4096
+        TIMEOUT:          int   = 300
+        ENABLE_RAG:       bool  = True
+        CHROMADB_URL:     str   = "http://chromadb:8000"
+        EMBEDDING_MODEL:  str   = "nomic-embed-text:latest"
+        RAG_COLLECTION:   str   = "n8n_knowledge"
+        RAG_TOP_K:        int   = 5
+        RAG_MIN_SCORE:    float = 0.25
+        PROMPT_VERSION:   str   = "2.1.0"
 
     SYSTEM_PROMPT = """## Role
 You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and write JSON with precision.
@@ -37,7 +38,7 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
 | SearXNG | http://searxng:8080/search?q=...&format=json | Web search |
 | ChromaDB | http://chromadb:8000 | Vector knowledge base |
 | Tika | http://tika:9998 | PDF/Word text extraction |
-| PostgreSQL | postgres:5432 | Main database |
+| PostgreSQL | postgres:5432 db:salehsaas | Main database |
 
 ## Expertise
 1. Workflow design: complete JSON ready for import
@@ -55,15 +56,17 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
 - When using retrieved knowledge: cite [Source: filename]"""
 
     def __init__(self):
-        self.name = "🔄 n8n Automation Expert"
-        self.id = "n8n-expert"
+        self.name   = "🔄 n8n Automation Expert"
+        self.id     = "n8n-expert"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print(f"[n8n Expert v2.0.0] Model: {self.valves.MODEL_ID} | RAG: {self.valves.ENABLE_RAG}")
+        print(f"[n8n Expert v2.1.0] Model: {self.valves.MODEL_ID} | RAG: {self.valves.ENABLE_RAG}")
 
     async def on_shutdown(self):
-        print("[n8n Expert v2.0.0] Shutdown")
+        print("[n8n Expert v2.1.0] Shutdown")
+
+    # ── RAG ──────────────────────────────────────────────────────────────────
 
     def _get_embedding(self, text: str):
         try:
@@ -78,12 +81,13 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
             print(f"[{self.name}] Embedding error: {e}")
             return None
 
-    def _retrieve_context(self, query: str) -> str:
+    def _retrieve_context(self, query: str):
+        """يسترجع الوثائق ذات الصلة من ChromaDB"""
         if not self.valves.ENABLE_RAG:
-            return ""
+            return "", []
         embedding = self._get_embedding(query)
         if not embedding:
-            return ""
+            return "", []
         try:
             r = requests.post(
                 f"{self.valves.CHROMADB_URL}/api/v2/tenants/default_tenant"
@@ -96,31 +100,37 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
                 timeout=15,
             )
             if r.status_code != 200:
-                return ""
+                return "", []
             data = r.json()
-            docs = data.get("documents", [[]])[0]
-            metas = data.get("metadatas", [[]])[0]
+            docs      = data.get("documents", [[]])[0]
+            metas     = data.get("metadatas", [[]])[0]
             distances = data.get("distances", [[]])[0]
-            relevant = []
+
+            relevant_text = []
+            rag_docs_meta = []
             for doc, meta, dist in zip(docs, metas, distances):
-                score = 1 - dist
+                score = round(1 - dist, 4)
                 if score >= self.valves.RAG_MIN_SCORE:
                     source = (meta or {}).get("source", "unknown")
-                    relevant.append(f"[Source: {source}]\n{doc}")
-            return "\n\n---\n\n".join(relevant)
+                    relevant_text.append(f"[Source: {source}]\n{doc}")
+                    rag_docs_meta.append({
+                        "source": source,
+                        "score":  score,
+                        "snippet": doc[:200],
+                    })
+            return "\n\n---\n\n".join(relevant_text), rag_docs_meta
         except Exception as e:
             print(f"[{self.name}] ChromaDB error: {e}")
-            return ""
+            return "", []
 
-    def _build_messages(self, user_message: str, messages: list, system_prompt: str) -> list:
+    def _build_messages(self, user_message: str, messages: list, system_prompt: str, rag_context: str):
         enriched = list(messages)
         if not any(m.get("role") == "system" for m in enriched):
             enriched = [{"role": "system", "content": system_prompt}] + enriched
-        rag_context = self._retrieve_context(user_message)
         if rag_context:
             rag_msg = {
                 "role": "system",
-                "content": f"## Retrieved Knowledge\n\n{rag_context}\n\n---\nUse this as primary reference.",
+                "content": f"## Retrieved Knowledge\n\n{rag_context}\n\n---\nUse as primary reference.",
             }
             if enriched and enriched[-1].get("role") == "user":
                 enriched = enriched[:-1] + [rag_msg] + [enriched[-1]]
@@ -128,7 +138,13 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
                 enriched.append(rag_msg)
         return enriched
 
-    def _call_ollama(self, messages: list, body: dict):
+    # ── Ollama + Logging ──────────────────────────────────────────────────────
+
+    def _call_ollama(self, messages: list, body: dict, user_message: str, rag_docs_meta: list):
+        """يستدعي Ollama ويسجّل النتيجة في PostgreSQL"""
+        from conversation_logger import get_logger, Timer
+        timer  = Timer()
+        logger = get_logger()
         stream = body.get("stream", False)
         payload = {
             "model": self.valves.MODEL_ID,
@@ -147,8 +163,10 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
                 stream=stream,
             )
             r.raise_for_status()
+
             if stream:
                 def _stream():
+                    full_reply = []
                     for line in r.iter_lines():
                         if not line:
                             continue
@@ -156,14 +174,38 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
                             chunk = json.loads(line)
                             content = chunk.get("message", {}).get("content", "")
                             if content:
+                                full_reply.append(content)
                                 yield content
                             if chunk.get("done"):
+                                # تسجيل بعد اكتمال الـ stream
+                                logger.log(
+                                    user_message=user_message,
+                                    assistant_reply="".join(full_reply),
+                                    expert_domain=self.DOMAIN,
+                                    model_used=self.valves.MODEL_ID,
+                                    prompt_version=self.valves.PROMPT_VERSION,
+                                    rag_used=bool(rag_docs_meta),
+                                    rag_docs=rag_docs_meta,
+                                    response_time_ms=timer.elapsed_ms(),
+                                )
                                 break
                         except json.JSONDecodeError:
                             pass
                 return _stream()
             else:
-                return r.json().get("message", {}).get("content", "No response.")
+                reply = r.json().get("message", {}).get("content", "No response.")
+                logger.log(
+                    user_message=user_message,
+                    assistant_reply=reply,
+                    expert_domain=self.DOMAIN,
+                    model_used=self.valves.MODEL_ID,
+                    prompt_version=self.valves.PROMPT_VERSION,
+                    rag_used=bool(rag_docs_meta),
+                    rag_docs=rag_docs_meta,
+                    response_time_ms=timer.elapsed_ms(),
+                )
+                return reply
+
         except requests.exceptions.ConnectionError:
             return f"Connection error: Cannot reach Ollama at {self.valves.OLLAMA_BASE_URL}"
         except requests.exceptions.Timeout:
@@ -177,5 +219,6 @@ You are an **n8n Automation Expert** in SaleHSaaS. You speak Arabic fluently and
             return f"Unexpected error: {str(e)}"
 
     def pipe(self, user_message: str, model_id: str, messages: list, body: dict):
-        enriched = self._build_messages(user_message, messages, self.SYSTEM_PROMPT)
-        return self._call_ollama(enriched, body)
+        rag_context, rag_docs_meta = self._retrieve_context(user_message)
+        enriched = self._build_messages(user_message, messages, self.SYSTEM_PROMPT, rag_context)
+        return self._call_ollama(enriched, body, user_message, rag_docs_meta)

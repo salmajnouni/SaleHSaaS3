@@ -1,16 +1,16 @@
 """
-Orchestrator Pipeline v2.0.0
+Orchestrator Pipeline v2.1.0
 Architecture: Intent Classification → Expert Routing → Specialized Response
 Models: qwen2.5:7b (routing + general) | deepseek-r1:7b (n8n + cybersecurity)
-VRAM: 4.7GB max (GTX 1660 Ti OK)
+Logging: PostgreSQL conversation_logs
 """
-from typing import List, Union, Generator, Iterator
+from typing import Generator, Iterator
 from pydantic import BaseModel
 import requests, json
 
 EXPERT_PROMPTS = {
     "n8n": """أنت خبير أتمتة n8n في SaleHSaaS. تصمّم Workflows وتشخّص الأخطاء وتدير Ollama.
-بيئة العمل: n8n:5678 | open-webui:8080 | ollama:11434 | n8n_bridge:3333/v1/ | chromadb:8000
+بيئة العمل: n8n:5678 | open-webui:8080 | ollama:11434 | n8n_bridge:3333/v1/ | chromadb:8000 | postgres:5432
 أجب بالعربية، JSON في كتلة ```json، اذكر typeVersion الصحيح دائماً.""",
 
     "legal": """أنت مستشار قانوني متخصص في الأنظمة السعودية (نظام العمل، PDPL، نظام الشركات، VAT).
@@ -47,44 +47,46 @@ Rules:
 Respond with ONE word only."""
 
 COLLECTION_MAP = {
-    "n8n": "n8n_knowledge",
-    "legal": "saleh_legal_knowledge",
-    "financial": "financial_knowledge",
-    "hr": "hr_knowledge",
-    "cybersecurity": "cybersecurity_knowledge",
+    "n8n":          "n8n_knowledge",
+    "legal":        "saleh_legal_knowledge",
+    "financial":    "financial_knowledge",
+    "hr":           "hr_knowledge",
+    "cybersecurity":"cybersecurity_knowledge",
     "social_media": "social_media_knowledge",
-    "general": "general_knowledge",
+    "general":      "general_knowledge",
 }
 
 REASONING_DOMAINS = {"n8n", "cybersecurity"}
 
 class Pipeline:
+    DOMAIN = "orchestrator"
+
     class Valves(BaseModel):
-        OLLAMA_BASE_URL: str = "http://host.docker.internal:11434"
-        ROUTING_MODEL: str = "qwen2.5:7b"
-        DEFAULT_MODEL: str = "qwen2.5:7b"
-        REASONING_MODEL: str = "deepseek-r1:7b"
-        TEMPERATURE: float = 0.3
-        MAX_TOKENS: int = 4096
-        TIMEOUT: int = 300
-        ENABLE_RAG: bool = True
-        CHROMADB_URL: str = "http://chromadb:8000"
-        EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-        RAG_TOP_K: int = 5
-        RAG_MIN_SCORE: float = 0.25
-        SHOW_ROUTING: bool = True
-        PROMPT_VERSION: str = "2.0.0"
+        OLLAMA_BASE_URL:  str   = "http://host.docker.internal:11434"
+        ROUTING_MODEL:    str   = "qwen2.5:7b"
+        DEFAULT_MODEL:    str   = "qwen2.5:7b"
+        REASONING_MODEL:  str   = "deepseek-r1:7b"
+        TEMPERATURE:      float = 0.3
+        MAX_TOKENS:       int   = 4096
+        TIMEOUT:          int   = 300
+        ENABLE_RAG:       bool  = True
+        CHROMADB_URL:     str   = "http://chromadb:8000"
+        EMBEDDING_MODEL:  str   = "nomic-embed-text:latest"
+        RAG_TOP_K:        int   = 5
+        RAG_MIN_SCORE:    float = 0.25
+        SHOW_ROUTING:     bool  = True
+        PROMPT_VERSION:   str   = "2.1.0"
 
     def __init__(self):
-        self.name = "🎯 SaleHSaaS Orchestrator"
-        self.id = "orchestrator"
+        self.name   = "🎯 SaleHSaaS Orchestrator"
+        self.id     = "orchestrator"
         self.valves = self.Valves()
 
     async def on_startup(self):
-        print(f"[Orchestrator v2.0.0] Ready | Routing: {self.valves.ROUTING_MODEL}")
+        print(f"[Orchestrator v2.1.0] Ready | Routing: {self.valves.ROUTING_MODEL}")
 
     async def on_shutdown(self):
-        print("[Orchestrator v2.0.0] Shutdown")
+        print("[Orchestrator v2.1.0] Shutdown")
 
     def _route(self, user_message: str) -> str:
         try:
@@ -94,7 +96,7 @@ class Pipeline:
                     "model": self.valves.ROUTING_MODEL,
                     "messages": [
                         {"role": "system", "content": ROUTING_PROMPT},
-                        {"role": "user", "content": user_message[:500]},
+                        {"role": "user",   "content": user_message[:500]},
                     ],
                     "stream": False,
                     "options": {"temperature": 0.0, "num_predict": 10},
@@ -123,12 +125,12 @@ class Pipeline:
         except Exception:
             return None
 
-    def _retrieve_context(self, query: str, collection: str) -> str:
+    def _retrieve_context(self, query: str, collection: str):
         if not self.valves.ENABLE_RAG:
-            return ""
+            return "", []
         embedding = self._get_embedding(query)
         if not embedding:
-            return ""
+            return "", []
         try:
             r = requests.post(
                 f"{self.valves.CHROMADB_URL}/api/v2/tenants/default_tenant"
@@ -141,31 +143,38 @@ class Pipeline:
                 timeout=15,
             )
             if r.status_code != 200:
-                return ""
-            data = r.json()
-            docs = data.get("documents", [[]])[0]
-            metas = data.get("metadatas", [[]])[0]
+                return "", []
+            data      = r.json()
+            docs      = data.get("documents", [[]])[0]
+            metas     = data.get("metadatas", [[]])[0]
             distances = data.get("distances", [[]])[0]
-            relevant = []
+            relevant_text = []
+            rag_docs_meta = []
             for doc, meta, dist in zip(docs, metas, distances):
-                if (1 - dist) >= self.valves.RAG_MIN_SCORE:
+                score = round(1 - dist, 4)
+                if score >= self.valves.RAG_MIN_SCORE:
                     source = (meta or {}).get("source", "unknown")
-                    relevant.append(f"[Source: {source}]\n{doc}")
-            return "\n\n---\n\n".join(relevant)
+                    relevant_text.append(f"[Source: {source}]\n{doc}")
+                    rag_docs_meta.append({"source": source, "score": score, "snippet": doc[:200]})
+            return "\n\n---\n\n".join(relevant_text), rag_docs_meta
         except Exception:
-            return ""
+            return "", []
 
     def pipe(self, user_message: str, model_id: str, messages: list, body: dict):
-        domain = self._route(user_message)
-        system_prompt = EXPERT_PROMPTS.get(domain, EXPERT_PROMPTS["general"])
-        model = self.valves.REASONING_MODEL if domain in REASONING_DOMAINS else self.valves.DEFAULT_MODEL
+        from conversation_logger import get_logger, Timer
+        timer  = Timer()
+        logger = get_logger()
+
+        domain     = self._route(user_message)
+        model      = self.valves.REASONING_MODEL if domain in REASONING_DOMAINS else self.valves.DEFAULT_MODEL
         collection = COLLECTION_MAP.get(domain, "general_knowledge")
-        rag_context = self._retrieve_context(user_message, collection)
+        sys_prompt = EXPERT_PROMPTS.get(domain, EXPERT_PROMPTS["general"])
+
+        rag_context, rag_docs_meta = self._retrieve_context(user_message, collection)
 
         enriched = list(messages)
         if not any(m.get("role") == "system" for m in enriched):
-            enriched = [{"role": "system", "content": system_prompt}] + enriched
-
+            enriched = [{"role": "system", "content": sys_prompt}] + enriched
         if rag_context:
             rag_msg = {
                 "role": "system",
@@ -176,9 +185,12 @@ class Pipeline:
             else:
                 enriched.append(rag_msg)
 
-        routing_suffix = f"\n\n---\n*🎯 Domain: **{domain.upper()}** | Model: `{model}`*" if self.valves.SHOW_ROUTING else ""
+        routing_suffix = (
+            f"\n\n---\n*🎯 Domain: **{domain.upper()}** | Model: `{model}`*"
+            if self.valves.SHOW_ROUTING else ""
+        )
 
-        stream = body.get("stream", False)
+        stream  = body.get("stream", False)
         payload = {
             "model": model,
             "messages": enriched,
@@ -192,31 +204,55 @@ class Pipeline:
         try:
             r = requests.post(
                 f"{self.valves.OLLAMA_BASE_URL}/api/chat",
-                json=payload,
-                timeout=self.valves.TIMEOUT,
-                stream=stream,
+                json=payload, timeout=self.valves.TIMEOUT, stream=stream,
             )
             r.raise_for_status()
+
             if stream:
                 def _stream():
+                    full_reply = []
                     for line in r.iter_lines():
                         if not line:
                             continue
                         try:
-                            chunk = json.loads(line)
+                            chunk   = json.loads(line)
                             content = chunk.get("message", {}).get("content", "")
                             if content:
+                                full_reply.append(content)
                                 yield content
                             if chunk.get("done"):
                                 if routing_suffix:
                                     yield routing_suffix
+                                logger.log(
+                                    user_message=user_message,
+                                    assistant_reply="".join(full_reply),
+                                    expert_domain=domain,
+                                    model_used=model,
+                                    prompt_version=self.valves.PROMPT_VERSION,
+                                    rag_used=bool(rag_docs_meta),
+                                    rag_docs=rag_docs_meta,
+                                    response_time_ms=timer.elapsed_ms(),
+                                    extra={"routed_by": "orchestrator"},
+                                )
                                 break
                         except json.JSONDecodeError:
                             pass
                 return _stream()
             else:
-                content = r.json().get("message", {}).get("content", "No response.")
-                return content + routing_suffix
+                reply = r.json().get("message", {}).get("content", "No response.")
+                logger.log(
+                    user_message=user_message,
+                    assistant_reply=reply,
+                    expert_domain=domain,
+                    model_used=model,
+                    prompt_version=self.valves.PROMPT_VERSION,
+                    rag_used=bool(rag_docs_meta),
+                    rag_docs=rag_docs_meta,
+                    response_time_ms=timer.elapsed_ms(),
+                    extra={"routed_by": "orchestrator"},
+                )
+                return reply + routing_suffix
+
         except requests.exceptions.ConnectionError:
             return f"Connection error: Cannot reach Ollama at {self.valves.OLLAMA_BASE_URL}"
         except requests.exceptions.Timeout:
