@@ -33,8 +33,8 @@ def import_workflow(api_key: str, workflow_path: Path, n8n_url: str = "http://lo
     wf = json.loads(content, strict=False)
     
     # إزالة الحقول التي يرفضها n8n API v1
-    # يقبل فقط: name, nodes, connections, settings, staticData, tags
-    for field in ["id", "createdAt", "updatedAt", "versionId", "pinData", "active"]:
+    # يقبل فقط: name, nodes, connections, settings, staticData
+    for field in ["id", "createdAt", "updatedAt", "versionId", "pinData", "active", "tags"]:
         wf.pop(field, None)
     
     try:
