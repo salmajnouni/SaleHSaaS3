@@ -90,18 +90,8 @@
     },
     {
       "parameters": {
-        "toolDescription": "Manage files in SaleHSaaS system. Operations:\n- List files: GET http://file_api:8765/list?dir=/data/knowledge_inbox\n- Read file: GET http://file_api:8765/read?path=/data/knowledge_inbox/file.txt\n- Upload URL for processing: POST http://file_api:8765/url with {\"url\": \"...\", \"title\": \"...\"}\n- Check processed files: GET http://file_api:8765/list?dir=/data/knowledge_processed",
-        "url": "={{ $fromAI('url', 'Full File API URL for the operation', 'string') }}",
-        "method": "={{ $fromAI('method', 'HTTP method: GET or POST', 'string') }}",
-        "sendBody": "={{ $fromAI('method', 'HTTP method', 'string') === 'POST' }}",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "={{ $fromAI('body_key', 'Request body key if POST', 'string') }}",
-              "value": "={{ $fromAI('body_value', 'Request body value if POST', 'string') }}"
-            }
-          ]
-        },
+        "toolDescription": "Manage files in SaleHSaaS system. Use GET for listing/reading, POST for uploading. Examples:\n- List: GET http://file_api:8765/list?dir=/data/knowledge_inbox\n- Read: GET http://file_api:8765/read?path=/data/knowledge_inbox/file.txt\n- Upload URL: POST http://file_api:8765/url",
+        "url": "={{ $fromAI('url', 'Full File API URL, e.g. http://file_api:8765/list?dir=/data/knowledge_inbox', 'string') }}",
         "options": {}
       },
       "id": "tool-file-api",
@@ -124,9 +114,8 @@
     },
     {
       "parameters": {
-        "toolDescription": "Make HTTP requests to any external API or service. Use for checking service health, calling external APIs, or any HTTP operation not covered by other tools.",
-        "url": "={{ $fromAI('url', 'Full URL to call', 'string') }}",
-        "method": "={{ $fromAI('method', 'HTTP method: GET, POST, PUT, DELETE', 'string') }}",
+        "toolDescription": "Make HTTP GET requests to any external API or service. Use for checking service health, calling external APIs, or fetching data. For POST requests use File API tool.",
+        "url": "={{ $fromAI('url', 'Full URL to call, e.g. http://host.docker.internal:11434/api/tags', 'string') }}",
         "options": {}
       },
       "id": "tool-http",
