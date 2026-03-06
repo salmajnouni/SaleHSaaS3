@@ -8,20 +8,25 @@
       "id": "models-trigger",
       "name": "Workflow Input",
       "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "position": [240, 300],
+      "position": [
+        240,
+        300
+      ],
       "typeVersion": 1.1
     },
     {
       "parameters": {
         "options": {
-          "systemMessage": "أنت وكيل إدارة النماذج في نظام SaleHSaaS.\n\n## مهمتك\nإدارة نماذج Ollama المحلية: عرضها، الاستعلام عنها، وتحميل نماذج جديدة.\n\n## الأدوات المتاحة (عبر MCP)\n1. **ollama_model_builder** — إدارة نماذج Ollama:\n   - `list_local_models` — عرض كل النماذج المحلية\n   - `get_model_info` — معلومات نموذج محدد\n   - `pull_model` — تحميل نموذج جديد من Ollama Hub\n\n2. **Ollama API Direct** — استعلام مباشر على Ollama:\n   - عرض النماذج: GET http://host.docker.internal:11434/api/tags\n   - معلومات نموذج: POST http://host.docker.internal:11434/api/show\n\n## قواعد العمل\n- قبل تحميل نموذج جديد، تحقق من المساحة المتاحة\n- أخبر المستخدم بحجم النموذج قبل التحميل\n- عند عرض النماذج، رتّبها حسب الحجم\n- رد بالعربية مع معلومات واضحة\n\nالطلب الوارد: {{ $json.chatInput ?? $json.action ?? $json.query ?? 'لا يوجد طلب' }}
-اسم النموذج (إن وُجد): {{ $json.model_name ?? '' }}}"
+          "systemMessage": "أنت وكيل إدارة النماذج في نظام SaleHSaaS.\n\n## مهمتك\nإدارة نماذج Ollama المحلية: عرضها، الاستعلام عنها، وتحميل نماذج جديدة.\n\n## الأدوات المتاحة (عبر MCP)\n1. **ollama_model_builder** — إدارة نماذج Ollama:\n   - `list_local_models` — عرض كل النماذج المحلية\n   - `get_model_info` — معلومات نموذج محدد\n   - `pull_model` — تحميل نموذج جديد من Ollama Hub\n\n2. **Ollama API Direct** — استعلام مباشر على Ollama:\n   - عرض النماذج: GET http://host.docker.internal:11434/api/tags\n   - معلومات نموذج: POST http://host.docker.internal:11434/api/show\n\n## قواعد العمل\n- قبل تحميل نموذج جديد، تحقق من المساحة المتاحة\n- أخبر المستخدم بحجم النموذج قبل التحميل\n- عند عرض النماذج، رتّبها حسب الحجم\n- رد بالعربية مع معلومات واضحة\n\nالطلب الوارد: {{ $json.chatInput ?? $json.action ?? $json.query ?? 'لا يوجد طلب' }}\nاسم النموذج (إن وُجد): {{ $json.model_name ?? '' }}}"
         }
       },
       "id": "models-agent",
       "name": "Models Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
-      "position": [560, 300],
+      "position": [
+        560,
+        300
+      ],
       "typeVersion": 2.2
     },
     {
@@ -35,7 +40,10 @@
       "id": "models-ollama",
       "name": "Ollama (Models)",
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
-      "position": [240, 560],
+      "position": [
+        240,
+        560
+      ],
       "typeVersion": 1,
       "credentials": {
         "ollamaApi": {
@@ -54,7 +62,10 @@
       "id": "models-mcp",
       "name": "Ollama Manager (MCP)",
       "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
-      "position": [440, 560],
+      "position": [
+        440,
+        560
+      ],
       "typeVersion": 1
     },
     {
@@ -67,7 +78,10 @@
       "id": "models-api",
       "name": "Ollama API Direct",
       "type": "n8n-nodes-base.httpRequestTool",
-      "position": [640, 560],
+      "position": [
+        640,
+        560
+      ],
       "typeVersion": 4.2
     },
     {
@@ -78,38 +92,83 @@
       "id": "models-output",
       "name": "Return Result",
       "type": "n8n-nodes-base.respondToWebhook",
-      "position": [880, 300],
+      "position": [
+        880,
+        300
+      ],
       "typeVersion": 1.1
     }
   ],
   "connections": {
     "Workflow Input": {
       "main": [
-        [{"node": "Models Agent", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Models Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Models Agent": {
       "main": [
-        [{"node": "Return Result", "type": "main", "index": 0}]
+        [
+          {
+            "node": "Return Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Ollama (Models)": {
       "ai_languageModel": [
-        [{"node": "Models Agent", "type": "ai_languageModel", "index": 0}]
+        [
+          {
+            "node": "Models Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
       ]
     },
     "Ollama Manager (MCP)": {
       "ai_tool": [
-        [{"node": "Models Agent", "type": "ai_tool", "index": 0}]
+        [
+          {
+            "node": "Models Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
       ]
     },
     "Ollama API Direct": {
       "ai_tool": [
-        [{"node": "Models Agent", "type": "ai_tool", "index": 0}]
+        [
+          {
+            "node": "Models Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
       ]
     }
   },
   "pinData": {},
-  "settings": {"executionOrder": "v1"},
-  "tags": [{"name": "salehsaas"}, {"name": "sub-agent"}, {"name": "models"}]
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "salehsaas"
+    },
+    {
+      "name": "sub-agent"
+    },
+    {
+      "name": "models"
+    }
+  ]
 }

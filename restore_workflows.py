@@ -26,11 +26,15 @@ def import_workflow(api_key: str, workflow_path: Path, n8n_url: str = "http://lo
     """استيراد workflow واحد"""
     headers = {"X-N8N-API-KEY": api_key, "Content-Type": "application/json"}
     
-    with open(workflow_path) as f:
-        wf = json.load(f)
+    with open(workflow_path, encoding='utf-8') as f:
+        content = f.read()
     
-    # إزالة الحقول التي قد تسبب تعارضاً
-    for field in ["id", "createdAt", "updatedAt", "versionId"]:
+    # قراءة بـ strict=False لتجاوز control characters
+    wf = json.loads(content, strict=False)
+    
+    # إزالة الحقول التي يرفضها n8n API v1
+    # يقبل فقط: name, nodes, connections, settings, staticData, tags
+    for field in ["id", "createdAt", "updatedAt", "versionId", "pinData", "active"]:
         wf.pop(field, None)
     
     try:
