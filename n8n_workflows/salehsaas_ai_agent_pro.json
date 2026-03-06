@@ -1,0 +1,292 @@
+{
+  "name": "SaleHSaaS AI Agent Pro",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "مرحباً! أنا مساعد SaleHSaaS الذكي.\n\nأستطيع مساعدتك في:\n🔍 البحث في الويب\n🌤️ حالة الطقس\n📰 آخر الأخبار\n🧮 العمليات الحسابية\n💻 تنفيذ الكود\n📚 البحث في ويكيبيديا\n🔗 استدعاء أي API\n\nاكتب سؤالك...",
+        "options": {
+          "inputPlaceholder": "اكتب رسالتك هنا...",
+          "showWelcomeScreen": false,
+          "subtitle": "مساعد SaleHSaaS الذكي - بكامل الأدوات",
+          "title": "SaleHSaaS AI Agent Pro",
+          "responseMode": "lastNode"
+        }
+      },
+      "id": "node-chat-trigger",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [480, 300],
+      "webhookId": "salehsaas-agent-pro-webhook-001",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are SaleHSaaS AI Assistant — a professional, multilingual AI agent.\n\n## IDENTITY\n- Name: SaleHSaaS Assistant\n- Language: ALWAYS respond in Arabic (العربية) regardless of input language\n- Tone: Professional, concise, helpful\n\n## TOOLS AVAILABLE\nYou have access to these tools — use them intelligently:\n1. **Web Search (SerpAPI)**: For current events, real-time data, anything requiring up-to-date info\n2. **Wikipedia**: For factual, encyclopedic knowledge about people, places, concepts\n3. **Calculator**: For any mathematical computation — ALWAYS use this instead of calculating mentally\n4. **Get Weather**: For weather forecasts — requires city name, auto-converts to coordinates\n5. **Get News (RSS)**: For latest news from BBC Arabic, Al Jazeera, TechCrunch\n6. **HTTP Request**: For calling external APIs or fetching web data\n7. **Code Execution**: For data processing, text manipulation, complex logic\n\n## DECISION RULES\n- Math question → use Calculator immediately\n- Weather question → use Get Weather immediately\n- News question → use Get News immediately\n- Factual/encyclopedic → try Wikipedia first, then Web Search\n- Current events → use Web Search\n- Complex data processing → use Code Execution\n- Unknown API → use HTTP Request\n\n## OUTPUT FORMAT\n- Always respond in Arabic\n- Be concise and direct\n- Use markdown formatting when helpful\n- Cite sources when using web search\n- Current date/time: {{ $now }}"
+        }
+      },
+      "id": "node-ai-agent",
+      "name": "SaleHSaaS AI Agent Pro",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [800, 300],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "model": "qwen2.5-coder:14b",
+        "options": {
+          "temperature": 0.3,
+          "numCtx": 8192
+        }
+      },
+      "id": "node-ollama-model",
+      "name": "Ollama Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "position": [480, 560],
+      "typeVersion": 1,
+      "credentials": {
+        "ollamaApi": {
+          "id": "ollama-local",
+          "name": "Ollama Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "id": "node-memory",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [680, 560],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "toolDescription": "Search Wikipedia for encyclopedic knowledge about people, places, history, science, and concepts. Use for factual questions that don't require real-time data.",
+        "language": "ar"
+      },
+      "id": "node-wikipedia",
+      "name": "Wikipedia",
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "position": [880, 560],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Perform mathematical calculations accurately. Use for ANY arithmetic, algebra, statistics, or numerical computation. Never calculate mentally — always use this tool.",
+        "jsCode": "// Calculator Tool\nconst expression = query;\ntry {\n  // Safe math evaluation\n  const result = Function('return (' + expression.replace(/[^0-9+\\-*/().%\\s,Math]/g, '') + ')')();\n  return `النتيجة: ${expression} = ${result}`;\n} catch(e) {\n  return `خطأ في الحساب: ${e.message}`;\n}"
+      },
+      "id": "node-calculator",
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [1080, 560],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get current weather forecast for any city worldwide. Automatically determines coordinates from city name. Returns temperature, wind speed, humidity, and conditions.",
+        "url": "https://api.open-meteo.com/v1/forecast",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "latitude",
+              "value": "={{ $fromAI('latitude', 'Latitude coordinate of the city (e.g. 24.7136 for Riyadh)', 'string') }}"
+            },
+            {
+              "name": "longitude",
+              "value": "={{ $fromAI('longitude', 'Longitude coordinate of the city (e.g. 46.6753 for Riyadh)', 'string') }}"
+            },
+            {
+              "name": "current",
+              "value": "temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,apparent_temperature"
+            },
+            {
+              "name": "daily",
+              "value": "temperature_2m_max,temperature_2m_min,precipitation_sum"
+            },
+            {
+              "name": "forecast_days",
+              "value": "3"
+            },
+            {
+              "name": "temperature_unit",
+              "value": "celsius"
+            },
+            {
+              "name": "wind_speed_unit",
+              "value": "kmh"
+            },
+            {
+              "name": "timezone",
+              "value": "Asia/Riyadh"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-weather",
+      "name": "Get Weather",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [1280, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get latest news from trusted Arabic and international sources. Choose the appropriate feed:\n- Al Jazeera Arabic: https://www.aljazeera.net/xml/rss/all.xml (أخبار عربية)\n- BBC Arabic: https://feeds.bbci.co.uk/arabic/rss.xml (أخبار دولية بالعربية)\n- TechCrunch: https://techcrunch.com/feed/ (أخبار التقنية)\n- Reuters: https://feeds.reuters.com/reuters/topNews (أخبار عالمية)\nSelect based on user's topic of interest.",
+        "url": "={{ $fromAI('feed_url', 'Choose the most appropriate RSS feed URL based on the news topic', 'string') }}",
+        "options": {}
+      },
+      "id": "node-news",
+      "name": "Get News",
+      "type": "n8n-nodes-base.rssFeedReadTool",
+      "position": [1480, 560],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Make HTTP requests to any external API or website. Use for fetching data from specific URLs, calling REST APIs, or accessing web services. Supports GET and POST methods.",
+        "method": "={{ $fromAI('method', 'HTTP method: GET or POST', 'string') }}",
+        "url": "={{ $fromAI('url', 'The full URL to request including query parameters', 'string') }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "node-http",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [1680, 560],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "toolDescription": "Execute JavaScript code for data processing, text manipulation, complex logic, or any computation that requires programming. Write clean, efficient code and return results.",
+        "jsCode": "={{ $fromAI('code', 'JavaScript code to execute. Must return a value or string result.', 'string') }}"
+      },
+      "id": "node-code",
+      "name": "Code Execution",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [1880, 560],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get News": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Execution": {
+      "ai_tool": [
+        [
+          {
+            "node": "SaleHSaaS AI Agent Pro",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "n8n-openai-bridge"
+    },
+    {
+      "name": "salehsaas"
+    }
+  ]
+}
