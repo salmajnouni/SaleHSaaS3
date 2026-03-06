@@ -1,33 +1,33 @@
 {
-  "name": "SaleHSaaS Orchestrator Agent (MCP)",
+  "name": "SaleHSaaS Automation Agent (MCP)",
   "nodes": [
     {
       "parameters": {
         "public": true,
-        "initialMessages": "مرحباً! أنا المنسق الذكي لنظام SaleHSaaS.\n\nأملك فريقاً من الوكلاء المتخصصين:\n🔬 وكيل البحث — ويب + ويكيبيديا + أخبار\n⚙️ وكيل الأتمتة — إنشاء وإدارة workflows في n8n\n📚 وكيل المعرفة — البحث في قاعدة المعرفة القانونية\n🤖 وكيل النماذج — إدارة نماذج Ollama\n\nكيف يمكنني مساعدتك؟",
+        "initialMessages": "مرحباً! أنا وكيل الأتمتة الذكي لنظام SaleHSaaS.\n\nأستطيع عبر MCP:\n⚙️ إنشاء وإدارة workflows في n8n\n📋 عرض وتشغيل وإيقاف الـ workflows\n🤖 إدارة نماذج Ollama (عرض، تحميل، معلومات)\n📁 إدارة الملفات ورفعها للمعالجة\n💻 تنفيذ كود JavaScript لمعالجة البيانات\n\nصف لي ما تريد أتمته وسأنفذه.",
         "options": {
-          "inputPlaceholder": "اكتب طلبك...",
+          "inputPlaceholder": "صف مهمة الأتمتة...",
           "showWelcomeScreen": false,
-          "subtitle": "نظام متعدد الوكلاء - مدعوم بـ MCP",
-          "title": "SaleHSaaS Orchestrator",
+          "subtitle": "وكيل الأتمتة - مدعوم بـ MCP",
+          "title": "SaleHSaaS Automation Agent",
           "responseMode": "lastNode"
         }
       },
-      "id": "orch-chat-trigger",
+      "id": "auto-chat-trigger",
       "name": "Chat Trigger",
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "position": [240, 300],
-      "webhookId": "salehsaas-orchestrator-webhook-001",
+      "webhookId": "salehsaas-automation-mcp-001",
       "typeVersion": 1.1
     },
     {
       "parameters": {
         "options": {
-          "systemMessage": "أنت المنسق الرئيسي (Orchestrator) لنظام SaleHSaaS متعدد الوكلاء.\n\n## مهمتك\nتحليل طلب المستخدم وتوجيهه للوكيل المتخصص المناسب.\n\n## الوكلاء المتاحة\n\n### 1. وكيل البحث (Research Agent)\n- **استخدم عند:** أسئلة عامة، أخبار، طقس، معلومات موسوعية، بحث ويب\n- **الأداة:** `call_research_agent`\n\n### 2. وكيل الأتمتة (Automation Agent)\n- **استخدم عند:** إنشاء workflow، تعديله، تشغيله، إدارة n8n\n- **الأداة:** `call_automation_agent`\n\n### 3. وكيل المعرفة (Knowledge Agent)\n- **استخدم عند:** أسئلة قانونية، البحث في الوثائق، الأنظمة السعودية\n- **الأداة:** `call_knowledge_agent`\n\n### 4. وكيل النماذج (Models Agent)\n- **استخدم عند:** إدارة نماذج Ollama، تحميل نموذج، عرض النماذج المتاحة\n- **الأداة:** `call_models_agent`\n\n## قواعد التنسيق\n- دائماً رد بالعربية\n- إذا كان الطلب يحتاج أكثر من وكيل، نسّق بينهم بالتسلسل\n- أعد صياغة النتيجة بشكل واضح ومنظم للمستخدم\n- لا تخمّن — استخدم الوكيل المناسب دائماً\n\nالتاريخ والوقت: {{ $now }}"
+          "systemMessage": "أنت وكيل الأتمتة الذكي المتخصص في نظام SaleHSaaS.\n\n## مهمتك الوحيدة\nأتمتة المهام وإدارة workflows في n8n وإدارة نماذج Ollama والملفات — كل ذلك عبر بروتوكول MCP.\n\n## الأدوات المتاحة عبر MCP\n\n### 1. n8n Builder (MCP) — إدارة كاملة لـ n8n\n- `list_workflows` — عرض كل الـ workflows مع حالتها\n- `get_workflow` — تفاصيل workflow بالـ ID\n- `create_workflow` — إنشاء workflow جديد بـ JSON\n- `update_workflow` — تعديل workflow موجود\n- `activate_workflow` — تفعيل workflow\n- `deactivate_workflow` — إيقاف workflow\n- `execute_workflow` — تشغيل workflow فوراً\n- `delete_workflow` — حذف workflow\n- `list_executions` — سجل التنفيذ\n\n### 2. Ollama Manager (MCP) — إدارة النماذج\n- `list_local_models` — عرض النماذج المثبتة\n- `get_model_info` — معلومات نموذج محدد\n- `pull_model` — تحميل نموذج جديد\n\n### 3. File API — إدارة الملفات\n- رفع ملفات لـ knowledge_inbox للمعالجة التلقائية\n- قراءة الملفات المعالجة\n- إدارة url_inbox\n\n### 4. Code Tool — معالجة البيانات\n- تنفيذ JavaScript لبناء JSON للـ workflows\n- معالجة البيانات وتحويلها\n- حساب وتحليل البيانات\n\n### 5. HTTP Request — APIs خارجية\n- استدعاء أي API خارجي\n- التحقق من حالة الخدمات\n\n## قواعد العمل الاحترافية\n1. **قبل الإنشاء:** اعرض خطة الـ workflow قبل تنفيذها\n2. **قبل الحذف:** اطلب تأكيداً صريحاً\n3. **عند الخطأ:** اشرح السبب واقترح الحل\n4. **التوثيق:** أضف وصفاً لكل workflow تنشئه\n5. **الرد:** دائماً بالعربية مع تفاصيل واضحة عما تم تنفيذه\n\n## مثال على سير العمل\nعند طلب إنشاء workflow:\n1. استخدم Code Tool لبناء JSON الـ workflow\n2. استخدم n8n Builder لإنشائه\n3. فعّله إذا طُلب\n4. أبلغ المستخدم بالنتيجة والـ ID\n\nالتاريخ والوقت الحالي: {{ $now }}"
         }
       },
-      "id": "orch-agent",
-      "name": "Orchestrator Agent",
+      "id": "auto-agent",
+      "name": "Automation Agent",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "position": [560, 300],
       "typeVersion": 2.2
@@ -36,12 +36,12 @@
       "parameters": {
         "model": "qwen2.5-coder:14b",
         "options": {
-          "temperature": 0.2,
+          "temperature": 0.1,
           "numCtx": 8192
         }
       },
-      "id": "orch-ollama",
-      "name": "Ollama (Orchestrator)",
+      "id": "auto-ollama",
+      "name": "Ollama Model",
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "position": [240, 560],
       "typeVersion": 1,
@@ -54,138 +54,135 @@
     },
     {
       "parameters": {
-        "contextWindowLength": 40
+        "contextWindowLength": 30
       },
-      "id": "orch-memory",
-      "name": "Orchestrator Memory",
+      "id": "auto-memory",
+      "name": "Conversation Memory",
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
-      "position": [440, 560],
+      "position": [400, 560],
       "typeVersion": 1.3
     },
     {
       "parameters": {
-        "toolDescription": "Call the Research Agent to search the web, get news, weather, and encyclopedic information. Pass the user's question as-is.",
-        "workflowId": {
-          "__rl": true,
-          "value": "salehsaas-research-agent",
-          "mode": "name"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "chatInput": "={{ $fromAI('query', 'The research question or topic to investigate', 'string') }}"
-          }
-        }
+        "toolDescription": "Full n8n workflow management via MCP protocol. Available tools:\n- list_workflows: List all workflows with id, name, active status\n- get_workflow: Get full details of a workflow by ID\n- create_workflow: Create a new workflow with JSON nodes and connections\n- update_workflow: Update existing workflow by ID\n- activate_workflow: Activate a workflow by ID\n- deactivate_workflow: Deactivate a workflow by ID\n- execute_workflow: Run a workflow immediately by ID\n- delete_workflow: Delete a workflow by ID (use with caution)\n- list_executions: Get execution history for a workflow",
+        "sseEndpoint": "http://mcpo:8000/n8n_builder/sse",
+        "authentication": "none",
+        "include": "all"
       },
-      "id": "tool-research",
-      "name": "call_research_agent",
-      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
-      "position": [640, 560],
-      "typeVersion": 2
+      "id": "tool-mcp-n8n",
+      "name": "n8n Builder (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [560, 560],
+      "typeVersion": 1
     },
     {
       "parameters": {
-        "toolDescription": "Call the Automation Agent to create, update, run, or manage n8n workflows. Describe the automation task in detail.",
-        "workflowId": {
-          "__rl": true,
-          "value": "salehsaas-automation-agent",
-          "mode": "name"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "chatInput": "={{ $fromAI('task', 'Detailed description of the automation task to perform in n8n', 'string') }}"
-          }
-        }
+        "toolDescription": "Manage Ollama AI models via MCP protocol. Available tools:\n- list_local_models: Show all installed models with size and modification date\n- get_model_info: Get detailed info about a specific model (parameters, template, etc.)\n- pull_model: Download a new model from Ollama Hub (e.g., llama3.2, mistral, gemma3)",
+        "sseEndpoint": "http://mcpo:8000/ollama_model_builder/sse",
+        "authentication": "none",
+        "include": "all"
       },
-      "id": "tool-automation",
-      "name": "call_automation_agent",
-      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
-      "position": [840, 560],
-      "typeVersion": 2
+      "id": "tool-mcp-ollama",
+      "name": "Ollama Manager (MCP)",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [760, 560],
+      "typeVersion": 1
     },
     {
       "parameters": {
-        "toolDescription": "Call the Knowledge Agent to search the legal knowledge base and internal documents. Use for legal questions, Saudi regulations, and document retrieval.",
-        "workflowId": {
-          "__rl": true,
-          "value": "salehsaas-knowledge-agent",
-          "mode": "name"
+        "toolDescription": "Manage files in SaleHSaaS system. Operations:\n- List files: GET http://file_api:8765/list?dir=/data/knowledge_inbox\n- Read file: GET http://file_api:8765/read?path=/data/knowledge_inbox/file.txt\n- Upload URL for processing: POST http://file_api:8765/url with {\"url\": \"...\", \"title\": \"...\"}\n- Check processed files: GET http://file_api:8765/list?dir=/data/knowledge_processed",
+        "url": "={{ $fromAI('url', 'Full File API URL for the operation', 'string') }}",
+        "method": "={{ $fromAI('method', 'HTTP method: GET or POST', 'string') }}",
+        "sendBody": "={{ $fromAI('method', 'HTTP method', 'string') === 'POST' }}",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ $fromAI('body_key', 'Request body key if POST', 'string') }}",
+              "value": "={{ $fromAI('body_value', 'Request body value if POST', 'string') }}"
+            }
+          ]
         },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "chatInput": "={{ $fromAI('question', 'The legal or knowledge question to search for', 'string') }}"
-          }
-        }
+        "options": {}
       },
-      "id": "tool-knowledge",
-      "name": "call_knowledge_agent",
-      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
-      "position": [1040, 560],
-      "typeVersion": 2
+      "id": "tool-file-api",
+      "name": "File API",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [960, 560],
+      "typeVersion": 4.2
     },
     {
       "parameters": {
-        "toolDescription": "Call the Models Agent to manage Ollama models: list available models, get model info, or pull new models.",
-        "workflowId": {
-          "__rl": true,
-          "value": "salehsaas-models-agent",
-          "mode": "name"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "chatInput": "={{ $fromAI('action', 'The model management action or request about Ollama models', 'string') }}",
-            "model_name": "={{ $fromAI('model_name', 'Optional: specific model name for info or pull actions', 'string') }}"
-          }
-        }
+        "toolDescription": "Execute JavaScript code for data processing, building n8n workflow JSON structures, calculations, or any logic needed. Returns the result of the last expression.",
+        "jsCode": "={{ $fromAI('code', 'JavaScript code to execute. Use return statement for output.', 'string') }}"
       },
-      "id": "tool-models",
-      "name": "call_models_agent",
-      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
-      "position": [1240, 560],
-      "typeVersion": 2
+      "id": "tool-code",
+      "name": "Code Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [1160, 560],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "toolDescription": "Make HTTP requests to any external API or service. Use for checking service health, calling external APIs, or any HTTP operation not covered by other tools.",
+        "url": "={{ $fromAI('url', 'Full URL to call', 'string') }}",
+        "method": "={{ $fromAI('method', 'HTTP method: GET, POST, PUT, DELETE', 'string') }}",
+        "options": {}
+      },
+      "id": "tool-http",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "position": [1360, 560],
+      "typeVersion": 4.2
     }
   ],
   "connections": {
     "Chat Trigger": {
       "main": [
-        [{"node": "Orchestrator Agent", "type": "main", "index": 0}]
+        [{"node": "Automation Agent", "type": "main", "index": 0}]
       ]
     },
-    "Ollama (Orchestrator)": {
+    "Ollama Model": {
       "ai_languageModel": [
-        [{"node": "Orchestrator Agent", "type": "ai_languageModel", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_languageModel", "index": 0}]
       ]
     },
-    "Orchestrator Memory": {
+    "Conversation Memory": {
       "ai_memory": [
-        [{"node": "Orchestrator Agent", "type": "ai_memory", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_memory", "index": 0}]
       ]
     },
-    "call_research_agent": {
+    "n8n Builder (MCP)": {
       "ai_tool": [
-        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
       ]
     },
-    "call_automation_agent": {
+    "Ollama Manager (MCP)": {
       "ai_tool": [
-        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
       ]
     },
-    "call_knowledge_agent": {
+    "File API": {
       "ai_tool": [
-        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
       ]
     },
-    "call_models_agent": {
+    "Code Tool": {
       "ai_tool": [
-        [{"node": "Orchestrator Agent", "type": "ai_tool", "index": 0}]
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [{"node": "Automation Agent", "type": "ai_tool", "index": 0}]
       ]
     }
   },
   "pinData": {},
   "settings": {"executionOrder": "v1"},
-  "tags": [{"name": "n8n-openai-bridge"}, {"name": "salehsaas"}, {"name": "orchestrator"}]
+  "tags": [
+    {"name": "n8n-openai-bridge"},
+    {"name": "salehsaas"},
+    {"name": "automation"},
+    {"name": "mcp"}
+  ]
 }
