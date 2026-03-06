@@ -1,0 +1,130 @@
+{
+  "_comment": "تعريف النماذج الخبيرة في Open WebUI — يُستخدم مع سكريبت create_expert_models.py",
+  "_version": "2.0",
+  "_updated": "2026-03-06",
+  "models": [
+    {
+      "id": "n8n-expert",
+      "name": "🔄 خبير أتمتة n8n",
+      "base_model_id": "deepseek-r1:7b",
+      "meta": {
+        "description": "خبير في تصميم وبناء workflows في n8n، تشخيص الأخطاء، وكتابة JSON جاهز للاستيراد",
+        "tags": ["n8n", "automation", "workflow", "أتمتة"],
+        "capabilities": {
+          "file_context": true,
+          "code_interpreter": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.3,
+        "top_p": 0.9,
+        "num_ctx": 8192
+      },
+      "pipeline_id": "n8n-expert-pipeline"
+    },
+    {
+      "id": "legal-expert",
+      "name": "⚖️ خبير الامتثال القانوني",
+      "base_model_id": "llama3.1:8b",
+      "meta": {
+        "description": "خبير في الأنظمة والتشريعات السعودية: نظام العمل، PDPL، NCA، نظام الشركات",
+        "tags": ["legal", "compliance", "قانون", "امتثال"],
+        "capabilities": {
+          "file_context": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "num_ctx": 8192
+      },
+      "pipeline_id": "legal-expert-pipeline"
+    },
+    {
+      "id": "financial-expert",
+      "name": "💰 خبير الذكاء المالي",
+      "base_model_id": "llama3.1:8b",
+      "meta": {
+        "description": "خبير في التحليل المالي، المحاسبة السعودية، ضريبة القيمة المضافة، وإعداد التقارير المالية",
+        "tags": ["financial", "accounting", "مالي", "محاسبة"],
+        "capabilities": {
+          "file_context": true,
+          "code_interpreter": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "num_ctx": 8192
+      },
+      "pipeline_id": "financial-expert-pipeline"
+    },
+    {
+      "id": "hr-expert",
+      "name": "👥 خبير الموارد البشرية",
+      "base_model_id": "llama3.1:8b",
+      "meta": {
+        "description": "خبير في إدارة الموارد البشرية وفق نظام العمل السعودي: التوظيف، الرواتب، الإجازات، الامتثال العمالي",
+        "tags": ["hr", "human resources", "موارد بشرية", "عمالة"],
+        "capabilities": {
+          "file_context": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.3,
+        "top_p": 0.9,
+        "num_ctx": 8192
+      },
+      "pipeline_id": "hr-expert-pipeline"
+    },
+    {
+      "id": "cybersecurity-expert",
+      "name": "🛡️ خبير الأمن السيبراني",
+      "base_model_id": "deepseek-r1:7b",
+      "meta": {
+        "description": "خبير في الأمن السيبراني والامتثال لضوابط NCA السعودية: تقييم المخاطر، حماية البنية التحتية، الاستجابة للحوادث",
+        "tags": ["cybersecurity", "security", "أمن سيبراني", "NCA"],
+        "capabilities": {
+          "file_context": true,
+          "code_interpreter": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "num_ctx": 8192
+      },
+      "pipeline_id": "cybersecurity-expert-pipeline"
+    },
+    {
+      "id": "social-media-expert",
+      "name": "📱 خبير وسائل التواصل",
+      "base_model_id": "llama3.1:8b",
+      "meta": {
+        "description": "خبير في التسويق الرقمي وإدارة المحتوى العربي: تويتر، لينكدإن، إنستغرام، سناب شات، تيك توك",
+        "tags": ["social media", "marketing", "تسويق", "محتوى"],
+        "capabilities": {
+          "file_context": true,
+          "citations": true,
+          "knowledge": true
+        }
+      },
+      "params": {
+        "temperature": 0.7,
+        "top_p": 0.95,
+        "num_ctx": 4096
+      },
+      "pipeline_id": "social-media-expert-pipeline"
+    }
+  ]
+}
