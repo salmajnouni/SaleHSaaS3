@@ -104,3 +104,7 @@ n8n/workflows/sample_export.json
 archive/**/*.bin
 archive/**/vector_db/
 archive/**/cache/
+
+# Runtime databases
+**/webui.db
+**/webui.db-journal
