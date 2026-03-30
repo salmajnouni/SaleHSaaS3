@@ -84,3 +84,23 @@ temp/
 *.crt
 *.p12
 secrets/
+
+# Model cache / embeddings (large binaries)
+**/cache/embedding/
+**/models--*/
+*.safetensors
+*.onnx
+
+# Vector DB binary files
+**/vector_db/
+**/chroma_data/
+
+# n8n temp exports
+n8n/workflows/_tmp_*
+n8n/workflows/*import*
+n8n/workflows/sample_export.json
+
+# Archive large binaries
+archive/**/*.bin
+archive/**/vector_db/
+archive/**/cache/

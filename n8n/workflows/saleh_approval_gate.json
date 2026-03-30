@@ -1,0 +1,231 @@
+{
+  "name": "Saleh Approval Gate - بوابة اعتماد صالح",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "aa000001-0001-4001-8001-000000000001",
+      "name": "⏰ يومياً الساعة 8 صباحاً",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [60, 300]
+    },
+    {
+      "parameters": {},
+      "id": "aa000001-0001-4001-8001-000000000002",
+      "name": "▶️ تشغيل يدوي",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [60, 120]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===================================================\n// هنا تضع العملية التي تحتاج اعتماد صالح\n// مثال: تقرير صحة النظام اليومي\n// ===================================================\n\nconst now = new Date();\nconst dateStr = now.toLocaleDateString('ar-SA', {\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric'\n});\nconst timeStr = now.toLocaleTimeString('ar-SA', {\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZone: 'Asia/Riyadh'\n});\n\n// --- مثال: ملخص العمليات المعلقة ---\nconst pendingActions = [\n  { id: 'ACT-001', type: 'تحديث قاعدة المعرفة', detail: 'إضافة 12 وثيقة جديدة إلى saleh_knowledge', risk: 'منخفض' },\n  { id: 'ACT-002', type: 'تنظيف البيانات', detail: 'حذف 3 وثائق مكررة من ChromaDB', risk: 'متوسط' }\n];\n\nconst actionsList = pendingActions.map((a, i) =>\n  `${i + 1}. [${a.id}] ${a.type}\\n   📄 ${a.detail}\\n   ⚠️ مستوى الخطر: ${a.risk}`\n).join('\\n\\n');\n\nconst summaryMessage = [\n  `🕋 *SaleH SaaS — بوابة الاعتماد اليومية*`,\n  `📅 ${dateStr} — ${timeStr}`,\n  ``,\n  `العمليات التالية تنتظر اعتمادك:`,\n  ``,\n  actionsList,\n  ``,\n  `هل تعتمد تنفيذ هذه العمليات؟`\n].join('\\n');\n\nreturn [{\n  json: {\n    message: summaryMessage,\n    pending_count: pendingActions.length,\n    actions: pendingActions,\n    timestamp: now.toISOString(),\n    workflow_id: `GATE-${now.getTime()}`\n  }\n}];"
+      },
+      "id": "aa000001-0001-4001-8001-000000000003",
+      "name": "📋 تجهيز ملخص العمليات",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 220]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $vars.SALEH_TELEGRAM_CHAT_ID }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_markup": {
+            "inline_keyboard": [
+              [
+                {
+                  "text": "✅ اعتمد التنفيذ",
+                  "callback_data": "={{ 'APPROVE::' + $json.workflow_id }}"
+                },
+                {
+                  "text": "❌ ارفض",
+                  "callback_data": "={{ 'REJECT::' + $json.workflow_id }}"
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "id": "aa000001-0001-4001-8001-000000000004",
+      "name": "📤 إرسال طلب الاعتماد لتيليجرام",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [560, 220],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_cred",
+          "name": "SaleH Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours",
+        "resume": "webhook",
+        "webhookSuffix": "={{ $json.workflow_id }}"
+      },
+      "id": "aa000001-0001-4001-8001-000000000005",
+      "name": "⏳ انتظار رد صالح (24 ساعة)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [800, 220],
+      "webhookId": "saleh-approval-gate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// استقبال رد التيليجرام وتحليله\nconst body = $json.body || $json;\n\n// callback_data من زر التيليجرام: \"APPROVE::GATE-xxx\" أو \"REJECT::GATE-xxx\"\nconst callbackData = body?.callback_query?.data ||\n                     body?.data ||\n                     $json?.callback_query?.data ||\n                     '';\n\nconst [decision, workflowId] = callbackData.split('::');\nconst approvedBy = body?.callback_query?.from?.first_name || 'صالح';\nconst respondedAt = new Date().toISOString();\n\nreturn [{\n  json: {\n    decision: decision || 'TIMEOUT',\n    workflow_id: workflowId || '',\n    approved_by: approvedBy,\n    responded_at: respondedAt,\n    raw_callback: callbackData\n  }\n}];"
+      },
+      "id": "aa000001-0001-4001-8001-000000000006",
+      "name": "🔍 تحليل الرد",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1040, 220]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.decision }}",
+              "rightValue": "APPROVE",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      },
+      "id": "aa000001-0001-4001-8001-000000000007",
+      "name": "🔀 اعتماد أم رفض؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1280, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===================================================\n// هنا يُنفَّذ العمل الفعلي بعد الاعتماد\n// استبدل هذا بالعملية الحقيقية المطلوبة\n// ===================================================\n\nconst approvedBy = $('🔍 تحليل الرد').item.json.approved_by;\nconst respondedAt = $('🔍 تحليل الرد').item.json.responded_at;\n\n// مثال: يمكن هنا استدعاء API لتنفيذ التحديث\n// const result = await fetch('http://data_pipeline:8001/process-file/', ...);\n\nconsole.log(`✅ اعتمد ${approvedBy} في ${respondedAt}`);\n\nreturn [{\n  json: {\n    status: 'executed',\n    message: `✅ تم تنفيذ العمليات بنجاح`,\n    approved_by: approvedBy,\n    executed_at: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "aa000001-0001-4001-8001-000000000008",
+      "name": "⚙️ تنفيذ العمليات المعتمدة",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 100]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $vars.SALEH_TELEGRAM_CHAT_ID }}",
+        "text": "={{ '✅ *تم التنفيذ بنجاح*\\n\\n' + $json.message + '\\n\\nاعتمد بواسطة: ' + $json.approved_by + '\\nوقت التنفيذ: ' + new Date($json.executed_at).toLocaleString(\"ar-SA\", {timeZone: \"Asia/Riyadh\"}) }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "aa000001-0001-4001-8001-000000000009",
+      "name": "✅ تأكيد التنفيذ لتيليجرام",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1800, 100],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_cred",
+          "name": "SaleH Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const decision = $json.decision;\nconst approvedBy = $json.approved_by;\nconst respondedAt = $json.responded_at;\n\nlet reason = 'رُفضت يدوياً';\nif (decision === 'TIMEOUT') reason = 'انتهت مدة الانتظار (24 ساعة) دون رد';\n\nconsole.log(`❌ العملية لم تُنفَّذ: ${reason}`);\n\nreturn [{\n  json: {\n    status: 'rejected',\n    reason: reason,\n    decision: decision,\n    responded_at: respondedAt\n  }\n}];"
+      },
+      "id": "aa000001-0001-4001-8001-000000000010",
+      "name": "🚫 تسجيل الرفض",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 360]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $vars.SALEH_TELEGRAM_CHAT_ID }}",
+        "text": "={{ '❌ *تم إلغاء التنفيذ*\\n\\nالسبب: ' + $json.reason + '\\nيمكنك تشغيل الـ workflow يدوياً في أي وقت.' }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "aa000001-0001-4001-8001-000000000011",
+      "name": "❌ إشعار الرفض لتيليجرام",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1800, 360],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_cred",
+          "name": "SaleH Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "⏰ يومياً الساعة 8 صباحاً": {
+      "main": [[{ "node": "📋 تجهيز ملخص العمليات", "type": "main", "index": 0 }]]
+    },
+    "▶️ تشغيل يدوي": {
+      "main": [[{ "node": "📋 تجهيز ملخص العمليات", "type": "main", "index": 0 }]]
+    },
+    "📋 تجهيز ملخص العمليات": {
+      "main": [[{ "node": "📤 إرسال طلب الاعتماد لتيليجرام", "type": "main", "index": 0 }]]
+    },
+    "📤 إرسال طلب الاعتماد لتيليجرام": {
+      "main": [[{ "node": "⏳ انتظار رد صالح (24 ساعة)", "type": "main", "index": 0 }]]
+    },
+    "⏳ انتظار رد صالح (24 ساعة)": {
+      "main": [[{ "node": "🔍 تحليل الرد", "type": "main", "index": 0 }]]
+    },
+    "🔍 تحليل الرد": {
+      "main": [[{ "node": "🔀 اعتماد أم رفض؟", "type": "main", "index": 0 }]]
+    },
+    "🔀 اعتماد أم رفض؟": {
+      "main": [
+        [{ "node": "⚙️ تنفيذ العمليات المعتمدة", "type": "main", "index": 0 }],
+        [{ "node": "🚫 تسجيل الرفض", "type": "main", "index": 0 }]
+      ]
+    },
+    "⚙️ تنفيذ العمليات المعتمدة": {
+      "main": [[{ "node": "✅ تأكيد التنفيذ لتيليجرام", "type": "main", "index": 0 }]]
+    },
+    "🚫 تسجيل الرفض": {
+      "main": [[{ "node": "❌ إشعار الرفض لتيليجرام", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": ["approval", "telegram", "governance"],
+  "meta": {
+    "instanceId": "salehsaas"
+  }
+}

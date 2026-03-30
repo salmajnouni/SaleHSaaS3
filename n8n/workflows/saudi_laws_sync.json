@@ -49,7 +49,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text', prompt: $json.chunk_text }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text:latest', prompt: $json.chunk_text }) }}",
         "options": {
           "timeout": 60000
         }
@@ -80,7 +80,7 @@
       ],
       "parameters": {
         "method": "POST",
-        "url": "http://chromadb:8000/api/v2/tenants/default_tenant/databases/default_database/collections/saleh_legal_knowledge/upsert",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_knowledge/upsert",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [

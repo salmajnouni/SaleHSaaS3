@@ -1,0 +1,93 @@
+{
+  "name": "Advisory Council Telegram Decisions - قرارات تيليجرام",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "id": "ct-0001",
+      "name": "📩 Telegram Callback Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [120, 260],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_cred",
+          "name": "SaleH Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json || {};\nconst callback = payload.callback_query || {};\nconst callbackData = callback.data || '';\n\nif (!callbackData.startsWith('COUNCIL_')) {\n  return [];\n}\n\nconst [rawDecision, sessionId] = callbackData.split('::');\nconst chatId = String(callback?.message?.chat?.id || '');\nconst allowedChatId = String($vars.SALEH_TELEGRAM_CHAT_ID || '');\n\nif (!allowedChatId || chatId !== allowedChatId) {\n  return [{ json: { chatId, message: '⛔ هذا القرار غير مصرح لك. الاعتماد محصور بصالح فقط.' } }];\n}\n\nconst map = {\n  COUNCIL_APPROVE: { status: 'approved', label: 'اعتماد عبر تيليجرام' },\n  COUNCIL_REJECT: { status: 'rejected', label: 'رفض عبر تيليجرام' },\n  COUNCIL_RESTUDY: { status: 'restudy', label: 'إعادة دراسة عبر تيليجرام' },\n};\n\nconst decisionInfo = map[rawDecision] || { status: 'awaiting_approval', label: 'قرار غير معروف' };\n\nconst fs = require('fs');\nconst logPath = '/app/logs/advisory_council_sessions.jsonl';\n\nlet updated = false;\nlet updatedRecord = null;\n\ntry {\n  const content = fs.existsSync(logPath) ? fs.readFileSync(logPath, 'utf8') : '';\n  const lines = content.split('\\n').filter(Boolean);\n  const rows = lines.map(line => {\n    try {\n      return JSON.parse(line);\n    } catch {\n      return null;\n    }\n  }).filter(Boolean);\n\n  for (const row of rows) {\n    if (String(row.sessionId) === String(sessionId)) {\n      row.status = decisionInfo.status;\n      row.dashboard_decision = decisionInfo.label;\n      row.decision_source = 'telegram';\n      row.decision_updated_at = new Date().toISOString();\n      row.decision_notes = `Telegram callback: ${rawDecision}`;\n      updated = true;\n      updatedRecord = row;\n      break;\n    }\n  }\n\n  fs.writeFileSync(logPath, rows.map(r => JSON.stringify(r)).join('\\n') + (rows.length ? '\\n' : ''), 'utf8');\n} catch (error) {\n  return [{ json: { chatId, message: `❌ تعذر تحديث السجل: ${error.message}` } }];\n}\n\nif (!updated) {\n  return [{ json: { chatId, message: `⚠️ لم يتم العثور على جلسة بهذا المعرف: ${sessionId}` } }];\n}\n\nconst statusText = decisionInfo.status === 'approved'\n  ? '✅ تم اعتماد توصية المجلس'\n  : decisionInfo.status === 'rejected'\n    ? '❌ تم رفض توصية المجلس'\n    : '🔄 تم طلب إعادة دراسة من المجلس';\n\nconst topic = updatedRecord?.topic || 'بدون عنوان';\n\nreturn [{\n  json: {\n    chatId,\n    message: `${statusText}\\n\\n🔖 الجلسة: ${sessionId}\\n📋 الموضوع: ${topic}\\n🕒 ${new Date().toLocaleString('ar-SA', { timeZone: 'Asia/Riyadh' })}`\n  }\n}];"
+      },
+      "id": "ct-0002",
+      "name": "🧠 تحليل callback وتحديث السجل",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 260]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "ct-0003",
+      "name": "📤 إشعار نتيجة القرار",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [720, 260],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram_bot_cred",
+          "name": "SaleH Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "📩 Telegram Callback Trigger": {
+      "main": [
+        [
+          {
+            "node": "🧠 تحليل callback وتحديث السجل",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 تحليل callback وتحديث السجل": {
+      "main": [
+        [
+          {
+            "node": "📤 إشعار نتيجة القرار",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": [
+    "advisory-council",
+    "telegram",
+    "decisions"
+  ],
+  "meta": {
+    "instanceId": "salehsaas"
+  }
+}

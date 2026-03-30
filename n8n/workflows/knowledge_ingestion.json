@@ -159,7 +159,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/add",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_knowledge/add",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [{ "name": "Content-Type", "value": "application/json" }]

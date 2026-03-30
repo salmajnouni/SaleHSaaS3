@@ -51,7 +51,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://chromadb:8000/api/v1/collections/saleh_legal_knowledge/query",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_knowledge/query",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
