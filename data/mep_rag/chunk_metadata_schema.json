@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MEP RAG Chunk Metadata",
+  "type": "object",
+  "required": [
+    "document_id",
+    "source_id",
+    "code_family",
+    "code_number",
+    "edition",
+    "chapter",
+    "section",
+    "article",
+    "language",
+    "effective_date",
+    "source_url",
+    "collection_name"
+  ],
+  "properties": {
+    "document_id": { "type": "string" },
+    "source_id": { "type": "string" },
+    "code_family": { "type": "string", "enum": ["SBC", "ASHRAE", "NFPA", "OTHER"] },
+    "code_number": { "type": "string" },
+    "edition": { "type": "string" },
+    "chapter": { "type": "string" },
+    "section": { "type": "string" },
+    "article": { "type": "string" },
+    "paragraph": { "type": "string" },
+    "page_number": { "type": ["integer", "string"] },
+    "language": { "type": "string" },
+    "city_context": { "type": "string" },
+    "occupancy_type": { "type": "string" },
+    "effective_date": { "type": "string" },
+    "source_url": { "type": "string" },
+    "ingestion_timestamp": { "type": "string" },
+    "collection_name": { "type": "string" },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}

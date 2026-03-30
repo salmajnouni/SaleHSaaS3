@@ -7,7 +7,7 @@ Ollama Model Builder - MCP Tool Server
 import requests
 from mcp.server.fastmcp import FastMCP
 
-OLLAMA_API_URL = "http://host.docker.internal:11434/api"
+OLLAMA_API_URL = "http://ollama:11434/api"
 
 mcp = FastMCP("ollama-model-builder")
 
@@ -73,4 +73,5 @@ def pull_model(model_name: str) -> str:
 
 
 if __name__ == "__main__":
+    mcp.run()
     mcp.run()

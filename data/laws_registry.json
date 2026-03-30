@@ -1,0 +1,2252 @@
+[
+  {
+    "law_id": "3c547223-8703-41cf-a850-b35c00d3ab9a",
+    "law_name": "نظام نزع ملكية العقارات للمصلحة العامة ووضع اليد المؤقت على العقارات",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "dcdc450d-8afc-40e0-9f05-b36a0090f65e",
+    "law_name": "تنظيم المركز الوطني لسلامة النقل",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "b4edc050-18f3-4b23-aabc-b35b00ddaab7",
+    "law_name": "نظام الإحصاء",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "a1bdadb5-c518-48bb-a1d0-b33000e66fd1",
+    "law_name": "نظام تملك غير السعوديين للعقار",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "831af69c-9bad-4f06-9843-b33100926b3c",
+    "law_name": "تنظيم المؤسسة العامة للري",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "6d1d7df9-b061-4830-8356-b332009f07ad",
+    "law_name": "تنظيم الهيئة العامة للأمن الغذائي",
+    "category": "security",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "7b3d4c04-1816-4c89-bdc7-b32200e54fee",
+    "law_name": "تنظيم الهيئة العامة للطيران المدني",
+    "category": "aviation",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "48da5c0f-b5a6-4e93-b76c-b33200be0330",
+    "law_name": "نظام المواد البترولية والبتروكيماوية",
+    "category": "petroleum",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "ddbe2b46-01ab-43b0-9fd8-af6300c1a649",
+    "law_name": "الترتيبات التنظيمية للمركز الوطني لسلامة النقل",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "39ee8b3c-770c-4e20-84bf-b33200b5b50a",
+    "law_name": "تنظيم مدينة الملك عبدالله للطاقة الذرية والمتجددة",
+    "category": "energy",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "b3060214-c11a-4709-b191-aca700cbcc58",
+    "law_name": "نظام الكهرباء",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "8912f72f-38b2-400e-8d4e-ac3e00c3a0aa",
+    "law_name": "تنظيم مجلس التنمية السياحي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "8847a132-156b-49e8-add9-aa52010570f2",
+    "law_name": "تنظيم مركز الإسناد والتصفية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "164f8184-6c84-4794-96c7-a9a700f1f420",
+    "law_name": "تنظيم المركز الوطني للدراسات الاستراتيجية التنموية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "7912ce55-36b8-4db2-8e59-a9eb016d382f",
+    "law_name": "تنظيم المؤسسة العامة للري 1439هـ",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "3213c2f6-eaf8-45dc-8f8c-a9a700f167ee",
+    "law_name": "نظام هيئة البيعة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "08381293-6388-48e2-8ad2-a9a700f2aa94",
+    "law_name": "نظام العمل",
+    "category": "labor_law",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "f7092b7f-77b4-4205-8dcf-a9a700f2e91c",
+    "law_name": "تنظيم الهيئة العامة للطيران المدني 1426هـ",
+    "category": "aviation",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "25450917-e26c-4532-a75f-a9a700f21996",
+    "law_name": "نظام نزع ملكية العقارات للمنفعة العامة ووضع اليد المؤقت على العقار",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "f327464b-2f5a-475d-aa94-a9a700f2e817",
+    "law_name": "تنظيم هيئة الاتصالات والفضاء والتقنية",
+    "category": "telecom",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "93e87aa7-f344-4711-b97c-a9a700f1662b",
+    "law_name": "نظام مجلس الوزراء",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "93f81644-fbbc-49ca-b33c-a9a700f16701",
+    "law_name": "نظام المناطق",
+    "category": "regions",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "b5cf540a-e6ac-426a-b348-a9a700f163de",
+    "law_name": "نظام مجلس الشورى",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "16b97fcb-4833-4f66-8531-a9a700f161b6",
+    "law_name": "النظام الأساسي للحكم",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "366a4221-3214-4338-b3f2-b35c009f36cd",
+    "law_name": "نظام الحرف والصناعات اليدوية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:43.661411"
+  },
+  {
+    "law_id": "664d871f-7a44-4a52-b653-b2db00b55732",
+    "law_name": "الترتيبات التنظيمية للمركز السعودي لكود البناء",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "43151145-3b31-47d1-8a6c-b2db00a871d0",
+    "law_name": "تنظيم الهيئة السعودية لتسويق الاستثمار",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "a62c4bd7-03c7-42fb-8356-b2ec00e341d7",
+    "law_name": "ضوابط شراء واستئجار الجهات الحكومية للمركبات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "7ac1a448-b042-4c73-8164-b2eb00ceb54f",
+    "law_name": "نظام الطوارئ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "479e4f48-d35c-4dac-994b-b2eb00e44c48",
+    "law_name": "تنظيم الهيئة الوطنية لإدارة الطوارئ",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "a187d565-1a52-45cc-a1de-b2dc00daae23",
+    "law_name": "النظام الأساس لمستشفى الملك خالد التخصصي للعيون ومركز الأبحاث (مؤسسة مستقلة ذات طبيعة خاصة وغير هادفة للربح)",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "eef585a5-c63a-4906-a951-b208009b3eff",
+    "law_name": "نظام ضريبة التصرفات العقارية",
+    "category": "tax",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "98ee4b51-d398-4323-ae69-b2b8009f3156",
+    "law_name": "نظام السجل التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "d4801a45-7f76-4414-bdca-b20900db6fc4",
+    "law_name": "نظام الأسماء التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "eda86cc3-3a00-4b90-900d-b1d000c8a863",
+    "law_name": "نظام الاستثمار",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "302fe435-6f39-4170-b12b-b13700bf55bd",
+    "law_name": "نظام الخطوط الحديدية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "0640036c-6e31-4479-9c8c-aef800e34d96",
+    "law_name": "الترتيبات التنظيمية للهيئة السعودية لتسويق الاستثمار",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "ae610645-e094-48ef-814e-aeb4009d244f",
+    "law_name": "نظام الاتصالات وتقنية المعلومات",
+    "category": "telecom",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "8ca91427-5be7-4807-80ae-adc700a97f0d",
+    "law_name": "نظام البريد",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "f95abff1-7f8b-4aea-9e97-adb900a2576e",
+    "law_name": "القواعد المنظمة للتخصيص",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "9560f620-e77e-476c-b9ea-abdd00b87480",
+    "law_name": "نظام الاستــثمار التعديني.",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "43344715-1e0d-4e7f-9895-aa3d00f670e6",
+    "law_name": "النظام البحري التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "cc46debb-482e-48be-9daf-a9a700f2bfe7",
+    "law_name": "لائحة عمال الخدمة المنزلية ومن في حكمهم",
+    "category": "labor_law",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "6932e745-0f61-4f25-9e4a-a9a700f21d6b",
+    "law_name": "نظام رسوم الأراضي البيضاء والعقارات الشاغرة",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "63dc01a6-fc5c-4600-9171-a9a700f2d222",
+    "law_name": "نظام المعلومات الائتمانية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "85364e57-c01e-41ba-8def-a9a700f183e9",
+    "law_name": "نظام المرور",
+    "category": "traffic",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "b680a5b2-1ed3-4014-9f49-a9a700f2e298",
+    "law_name": "نظام الموانئ والمرافئ والمنائر البحرية",
+    "category": "maritime",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "21bbfc47-571d-4916-82b6-a9a700f2e06c",
+    "law_name": "نظام المؤسسة العامة للخطوط الجوية العربية السعودية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "748dc7f1-acae-43a2-b536-a9a700f2dfa3",
+    "law_name": "نظام حماية خطوط السكك الحديدية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "cddb94e2-167b-4158-af5f-a9a700f2de58",
+    "law_name": "نظام نقابة السيارات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:46.788457"
+  },
+  {
+    "law_id": "a8ebff8e-412c-4f67-ac5f-b1ca008d18d9",
+    "law_name": "نظام هيئة الرقابة ومكافحة الفساد",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "a292ec7e-85fb-4ceb-9ad0-ac9200ced829",
+    "law_name": "نظام البنك المركزي السعودي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "88254f6b-0311-4ed2-be96-a9a700f2d6f2",
+    "law_name": "نظام التمويل العقاري",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "8b100aee-54a5-48c1-9866-a9a700f2d539",
+    "law_name": "نظام إيرادات الدولة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "6f509360-2c39-4358-ae2a-a9a700f2ed16",
+    "law_name": "نظام التعاملات الإلكترونية",
+    "category": "ecommerce",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "25df73d6-0f49-4dc5-b010-a9a700f2ec1d",
+    "law_name": "نظام مكافحة جرائم المعلوماتية",
+    "category": "cyber_crimes",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "86f03d34-3650-4553-b6a0-a9a700f2cdae",
+    "law_name": "نظام الإيداع في المخازن العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "c2c05ee1-201a-48de-91e7-a9a700f2d14f",
+    "law_name": "نظام المنافسات والمشتريات الحكومية",
+    "category": "competition",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "90b81287-baab-4f66-a9c1-a9a700f2ce78",
+    "law_name": "نظام البنك السعودي للتسليف والادخار ( بنك التنمية الاجتماعية )",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "33ef05e2-f53e-4340-b5cb-a9a700f2ead1",
+    "law_name": "نظام الطيران المدني",
+    "category": "aviation",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "456ab486-9c16-4c7b-993c-a9a700f2cc4a",
+    "law_name": "نظام تعريفة الطيران المدني",
+    "category": "aviation",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "23576008-1ce4-4685-ac3e-a9a700f2cb02",
+    "law_name": "نظام ضريبة الدخل",
+    "category": "tax",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "b93d0275-775f-482a-9d52-a9a700f2ca15",
+    "law_name": "نظام (قانون) الجمارك الموحد لدول مجلس التعاون لدول الخليج العربية",
+    "category": "customs",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "a30e7653-6c25-471d-859e-a9a700f2e5bb",
+    "law_name": "نظام الاتصالات",
+    "category": "telecom",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "59d8016f-daa9-463b-8a5d-a9a700f2d3eb",
+    "law_name": "نظام رسوم تسجيل السفن والوحدات العائمة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "87aa6473-8e77-4dc5-b45d-a9a700f2e50f",
+    "law_name": "نظام البريد 1406هـ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "d6bd59f3-b94c-4b6e-8ced-a9a700f2c955",
+    "law_name": "نظام رسوم وأجور خدمات الموانئ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "db0851bf-16ee-41d5-b87f-a9a700f2e35d",
+    "law_name": "نظام المؤسسة العامة للموانئ السعودية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "35c24150-3c9e-4031-8f52-a9a700f2e443",
+    "law_name": "نظام النقل العام على الطرق بالمملكة العربية السعودية",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "5dc538d4-5bbd-4995-8f0c-a9a700f2c88c",
+    "law_name": "نظام ديوان المراقبة العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "4eb4bd77-cb8e-461d-b5bd-a9a700f2ee03",
+    "law_name": "نظام المؤسسة العامة لخطوط حديد حكومة المملكة العربية السعودية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "8f70dc63-dd9a-4734-9216-a9a700f2c78c",
+    "law_name": "نظام مراقبة البنوك",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "1603064a-ab7e-48eb-9564-a9a700f2d2e0",
+    "law_name": "نظام النقد العربى السعودى",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "35ecc858-eec3-4543-9540-a9a700f2c681",
+    "law_name": "نظام مؤسسة النقد العربي السعودي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "25fed59a-2790-4a77-ab11-a9a700f2c5fd",
+    "law_name": "نظام جباية الزكاة",
+    "category": "tax",
+    "discovered_at": "2026-03-28T00:57:49.912595"
+  },
+  {
+    "law_id": "738c42bb-a29f-4da7-bed4-b1d300a55f20",
+    "law_name": "نظام جمع التبرعات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "eaee8a20-3a54-4aaf-b0d9-b1ad00998962",
+    "law_name": "نظام التأمينات الاجتماعية",
+    "category": "social_insurance",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "e52b691a-785c-42a7-8916-b07d00e4fd38",
+    "law_name": "نظام حقوق الأشخاص ذوي الإعاقة",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "c1777105-e927-4fa8-978d-af9900e23e18",
+    "law_name": "نظام إمدادات الطاقة",
+    "category": "energy",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "3c63e654-4046-468d-93fd-ae1a00de13be",
+    "law_name": "نظام حقوق كبير السن ورعايته",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "7799b707-e228-452c-8b19-ac7b00b4b64e",
+    "law_name": "نظام الضمان الاجتماعي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "e4436403-31ee-439c-bac4-a9a700f2a17d",
+    "law_name": "نظام توزيع الغاز الجاف وغاز البترول السائل للأغراض السكنية والتجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "4ec27eee-f917-408c-85eb-a9f6011ea426",
+    "law_name": "نظام الأحداث",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "cabff788-438d-4003-be74-a9a700f2bcde",
+    "law_name": "نظام الهيئة العامة للأوقاف",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "37e0768f-8e3c-493a-b951-a9a700f2bbb1",
+    "law_name": "نظام الجمعيات والمؤسسات الأهلية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "fd30f9c7-8606-4367-bb22-a9a700f2d952",
+    "law_name": "نظام وظائف مباشرة الأموال العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "c331efa7-58ec-48c9-b70e-a9a700f2ba82",
+    "law_name": "نظام التأمين ضد التعطل عن العمل",
+    "category": "labor_law",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "83f450eb-7985-461f-b053-a9a700f2ba08",
+    "law_name": "نظام الحماية من الإيذاء",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "9b61c9c0-71e2-4096-a3da-a9a700f2d79a",
+    "law_name": "نظام الايجار التمويلي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "f53c97f5-d253-4828-89d4-a9a700f2d829",
+    "law_name": "نظام مراقبة شركات التمويل",
+    "category": "companies_law",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "bf568515-eef9-4356-9d52-a9a700f2d8c3",
+    "law_name": "نظام الرهن العقاري المسجل",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "0264f52c-70bd-40f2-94c1-a9a700f2b561",
+    "law_name": "نظام الجمعيات التعاونية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "123ace97-8b0e-40a2-bb6f-a9a700f2b3fd",
+    "law_name": "نظام الضمان الاجتماعي 1427هـ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "8ff3cd90-e466-4bf9-a071-a9a700f2a70d",
+    "law_name": "نظام التأمينات الاجتماعية 1421هـ",
+    "category": "social_insurance",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "872950d8-7059-41fd-a6f1-a9a700f2a962",
+    "law_name": "نظام رعاية المعوقين",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "87c1482d-fa95-41ea-98b6-a9a700f2a529",
+    "law_name": "نظام الضمان الصحي التعاوني",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "0f54d227-1450-4231-93cd-a9a700f29821",
+    "law_name": "نظام المعادن الثمينة والأحجار الكريمة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "407a32f0-2e60-4c3e-9994-a9a700f2952a",
+    "law_name": "نظام صندوق التنمية الصناعية السعودي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "33531bcc-0d4d-4193-9703-a9a700f2947a",
+    "law_name": "نظام حماية وتشجيع الصناعات الوطنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "a122634e-98ea-4e40-b4dd-ab5700c51c7d",
+    "law_name": "نظام العمل التطوعي",
+    "category": "labor_law",
+    "discovered_at": "2026-03-28T00:57:53.206245"
+  },
+  {
+    "law_id": "cdb31382-3f97-4232-82e8-ae0b00dc2727",
+    "law_name": "النظام الأساس لمستشفى الملك فيصل التخصصي ومركز الأبحاث  (مؤسسة مستقلة ذات طبيعة خاصة وغير هادفة للربح)",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "4a16fbc8-7f1d-4647-8acc-ad0900d849c2",
+    "law_name": "نظام التبرع بالأعضاء البشرية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "9daec1bf-6bda-4a65-a111-ace90163af7e",
+    "law_name": "نظام الأجهزة والمستلزمات الطبية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "c447d12a-6c10-40c2-a51e-a9f7000a97cb",
+    "law_name": "نظام الرقابة على الاستخدامات النووية والاشعاعية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "2a68bdd7-6395-417e-be02-a9f70181b49c",
+    "law_name": "نظام المسؤولية المدنية عن الأضرار النووية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "7ea51f01-916d-4f4b-81b3-a9ed010a6dc5",
+    "law_name": "نظام المواد الهيدروكربونية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "2682df03-16ab-4d93-b19d-a9a700f2915b",
+    "law_name": "نظام منتجات التجميل",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "9167ec51-a011-4a22-b6c3-a9a700f290f8",
+    "law_name": "نظام الغذاء",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "c1a67dbf-6959-437d-bb86-a9a700f2a126",
+    "law_name": "النظام الموحد بشأن المواد المستنفدة لطبقة الأوزون لدول مجلس التعاون لدول الخليج العربية (المعدل)",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "107f22b5-81a2-47ee-84bc-a9a700f2907a",
+    "law_name": "نظام الرعاية الصحية النفسية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "652bbeb0-fb94-4f08-b70c-a9a700f2a0c2",
+    "law_name": "القانون (النظام) الموحد للتعدين لدول مجلس التعاون",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "1b787adb-3b1e-4b69-b04d-a9a700f28ca6",
+    "law_name": "نظام المراقبة الصحية في منافذ الدخول",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "fad7b0d1-e536-46ea-8202-a9a700f28b03",
+    "law_name": "نظام أخلاقيات البحث على المخلوقات الحية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "dd7a7d7d-a92d-431b-9ec3-a9a700f28a46",
+    "law_name": "نظام الهيئة العامة للغذاء والدواء",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "66c640db-fbb2-45fc-a797-a9a700f29c6a",
+    "law_name": "قانون (نظام) التنظيم الصناعي الموحد لدول مجلس التعاون لدول الخليج العربية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "f1de206c-eef4-4a76-904a-a9a700f2899a",
+    "law_name": "نظام مزاولة المهن الصحية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "73fd9170-ee6a-4380-8181-a9a700f29b65",
+    "law_name": "نظام الكهرباء1426هـ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "81556dde-a88b-460f-b96a-a9a700f288d6",
+    "law_name": "النظام الموحد لإدارة نفايات الرعاية الصحية بدول مجلس التعاون لدول الخليج العربية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "4943163b-a079-4beb-b544-a9a700f286b1",
+    "law_name": "نظام وحدات الإخصاب والأجنة وعلاج العقم",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "8d68a28a-3ca8-4093-8f53-a9a700f28818",
+    "law_name": "نظام تداول بدائل حليب الأم",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "e14d5204-6b1f-432e-b139-a9a700f28765",
+    "law_name": "نظام المنشآت والمستحضرات الصيدلانية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "64e307c5-ac8c-49d8-9174-a9a700f285a0",
+    "law_name": "نظام المؤسسات الصحية الخاصة",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "1169b2b7-4e7d-4775-86b0-a9a700f2841e",
+    "law_name": "النظام الصحي",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "4c55f487-89fa-4d0f-80f1-a9a700f2835e",
+    "law_name": "نظام المختبرات الخاصة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "6c8d5fc7-ce6c-4636-9c72-a9a700f28290",
+    "law_name": "نظام الهيئة السعودية للتخصصات الصحية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:57:56.480799"
+  },
+  {
+    "law_id": "655fdb42-8c96-422b-b8c4-b04f0095c94c",
+    "law_name": "نظام المعاملات المدنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "7d777c66-d28b-43de-9305-af23013b1738",
+    "law_name": "نظام السياحة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "4d72d829-947b-45d5-b9b5-ae5800d6bac2",
+    "law_name": "نظام الأحوال الشخصية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "3e368087-7b31-46e7-8005-ada100b8f703",
+    "law_name": "نظام التكاليف القضائية",
+    "category": "judiciary",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "ae1d79bf-3716-4bc5-a85e-ada100c8a870",
+    "law_name": "نظام التنفيذ أمام ديوان المظالم",
+    "category": "execution_law",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "40754577-f250-47f6-8a5a-abf600af7d72",
+    "law_name": "نظام التوثيق",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "0f0ebdaa-a50b-4410-9460-abe500b03486",
+    "law_name": "نظام صندوق التنمية السياحي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "3d191772-e60b-4925-b5e7-aba50097641f",
+    "law_name": "نظام المنشآت والمستحضرات الصيدلانية والعشبية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "38334008-3b70-4c6c-b3af-aba3016a8061",
+    "law_name": "نظام المحاكم التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "9d240ae2-a709-48ee-ac82-a9ed0119f62d",
+    "law_name": "نظام الوقاية  من متلازمة العوز المناعي المكتسب (الإيدز) وحقوق المصابين وواجباتهم",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "93b6f7f3-1083-46e7-b30e-a9a700f291b0",
+    "law_name": "نظام مكافحة التدخين",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "a7d4493b-7c03-4c2d-b3c6-a9a700f275cd",
+    "law_name": "نظام الآثار والمتاحف والتراث العمراني",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "f0eaae46-9f84-40ee-815e-a9a700f268b3",
+    "law_name": "نظام المرافعات الشرعية",
+    "category": "litigation",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "8f1b7079-a5f0-425d-b5e0-a9a700f26b2d",
+    "law_name": "نظام الإجراءات الجزائية",
+    "category": "criminal_procedure",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "5535039e-13da-43f6-8f53-a9a700f26485",
+    "law_name": "نظام التحكيم",
+    "category": "arbitration",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "d805702d-77b9-40d0-92bd-a9a700f27da2",
+    "law_name": "نظام أندية السيارات والدراجات النارية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "ea1765a3-dec3-41a0-a32f-a9a700f26d58",
+    "law_name": "نظام القضاء",
+    "category": "judiciary",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "6a8286ec-baea-43ec-ab0d-a9a700f26c94",
+    "law_name": "نظام الهيئة العامة للولاية على أموال القاصرين ومن فى حكمهم",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "f42655be-79b0-4fd4-bb90-a9a700f26a3e",
+    "law_name": "نظام المحاماة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "8161ec24-d5e0-48b4-8392-a9a700f278d8",
+    "law_name": "نظام حماية التراث المخطوط في المملكة العربية السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "ac892eff-4aa4-4b26-b312-a9a700f2663d",
+    "law_name": "نظام هيئة التحقيق والادعاء العام ( نظام النيابة العامة )",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "040228ce-9ca5-4666-aab1-a9a700f27c6d",
+    "law_name": "النظام الأساسي للاتحادات الرياضية واللجنة الأولمبية العربية السعودية",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "bbfab460-8fe8-4425-9202-a9a700f27ba7",
+    "law_name": "نظام جمعية الكشافة العربية السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "e143d9d5-1889-45d8-8d99-a9a700f263cd",
+    "law_name": "نظام محاكمة الوزراء",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "2072c9ff-5a70-444e-91cc-a9a700f26346",
+    "law_name": "نظام تركيز مسؤوليات القضاء الشرعي",
+    "category": "judiciary",
+    "discovered_at": "2026-03-28T00:57:59.594214"
+  },
+  {
+    "law_id": "159008ad-198a-4439-b28b-b081009b92c2",
+    "law_name": "نظام صندوق التنمية الزراعية.",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "cd3a793a-ab18-4ad3-b28e-ad2e00a7f88f",
+    "law_name": "نظام الأرصاد",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "d113fa79-5ad8-42b1-9955-acfb00a2c7ed",
+    "law_name": "نظام الزراعة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "63831ff6-63d9-4212-8b54-abf800e146bd",
+    "law_name": "نظام البيئة",
+    "category": "environment",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "57261279-94b7-4ddc-8ad2-abf100d246be",
+    "law_name": "نظام المياه",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "43c53ab1-1cb3-4d76-ab39-a9f5012d437c",
+    "law_name": "النظام الأساسي للهيئة القضائية الاقتصادية لمجلس التعاون لدول الخليج العربية",
+    "category": "judiciary",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "2d3cb83a-0379-4cde-8e0b-a9a700f272bd",
+    "law_name": "نظام حماية الطفل",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "f2f7b465-b576-4f47-a8e7-a9a700f27202",
+    "law_name": "نظام المرافعات أمام ديوان المظالم",
+    "category": "litigation",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "c81ba2f1-1bf1-443b-9b1c-a9a700f27110",
+    "law_name": "نظام التنفيذ",
+    "category": "execution_law",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "4e09c59d-f173-4971-8a38-a9a700f27025",
+    "law_name": "نظام مكافحة جرائم الاتجار بالأشخاص",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "5d3379bd-3547-494e-9fbd-a9a700f26e24",
+    "law_name": "نظام ديوان المظالم",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "c46966ec-0e03-41a3-96fa-a9a700f250b1",
+    "law_name": "نظام (قانون) الحجر الزراعي لدول مجلس التعاون لدول الخليج العربية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "4cbce34d-f9d3-4d07-bc08-a9a700f24bff",
+    "law_name": "نظام المراعي والغابات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "ae6dac2c-6da4-47fc-b605-a9a700f251c2",
+    "law_name": "نظام (قانون) الحجر البيطري لدول مجلس التعاون لدول الخليج العربية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "965f24c7-0ddb-4d8f-a658-a9a700f24b24",
+    "law_name": "نظام الثروة الحيوانية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "4dab5511-f6af-442a-b4be-a9a700f24a3f",
+    "law_name": "النظام العام للبيئة",
+    "category": "environment",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "c440e774-b1d8-42f5-9169-a9a700f24951",
+    "law_name": "نظام مياه الصرف الصحي المعالجة وإعادة استخدامها",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "233c2b64-6824-4d1a-bd38-a9a700f24fc5",
+    "law_name": "نظام الاتجار بالكائنات الفطرية المهددة بالانقراض و منتجاتها",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "d0d49e6b-0989-40ae-a889-a9a700f2488c",
+    "law_name": "نظام صيد الحيوانات والطيور البرية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "799f2563-d262-4444-9646-a9a700f24f08",
+    "law_name": "نظام البحث العلمي البحري في المناطق البحرية التابِعة للمملكة العربية السعودية",
+    "category": "regions",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "e74c8b2e-f6e6-4eaf-ad6d-a9a700f24e39",
+    "law_name": "نظام صيد واستثمار وحماية الثروات المائية الحية في المياه الاقليمية للمملكة العربية السعودية",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "d54dd8db-5d3c-4b5c-bfa7-a9a700f246cd",
+    "law_name": "نظام الهيئة الوطنية لحماية الحياة الفطرية وإنمائها",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "588efd09-dc0d-4491-82e4-a9a700f245f6",
+    "law_name": "نظام المحافظة على مصادر المياه",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "37f95015-f360-45be-8f91-a9a700f244c1",
+    "law_name": "نظام المؤسسة العامة لتحلية المياه المالحة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "c1a70c2f-ba99-45ce-9dd8-a9a700f243ef",
+    "law_name": "نظام توزيع الأراضي البور",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:02.879228"
+  },
+  {
+    "law_id": "896f4986-334b-4c76-b938-ada500eae2eb",
+    "law_name": "نظام الانضباط الوظيفي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.014240"
+  },
+  {
+    "law_id": "f0761b32-f420-4435-bd2f-a9a700f25a36",
+    "law_name": "النظام الأساسي للمجلس الدولي للتمور",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:06.014240"
+  },
+  {
+    "law_id": "cfc97985-4a9f-4012-832b-a9a700f21ed2",
+    "law_name": "نظام تطبيق كود البناء السعودي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.014240"
+  },
+  {
+    "law_id": "552d21ef-81c0-4373-bd8a-a9f6016398ef",
+    "law_name": "نظام التعامل مع الموارد الوراثية النباتية للأغذية والزراعة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.014240"
+  },
+  {
+    "law_id": "7dd058e6-3f77-4eaa-a069-a9f801447c70",
+    "law_name": "نظام مطاحن إنتاج الدقيق",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "415d80f3-d9f9-4def-92d9-a9a700f25799",
+    "law_name": "نظام المناطق المحمية للحياة الفطرية",
+    "category": "regions",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "b8a7e5ff-d9a4-466b-b4b8-a9a700f256e1",
+    "law_name": "نظام الأعلاف",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "e37044a1-c673-4e80-af59-a9a700f25663",
+    "law_name": "نظام الزراعة العضوية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "6f3797d0-fc94-4930-b5e3-a9a700f25744",
+    "law_name": "قانون (نظام) الرفق بالحيوان لدول مجلس التعاون لدول الخليج العربية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "98b1d2e8-4724-439b-af00-a9a700f255ef",
+    "law_name": "نظام المناطق البحرية للمملكة العربية السعودية",
+    "category": "regions",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "a5fa054e-a124-4cce-96a2-a9a700f254a0",
+    "law_name": "نظام تربية النحل",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "9b79b62a-da9e-4f66-8a7d-a9a700f25369",
+    "law_name": "قانون (نظام) المبيدات في دول مجلس التعاون لدول الخليج العربية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "e2263a48-092e-481d-84e5-a9a700f2529e",
+    "law_name": "قانون (نظام) الأسمدة ومحسنات التربة الزراعية في دول مجلس التعاون لدول الخليج العربية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "fc9ac74c-fc7d-4456-a0e2-a9a700f23eff",
+    "law_name": "النظام الموحد لمد الحماية التأمينية لمواطني دول مجلس التعاون لدول الخليج العربية العاملين في غير دولهم في أي دولة عضو في المجلس",
+    "category": "social_insurance",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "985cf9ba-02ec-4eb1-9e36-a9a700f23514",
+    "law_name": "نظام الملابس والتجهيزات العسكرية الفردية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "ae482429-33b8-4e3f-a3ae-a9a700f23d5c",
+    "law_name": "نظام تبادل المنافع بين نظامي التقاعد المدني والعسكري ونظام التأمينات الإجتماعية",
+    "category": "social_insurance",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "ea6489f2-9c4e-43ce-892e-a9a700f23355",
+    "law_name": "نظام الأنواط العسكرية السعودية ولائحته التنظيمية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "11d3d5b0-dddf-443a-9851-a9a700f23208",
+    "law_name": "نظام مجلس الخدمة العسكرية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "e36e899b-f29b-4db0-8b71-a9a700f23065",
+    "law_name": "نظام الكليات العسكرية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "32f651e6-2976-439c-b418-a9a700f23fb2",
+    "law_name": "نظام الخدمة المدنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "1fe7fe77-d349-4fae-a561-a9a700f23a89",
+    "law_name": "نظام مجلس الخدمة المدنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "0838afd4-ca76-4b4a-b1d1-a9a700f22afd",
+    "law_name": "نظام التقاعد العسكري",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "8a12c94e-5a31-45cf-9c57-ac4400be8677",
+    "law_name": "نظام خدمة الضباط",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "859d4e56-627b-4766-a7aa-a9a700f23975",
+    "law_name": "نظام التقاعد المدني",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "b2a002e4-a3da-474b-9735-a9a700f2386c",
+    "law_name": "نظام الوزراء ونواب الوزراء وموظفي المرتبة الممتازة",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:06.015240"
+  },
+  {
+    "law_id": "99613e6a-6b85-423c-87af-b0ec00b4633e",
+    "law_name": "نظام بيع وتأجير مشروعات عقارية على الخارطة",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "5efb6f40-d859-47e6-9c8a-b04500943ecc",
+    "law_name": "نظام المساهمات العقارية",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "220f5444-31ee-4132-8712-aeee00ac1ba3",
+    "law_name": "نظام استئجار الدولة للعقار",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "f1bfd1f1-0c50-468e-b9a5-aeee008e493a",
+    "law_name": "نظام الوساطة العقارية",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "c9756bfb-ff81-4226-a820-ae8200dc074c",
+    "law_name": "نظام التسجيل العيني للعقار",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "4d5bda56-cc0d-4b16-a025-ad9d00b281ab",
+    "law_name": "نظام إدارة النفايات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "2d8aa57a-3b29-438e-a686-acae00b6728d",
+    "law_name": "نظام صندوق التنمية العقارية",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "d19fbfe8-6517-4e8b-b06a-b09000cefe1b",
+    "law_name": "نظام ملكية الوحدات العقارية وفرزها وإدارتها",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "962235c2-9fa8-4c1a-b835-aa6400dd851e",
+    "law_name": "نظام مقدمي خدمة حجاج الخارج",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "1dd4c3d4-f4e9-4c15-852f-a9a700f21cab",
+    "law_name": "نظام إجراءات التراخيص البلدية",
+    "category": "municipal",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "9da91b16-62ba-41d8-b6f7-a9a700f21d07",
+    "law_name": "نظام المجالس البلدية",
+    "category": "municipal",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "de0a2f61-27e3-47fa-a710-a9a700f21a67",
+    "law_name": "نظام إدارة النفايات البلدية الصلبة",
+    "category": "municipal",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "c57d7f19-9b3e-4161-bb91-a9a700f203fb",
+    "law_name": "نظام نقل الحجاج إلى المملكة وإعادتهم إلى بلادهم",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "c104908b-d32d-411a-b71e-a9a700f214b0",
+    "law_name": "نظام ملكية الوحدات العقارية وفرزها",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "eb5cc9e3-b938-42db-b375-a9a700f2156b",
+    "law_name": "نظام التسجيل العيني للعقار 1423هـ",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "9cff56dc-09be-45e1-a736-a9a700f218db",
+    "law_name": "نظام الأنشطة المقلقة للراحة أو الخطرة أو المضرة بالصحة أو البيئة",
+    "category": "environment",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "753d7ffc-5e18-4f36-818d-a9a700f213a1",
+    "law_name": "نظام تملك غير السعوديين للعقار واستثماره",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "70405759-cf34-4260-a81e-a9a700f21241",
+    "law_name": "نظام حماية المرافق العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "e5f63d07-7de5-4a4d-a02f-a9a700f21187",
+    "law_name": "نظام البلديات والقرى",
+    "category": "municipal",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "76ad693d-d427-4de8-8980-a9a700f210be",
+    "law_name": "نظام صندوق التنمية العقارية1394هـ",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "81bd35e9-ee8d-47bf-97c7-a9a700f2100a",
+    "law_name": "نظام التصرف في العقارات البلدية",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "23b12c1f-6823-4759-982e-a9a700f2031a",
+    "law_name": "نظام الأئمة والمؤذنين وخدم المساجد",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "0fceb9eb-d143-4d87-8a47-a9a700f20f2e",
+    "law_name": "نظام تعداد السكان العام",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "3563a355-6ff9-4296-af66-a9a700f20e70",
+    "law_name": "نظام الإحصاءات العامة للدولة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "ece2f7dc-db78-4ba4-a9e4-a9a700f20da3",
+    "law_name": "نظام الطرق والمباني",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:09.277830"
+  },
+  {
+    "law_id": "c3825760-995a-4f0e-83ca-af230115f2f5",
+    "law_name": "النظام الأساس لجامعة الملك سعود (مؤسسة أكاديمية مستقلة غير هادفة للربح)",
+    "category": "education",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "8af67ec1-6776-4f67-abb4-ad0900eadf2f",
+    "law_name": "نظام التخصيص",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "6435e205-a7ae-4a8c-9580-ad0000b6bef2",
+    "law_name": "نظام مهنة المحاسبة والمراجعة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "fb3e69e4-84a6-45b4-85d6-ac8c00cb3d67",
+    "law_name": "نظام الغرف التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "82b804f6-0075-47c2-a772-acc4002f8b3e",
+    "law_name": "نظام معالجة المنشآت المالية المهمة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "bf9e0aae-6df6-4785-a305-ac2300bd0856",
+    "law_name": "نظام مكافحة التستر",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "e2c00ba7-2af3-41fa-a1ab-ab9f00af1dec",
+    "law_name": "نظام ضمان الحقوق بالأموال المنقولة",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "8ee74282-7f0d-49ff-b6ee-aafc00a3d801",
+    "law_name": "نظام الجامعات",
+    "category": "education",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "af2a6b93-51dd-4f16-b781-aafd00d9fbbc",
+    "law_name": "نظام الامتياز التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "24c563f9-7292-49c8-b0fb-aa9800b999f1",
+    "law_name": "نظام  المنافسات و المشتريات الحكومية",
+    "category": "competition",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "360de590-0286-4fa5-a243-aa9100c31979",
+    "law_name": "نظام التجارة الإلكترونية",
+    "category": "ecommerce",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "52da052e-9de3-4ead-abbf-aa3f00ef5083",
+    "law_name": "نظام صندوق الاستثمارات  العامة",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "e3605c0d-ef87-4cff-b5da-aa3f0102bbb4",
+    "law_name": "نظام  المنافسة",
+    "category": "competition",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "4db42334-ba00-47bf-b9f9-a9f4016e0ac1",
+    "law_name": "النظام الأساس لجمعية الكشافة العربية السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "e7bd6fcc-c29c-4696-8032-aae9009b113a",
+    "law_name": "نظام  الرهن التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "9ba0d5dc-2dc4-4b71-b979-a9a700f1f5fd",
+    "law_name": "نظام الأوسمة السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "f55f0003-8b87-4ff0-8f0f-a9a700f20578",
+    "law_name": "نظام خدمة حجاج الداخل",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "7797548e-f8c5-4042-a383-a9a700f1fe68",
+    "law_name": "نظام معهد الإدارة العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "dbc3e41b-e877-48f2-a213-a9a700f1fdab",
+    "law_name": "نظام إنتاج المواد التعليمية المساعدة وتسويقها",
+    "category": "education",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "a6843359-3237-4553-8271-a9a700f1fcda",
+    "law_name": "نظام مجلس التعليم العالي والجامعات",
+    "category": "education",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "4033de9e-45f5-406f-9b3c-a9a700f1fbf0",
+    "law_name": "نظام مدينة الملك عبد العزيز للعلوم والتقنية",
+    "category": "telecom",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "b3f0cb3a-6338-4995-91d7-a9a700f1fad2",
+    "law_name": "نظام معهد الدراسات الدبلوماسية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "03de5462-eda0-4dd6-9efa-a9a700f1f802",
+    "law_name": "نظام العلم للمملكة العربية السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "f457818f-2d89-4339-b7e7-a9a700f1fff2",
+    "law_name": "نظام تعليم الكبار ومحو الأمية في المملكة العربية السعودية",
+    "category": "education",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "e1fd0b90-ced3-4402-ad60-a9a700f1f755",
+    "law_name": "نظام الميداليات المدنية والعسكرية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:12.452221"
+  },
+  {
+    "law_id": "ad9ed861-70e6-4d31-9268-b20400d68915",
+    "law_name": "نظام القياس والمعايرة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.664952"
+  },
+  {
+    "law_id": "c487b0ff-8e52-442d-bf62-b1cd009fdc57",
+    "law_name": "نظام المواصفات والجودة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.664952"
+  },
+  {
+    "law_id": "7f147afb-5a81-4744-a4bf-b1cd00b831ea",
+    "law_name": "نظام سلامة المنتجات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.664952"
+  },
+  {
+    "law_id": "8799f302-3ad8-41ae-a8d8-b11d008a40f6",
+    "law_name": "نظام صندوق البنية التحتية الوطني",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "319fe343-cafd-4638-bc7d-af5e00b16b6b",
+    "law_name": "نظام المعالجات التجارية في التجارة الدولية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "2ed6dfe1-d66e-41c8-bdf6-af4800cb050d",
+    "law_name": "نظام بنك المنشآت الصغيرة والمتوسطة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "a8376aea-1bc3-49d4-9027-aed900b555af",
+    "law_name": "نظام الشركات",
+    "category": "companies_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "c4af9503-d0f4-4d07-a7c3-add500a67d0c",
+    "law_name": "نظام المدفوعات وخدماتها",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "66eccea3-fc1c-471f-bcfa-ad9d009a7ec0",
+    "law_name": "نظام تصنيف المقاولين",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "3ab82e3c-de46-4463-a939-a9a700f1b2af",
+    "law_name": "نظام  المشاركة بالوقت فى الوحدات العقارية السياحية",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "5c351f5d-0814-4b94-86a0-a9a700f1b1f8",
+    "law_name": "نظام تصنيف المقاولين1427هـ",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "07e87d88-b2c4-40ab-8770-a9a700f1af21",
+    "law_name": "نظام مكافحة التستر1425هـ",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "6b615a05-f637-41cf-8419-a9a700f1afd7",
+    "law_name": "نظام المنافسة",
+    "category": "competition",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "7b6436fd-e7c0-4a51-afcc-a9a700f1ae15",
+    "law_name": "نظام الرهن التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "3e3c6fc3-9a45-4a0e-b28e-a9a700f1ad14",
+    "law_name": "نظام مراقبة شركات التأمين التعاوني",
+    "category": "companies_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "50924f95-f74e-430e-820c-a9a700f1abfa",
+    "law_name": "نظام السوق المالية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "95a6369d-d712-4028-842e-a9a700f1a957",
+    "law_name": "نظام البيانات التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "3ec4414f-2ec5-48b1-bcb4-a9a700f1aa2b",
+    "law_name": "نظام العلامات التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "3e1de77d-3cd1-44d8-b174-a9a700f1ab06",
+    "law_name": "نظام الهيئة السعودية للمهندسين",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "cf510039-d022-421f-9901-a9a700f1a8a0",
+    "law_name": "نظام محلات بيع المركبات الملغى تسجيلها",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "737705df-17ad-42b0-9094-a9a700f1bb61",
+    "law_name": "نظام الغرف التجارية والصناعية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "7017dc70-15bb-4137-b87d-a9a700f1b950",
+    "law_name": "نظام الصندوق السعودي للتنمية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "2541255e-9e5b-4393-a8b0-a9a700f1a596",
+    "law_name": "نظام صندوق الاستثمارات العامة",
+    "category": "investment",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "4763eb94-047b-46f1-9697-a9a700f1b7ed",
+    "law_name": "نظام الأوراق التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "b19a8aa6-7b50-43f0-ab8c-a9a700f1a446",
+    "law_name": "نظام الوكالات التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:15.665959"
+  },
+  {
+    "law_id": "6c421c5c-c137-442e-a854-b12200c46ffe",
+    "law_name": "نظام حماية المبلغين والشهود والخبراء والضحايا",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "469689de-5af0-4c28-b96c-b05a008bdda3",
+    "law_name": "نظام استخدام وحماية شارة واسم الهلال الأحمر وما في حكمهما",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "f3a44a6f-9217-478b-b7ca-af3401391514",
+    "law_name": "نظام استخدام كاميرات المراقبة الأمنية",
+    "category": "security",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "2716057c-c097-4bad-8e1e-ae1400c678d5",
+    "law_name": "نظام الإثبات",
+    "category": "evidence_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "61fa8a49-aa1b-49ed-b9ad-adaa00dc6272",
+    "law_name": "نظام مكافحة التسول",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "b7cfae89-828e-4994-b167-adaa00e37188",
+    "law_name": "نظام حماية البيانات الشخصية",
+    "category": "data_protection",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "905e11b3-4d66-496c-9c1b-ad240106367f",
+    "law_name": "نظام مكافحة الاحتيال المالي وخيانة الأمانة",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "5e9762df-2b15-4e66-8cdc-aa5200f62042",
+    "law_name": "نظام الإقامة المميزة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "f98f4238-0289-4891-8a22-a9a700f1f538",
+    "law_name": "نظام ضريبة القيمة المضافة",
+    "category": "tax",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "68204119-84f1-4789-8fad-a9ec014c3788",
+    "law_name": "نظام الإفلاس",
+    "category": "bankruptcy",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "0657dfce-95f8-463a-9d87-aa3900ec7b51",
+    "law_name": "نظام مكافحة غسل  الأموال",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "ebb751a1-6f0b-4595-9736-a9a700f1f47b",
+    "law_name": "نظام مزاولة المهن الهندسية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "b2d0decd-a691-45b9-9af0-a9a700f1e86f",
+    "law_name": "قانون (نظام) العلامات التجارية لدول مجلس التعاون لدول الخليج العربية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "d93b5ced-1adb-494d-85fd-a9a700f1e817",
+    "law_name": "النظام الأساسي للمركز الإحصائي لدول مجلس التعاون لدول الخليج العربية",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "cad66e4d-38d3-4baa-8049-a9a700f1e7a8",
+    "law_name": "نظام المقيمين المعتمدين",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "64aee787-4618-4979-b4d8-a9a700f1c647",
+    "law_name": "نظام استيراد المواد الكيميائية وإدارتها ( نظام إدارة المواد الكيميائية )",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "0da0543b-72bf-4405-98f3-a9a700f1c593",
+    "law_name": "القانون \"النظام\" الموحد لمكافحة الإغراق والتدابير التعويضية والوقائية لدول مجلس التعاون لدول الخليج العربية",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "746f3ff2-0c3a-4b60-aac2-a9a700f1c4e8",
+    "law_name": "النظام الأساسي لهيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "6cfde53b-e803-49be-b2c6-a9a700f1c434",
+    "law_name": "نظام براءات الاختراع والتصميمات التخطيطية للدارات المتكاملة والأصناف النباتية والنماذج الصناعية",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "f95138ff-0892-49b0-921c-a9a700f1c37f",
+    "law_name": "نظام براءات الاختراع لدول مجلس التعاون لدول الخليج العربية",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "109578cc-5c5c-42a9-9bae-a9a700f1c2a8",
+    "law_name": "النظام الأساسي لهيئة المحاسبة والمراجعة لدول مجلس التعاون",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "56195fdf-46c2-44f0-88e5-a9a700f1be50",
+    "law_name": "نظام المحاسبين القانونيين",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "05690bd6-2c75-4b65-a148-a9a700f1bccf",
+    "law_name": "نظام الدفاتر التجارية",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "c58ba10c-4e89-4c06-98d7-a9a700f1c706",
+    "law_name": "النظام التجاري ( نظام المحكمة التجارية)",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "85eb2897-bec6-4c0c-b1d7-ac7c008ec09c",
+    "law_name": "نظام مكافحة الغش التجاري",
+    "category": "commercial_law",
+    "discovered_at": "2026-03-28T00:58:18.944367"
+  },
+  {
+    "law_id": "f935b20b-e275-4f4f-9441-acad00e22fdb",
+    "law_name": "نظام صندوق التنمية الثقافي",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "f9de1b7f-7526-4c44-b9f3-a9f8015cf5b6",
+    "law_name": "نظام مكافحة جريمة التحرش",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "57694209-3eed-46c7-a5d8-a9ed012761d4",
+    "law_name": "نظام مكافحة جرائم الإرهاب وتمويله",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "ad0354f7-9756-4a4e-8948-a9a700f19705",
+    "law_name": "نظام نقل معلومات المتعاملين مع المنشآت الخاصة إلكترونياً إلى مركز المعلومات الوطني في وزارة الداخلية (نظام شموس الأمني)",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "c1878d16-7ce0-4710-993b-a9a700f17ac5",
+    "law_name": "النظام الجزائي لجرائم التزوير",
+    "category": "criminal_procedure",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "4a8842df-9cd1-4ee7-bf97-a9a700f180d4",
+    "law_name": "نظام مكافحة غسل الأموال",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "76988d51-8339-42a8-97d1-a9a700f194dc",
+    "law_name": "النظام الأساسي لمركز المعلومات الجنائية لمكافحة المخدرات  لمجلس التعاون لدول الخليج العربية",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "2640f5ff-1f7b-49fc-a57c-a9a700f192c9",
+    "law_name": "نظام مزاولة نقل النقود والمعادن الثمينة والمستندات ذات القيمة",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "a05632b0-ac19-4659-af2a-a9a700f18337",
+    "law_name": "نظام المتفجرات والمفرقعات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "a445af93-671f-496b-818a-a9a700f19150",
+    "law_name": "نظام الأسلحة والذخائر",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "221b3286-a3c6-4ea4-97c7-a9a700f18273",
+    "law_name": "نظام مكافحة المخدرات والمؤثرات العقلية",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "51c9a546-fc5e-4607-ba34-a9a700f19012",
+    "law_name": "نظام الحراسة الأمنية المدنية الخاصة",
+    "category": "security",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "e29f08fa-d53e-4944-b22b-a9a700f17fd9",
+    "law_name": "نظام وثائق السفر",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "75e963c8-9ff3-4d10-88a4-a9a700f17f21",
+    "law_name": "نظام مكافحة الرشوة",
+    "category": "criminal_law",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "ebd54fd4-fb61-458b-a837-a9a700f17e56",
+    "law_name": "نظام عقوبات انتحال صفة رجل السلطة العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "7e2b99b1-0e84-4dd1-90c7-a9a700f18cdf",
+    "law_name": "نظام الأحوال المدنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "f09eda85-7150-4803-b87a-a9a700f189f3",
+    "law_name": "نظام الدفاع المدني",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "19945fe2-e690-4b24-9ab0-a9a700f17d03",
+    "law_name": "نظام السجن والتوقيف",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "871b7db0-6d40-4380-90a1-a9a700f188c7",
+    "law_name": "نظام أمن الحدود",
+    "category": "security",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "f5b4288e-5625-4cf3-8ce8-a9a700f17bf9",
+    "law_name": "نظام جوازات السفر السياسية والخاصة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "f62643d0-eff3-43c2-8629-a9a700f18812",
+    "law_name": "نظام استبدال الغرامة بالحبس",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "8a1799f2-3cd4-4619-b2ce-a9a700f18741",
+    "law_name": "النظام الجزائي الخاص بتزييف وتقليد النقود",
+    "category": "criminal_procedure",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "d9f183b6-3afc-4405-834f-a9a700f18571",
+    "law_name": "نظام الجنسية العربية السعودية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "83431376-5cf3-4374-875a-a9a700f16985",
+    "law_name": "نظام الإذاعة الأساسي",
+    "category": "constitutional",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "9b461caf-dc11-46bd-a8fd-ac74009a8724",
+    "law_name": "نظام خدمة الأفراد",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:22.254872"
+  },
+  {
+    "law_id": "db8ba5c5-726b-471a-aeb0-b02800a195fd",
+    "law_name": "تنظيم وكالة الفضاء السعودية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "c6b7358c-cc66-4a6b-8694-aef800d07e5e",
+    "law_name": "الترتيبات التنظيمية للهيئة العامة للطرق",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "8a661e5c-5844-4d90-87fd-adb900ba3c3a",
+    "law_name": "تنظيم مجلس المحتوى الرقمي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "cb98b088-6d6f-41a7-8633-acfc00b6db02",
+    "law_name": "تنظيم هيئة الحكومة الرقمية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "017d722d-4f95-4acd-be8c-ab6c00eb3f90",
+    "law_name": "تنظيم بنك التصدير والاستيراد السعودي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "e4e5f15c-9728-4ed1-b1b9-a9fc00b15fef",
+    "law_name": "تنظيم المنطقة الخاصة اللوجستية المتكاملة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "a04e017e-cefb-4939-973f-a9ee00ff5646",
+    "law_name": "تنظيم الهيئة العامة للموانئ",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "ed5fdbc0-c183-4a8a-a8b7-a9ed004b5900",
+    "law_name": "نظام الإعلام المرئي والمسموع",
+    "category": "media",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "c4da61a8-c85e-49de-a751-a9a700f2db8b",
+    "law_name": "تنظيم المركز الوطني لقياس أداء الأجهزة العامة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "9a1c4977-c539-4e01-8c88-a9a700f2efa9",
+    "law_name": "تنظيم هيئة النقل العام ( الهيئة العامة للنقل )",
+    "category": "transport",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "d33175c0-1755-4b1f-8925-a9a700f2b996",
+    "law_name": "تنظيم المركز الوطني للدراسات والبحوث الاجتماعية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "77d77bae-afbb-4481-a1cd-a9a700f1744b",
+    "law_name": "نظام عقوبات نشر الوثائق والمعلومات السرية وإفشائها",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "5203b65e-bf51-4e81-8701-a9a700f2d4b7",
+    "law_name": "تنظيم الجمعية السعودية للمراجعين الداخليين",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "807582c2-555f-4ee0-aeea-a9a700f2b6b3",
+    "law_name": "تنظيم الصندوق الخيري الاجتماعي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "67d159e6-ee98-4efc-a2ee-a9a700f17083",
+    "law_name": "نظام حماية حقوق المؤلف",
+    "category": "intellectual_property",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "0041fa37-4a6d-4b68-a9ab-a9a700f2e88f",
+    "law_name": "تنظيم مؤسسة البريد السعودي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "c385b62c-c635-484c-afa1-a9a700f16fe1",
+    "law_name": "نظام المؤسسات الصحفية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "5a16cf9b-e1b8-426f-82ab-a9a700f2a640",
+    "law_name": "تنظيم صندوق تنمية الموارد البشرية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "ecaaec43-8ff9-46b8-b269-a9a700f16e66",
+    "law_name": "نظام المطبوعات والنشر",
+    "category": "media",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "fe1771f7-158f-4570-9bb1-a9a700f16dec",
+    "law_name": "نظام مكتبة الملك عبد العزيز العامة",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "dc90bcd7-26fe-44c0-a40d-a9a700f17216",
+    "law_name": "نظام الإيداع",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "891a3908-3c1b-4b06-85ac-a9a700f17132",
+    "law_name": "نظام مكتبة الملك فهد الوطنية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "a4d3a985-a838-47e8-977e-a9a700f16c1c",
+    "law_name": "نظام الوثائق والمحفوظات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "bdf15375-52e6-4c94-9153-a9a700f16cc3",
+    "law_name": "نظام المركز الوطني للوثائق والمحفوظات",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "0057fd8d-8ad4-48f9-b02f-a9a700f16a48",
+    "law_name": "نظام دارة الملك عبد العزيز",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:25.209031"
+  },
+  {
+    "law_id": "b615dc50-327f-4e76-a911-b17c00886fa9",
+    "law_name": "تنظيم هيئة الصحة العامة",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "c7a10e52-37e6-492d-a3cf-acea0013f2f0",
+    "law_name": "الترتيبات التنظيمية لهيئة الصحة العامة",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "36ccdf4a-396d-48aa-8231-acb0009c3cbd",
+    "law_name": "تنظيم هيئة تنظيم المياه والكهرباء ( الهيئة السعودية لتنظيم الكهرباء )",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "47160380-97d9-47de-a08e-ac5f00cc3875",
+    "law_name": "تنظيم المركز السعودي لسلامة المرضى",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "796a6587-8da2-4583-8603-ac4500d5b8bc",
+    "law_name": "تنظيم الهيئة العامة للمساحة والمعلومات الجيومكانية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "e26d2707-afe5-4a81-894f-ac3800a8d131",
+    "law_name": "تنظيم المركز الوطني للتنمية الصناعية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "acf735b8-a606-424e-8c0e-aaab016118b6",
+    "law_name": "تنظيم المركز الوطني لتعزيز الصحة النفسية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "1c026125-b0b2-4ea7-b374-a9a700f2c0ee",
+    "law_name": "تنظيم مجلس شؤون الأسرة",
+    "category": "personal_status",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "95b320eb-06f8-4e5c-95d1-aa3a0106ede6",
+    "law_name": "تنظيم المركز السعودي  لكفاءة  الطاقة",
+    "category": "energy",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "da239a6c-1c67-443e-9b6b-a9ed003fd9e6",
+    "law_name": "تـنظيم هيـئـة الرقابة النوويـة والإشعـاعـية",
+    "category": "general",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "c99fc50a-eeb9-46ab-8144-a9ec01007992",
+    "law_name": "تنظيم هيئة رعاية الأشخاص ذوي الإعاقة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "6383fcba-9d26-428a-8b5a-a9a700f29275",
+    "law_name": "تنظيم المركز السعودي لاعتماد المنشآت الصحية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "7270187a-6cde-413d-9665-a9a700f29022",
+    "law_name": "تنظيم المدن الطبية والمستشفيات التخصصية التابعة لوزارة الصحة",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "9d091f8f-5de0-4603-9adc-a9a700f28d86",
+    "law_name": "تنظيم المركز الوطني للمعلومات الصحية",
+    "category": "health",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "d4a9cc4c-61cb-4053-8fe5-a9a700f28d1a",
+    "law_name": "تنظيم المركز السعودي لزراعة الأعضاء",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "49ab78f2-a4ad-42f8-97ce-a9a700f28035",
+    "law_name": "تنظيم هيئة الهلال الأحمر السعودي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "62679230-95a3-44d5-bc69-a9a700f28bbd",
+    "law_name": "تنظيم المركز الوطني للطب البديل والتكميلي",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "93365bc0-8aa6-47a7-aed9-a9a700f29ecb",
+    "law_name": "التنظيم الخاص بمركز الدراسات والبحوث البترولية",
+    "category": "petroleum",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "5f028fb6-ec65-4745-8836-a9a700f28c38",
+    "law_name": "تنظيم صندوق مدينة الملك فهد الطبية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "8d3508da-fafc-4fb7-bc66-a9a700f29d23",
+    "law_name": "تنظيم الهيئة العامة للمساحة",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "f9bd197e-980e-4e9f-948c-a9a700f2994e",
+    "law_name": "تنظيم الهيئة السعودية للمدن الصناعية ومناطق التقنية",
+    "category": "telecom",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "5329f61e-2ad8-42b8-8592-a9a700f298d1",
+    "law_name": "التنظيم الخاص بهيئة المساحة الجيولوجية السعودية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "53cfe087-dae1-4b95-8dff-a9a700f29f3b",
+    "law_name": "تنظيم المجلس الأعلى لشؤون البترول والمعادن",
+    "category": "petroleum",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "ff94406f-9cba-4e01-bc22-a9a700f27d2b",
+    "law_name": "إنشاء الهيئة العليا لأندية الفروسية",
+    "category": "regulatory",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  },
+  {
+    "law_id": "0ad8fc8e-73f8-48b6-9c5b-a9a700f2974b",
+    "law_name": "تنظيم الهيئة الملكية للجبيل وينبع",
+    "category": "real_estate",
+    "discovered_at": "2026-03-28T00:58:28.337874"
+  }
+]

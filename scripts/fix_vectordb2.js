@@ -1,10 +1,18 @@
 // Fix AnythingLLM Vector DB - Complete fix including all QDrant settings
 // Run from: /app/server inside the container
+// Legacy-only helper: this script is not part of current default runtime.
+// Set ALLOW_LEGACY_ANYTHINGLLM_FIX=true to run intentionally.
 
 const { PrismaClient } = require('@prisma/client');
 const p = new PrismaClient();
 
 async function fixVectorDB() {
+  if (process.env.ALLOW_LEGACY_ANYTHINGLLM_FIX !== 'true') {
+    console.log('Skipped: legacy AnythingLLM fix is disabled by default.');
+    console.log('Set ALLOW_LEGACY_ANYTHINGLLM_FIX=true if you really want to run it.');
+    return;
+  }
+
   console.log('=== Complete Vector DB Fix ===\n');
 
   // Show all current settings

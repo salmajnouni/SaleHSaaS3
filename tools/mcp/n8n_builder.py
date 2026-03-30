@@ -10,7 +10,7 @@ import sys
 import requests
 from typing import Any
 
-N8N_BASE_URL = os.getenv("N8N_BASE_URL", "http://n8n:5678")
+N8N_BASE_URL = os.getenv("N8N_BASE_URL", "http://localhost:5678")
 N8N_API_KEY  = os.getenv("N8N_API_KEY", "salehsaas-n8n-api-key")
 
 HEADERS = {

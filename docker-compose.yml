@@ -1,24 +1,3 @@
-###############################################################################
-# SaleH SaaS 4.0 - Docker Compose Configuration
-# 🕋 صُنع بفخر في مكة المكرمة، المملكة العربية السعودية
-#
-# الهيكل المبسّط - 8 حاويات:
-#   1. postgres         - قاعدة البيانات الرئيسية
-#   2. chromadb         - قاعدة البيانات المتجهية (القوانين والوثائق)
-#   3. open_webui       - الواجهة الرئيسية + RAG + Pipelines + Code Execution
-#   4. pipelines        - المعالج القانوني المخصص
-#   5. tika             - استخراج النصوص من الوثائق
-#   6. searxng          - البحث المحلي على الإنترنت
-#   7. n8n              - الأتمتة والنشر على الميديا
-#   8. knowledge_watcher - معالج الوثائق التلقائي
-#   9. n8n_bridge       - n8n OpenAI Bridge (n8n workflows كنماذج OpenAI)
-#
-# Ollama يعمل على Windows مباشرة (host.docker.internal:11434)
-# جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
-###############################################################################
-
-version: "3.9"
-
 networks:
   salehsaas_net:
     driver: bridge
@@ -28,195 +7,136 @@ networks:
 
 volumes:
   postgres_data:
-  chromadb_data:
-  open_webui_data:
   n8n_data:
-  saleh_uploads:
-  saleh_knowledge:
+  open-terminal-data:
+  pipelines_data:
 
-###############################################################################
-# SERVICES
-###############################################################################
 services:
-
-  # ── 1. PostgreSQL - قاعدة البيانات الرئيسية ──────────────────────────────
   postgres:
     image: postgres:16-alpine
     container_name: salehsaas_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-salehsaas}
-      POSTGRES_USER: ${POSTGRES_USER:-salehsaas}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-salehsaas_pass}
-      PGDATA: /var/lib/postgresql/data/pgdata
+      - POSTGRES_DB=salehsaas
+      - POSTGRES_USER=salehsaas
+      - POSTGRES_PASSWORD=salehsaas_pass
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.10
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-salehsaas}"]
+      test: ["CMD-SHELL", "pg_isready -U salehsaas"]
       interval: 10s
       timeout: 5s
       retries: 5
-    labels:
-      - "salehsaas.service=database"
-      - "salehsaas.description=قاعدة البيانات الرئيسية"
 
-  # ── 2. ChromaDB - قاعدة البيانات المتجهية للقوانين ──────────────────────
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.3
     container_name: salehsaas_chromadb
     restart: unless-stopped
-    environment:
-      - ANONYMIZED_TELEMETRY=False
-      - ALLOW_RESET=True
-      - IS_PERSISTENT=TRUE
-      - CHROMA_SERVER_CORS_ALLOW_ORIGINS=["*"]
     volumes:
-      - chromadb_data:/chroma/chroma
+      - ./chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.20
     ports:
-      - "${CHROMADB_PORT:-8010}:8000"
-    labels:
-      - "salehsaas.service=vector-db"
-      - "salehsaas.description=قاعدة البيانات المتجهية - ذاكرة القوانين السعودية"
+      - "8010:8000"
 
-  # ── 3. Open WebUI - الواجهة الرئيسية + RAG + Pipelines ──────────────────
-  open_webui:
-    image: ghcr.io/open-webui/open-webui:v0.8.7
-    container_name: salehsaas_webui
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      chromadb:
-        condition: service_started
-      n8n_bridge:
-        condition: service_started
-    environment:
-      # ── Ollama على Windows ──
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-
-      # ── RAG - ChromaDB ──
-      - VECTOR_DB=chroma
-      - CHROMA_HTTP_HOST=chromadb
-      - CHROMA_HTTP_PORT=8000
-      - RAG_EMBEDDING_ENGINE=ollama
-      - RAG_EMBEDDING_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
-      - RAG_OLLAMA_BASE_URL=http://host.docker.internal:11434
-
-      # ── استخراج الوثائق ──
-      - CONTENT_EXTRACTION_ENGINE=tika
-      - TIKA_SERVER_URL=http://tika:9998
-
-      # ── البحث على الإنترنت ──
-      - ENABLE_RAG_WEB_SEARCH=True
-      - RAG_WEB_SEARCH_ENGINE=searxng
-      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&format=json
-
-      # ── الأمان ──
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-salehsaas-secret-key-change-me}
-      - WEBUI_NAME=SaleH SaaS
-      - DEFAULT_LOCALE=ar
-      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-false}
-      - WEBUI_AUTH=true
-
-      # ── تعطيل التتبع ──
-      - SCARF_NO_ANALYTICS=true
-      - DO_NOT_TRACK=true
-      - ANONYMIZED_TELEMETRY=false
-
-      # ── إصلاح تحذيرات الأمان ──
-      - USER_AGENT=Mozilla/5.0 (compatible; SaleH-SaaS/4.0; +http://localhost:3000)
-      # CORS: يجب استخدام WEBUI_URL لتحديد الأصل المسموح في Open WebUI
-      - WEBUI_URL=http://localhost:${WEBUI_PORT:-3000}
-      - CORS_ALLOW_ORIGIN=http://localhost:${WEBUI_PORT:-3000}
-
-      # ── Pipelines ──
-      - OPENAI_API_BASE_URL=http://pipelines:9099
-      - OPENAI_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
-
-      # ── n8n OpenAI Bridge - n8n workflows كنماذج OpenAI إضافية ──
-      # يُضاف كـ OpenAI-compatible connection في Open WebUI
-      # الاتصال يتم من Admin Settings → Connections → Add OpenAI Connection
-      # URL: http://n8n_bridge:3333  |  API Key: ${BRIDGE_API_KEY:-salehsaas-bridge-key}
-      # بعد الإضافة تظهر workflows المُعلَّمة بـ n8n-openai-bridge كنماذج في القائمة
-
-    volumes:
-      - open_webui_data:/app/backend/data
-      - saleh_uploads:/app/backend/data/uploads
-      - saleh_knowledge:/app/backend/data/docs
-      - ./saleh_brain/glossary:/app/backend/data/glossary:ro
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.30
-    ports:
-      - "${WEBUI_PORT:-3000}:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=webui"
-      - "salehsaas.description=الواجهة الرئيسية - محادثة + RAG + تحليل + توليد"
-
-  # ── 4. Open WebUI Pipelines - المعالج القانوني ──────────────────────────
   pipelines:
     image: ghcr.io/open-webui/pipelines:main
     container_name: salehsaas_pipelines
     restart: unless-stopped
-    environment:
-      - PIPELINES_API_KEY=${PIPELINES_KEY:-salehsaas-pipelines-key}
+    depends_on:
+      - open_webui
     volumes:
       - ./pipelines:/app/pipelines
-      - ./pipelines/backend:/app/backend
+    environment:
+      - PIPELINES_API_KEY=0p_salehsaas-pipelines-key-2026
+      - N8N_BASE_URL=http://n8n:5678
+      - N8N_API_KEY=${N8N_API_KEY}
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=salehsaas_pass
+      - N8N_LOGIN_EMAIL=salmajnouni@gmail.com
+      - N8N_LOGIN_PASSWORD=SalehSaaS2026!
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.31
     ports:
-      - "${PIPELINES_PORT:-9099}:9099"
+      - "9099:9099"
+
+  open_webui:
+    image: ghcr.io/open-webui/open-webui:v0.8.12
+    container_name: salehsaas_webui
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - browserless
+      - tika
+      - chromadb
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - ENABLE_PIPELINES=True
+      - PIPELINES_URLS=http://pipelines:9099
+      - PIPELINES_API_KEY=0p_salehsaas-pipelines-key-2026
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_EMBEDDING_MODEL=nomic-embed-text:latest
+      - RAG_CHROMA_HTTP_HOST=chromadb
+      - RAG_CHROMA_HTTP_PORT=8000
+      - WEBUI_NAME=SaleH SaaS 4.0 - صالح
+      - ENABLE_SIGNUP=True
+      - DEFAULT_LOCALE=ar-SA
+      - WEBUI_SECRET_KEY=salehsaas_super_secret_key
+      - TIKA_SERVER_URL=http://tika:9998
+      - ENABLE_RAG_WEB_SEARCH=True
+      - RAG_WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&format=json
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=pipelines"
-      - "salehsaas.description=معالج Python المخصص - المعجم القانوني والتقارير"
+    volumes:
+      - ./saleh_core_data:/app/backend/data
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.30
+    ports:
+      - "3000:8080"
 
-  # ── 5. Apache Tika - استخراج النصوص من الوثائق ──────────────────────────
+  browserless:
+    image: browserless/chrome:latest
+    container_name: salehsaas_browser
+    restart: unless-stopped
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.70
+    ports:
+      - "3001:3000"
+
   tika:
-    build:
-      context: .
-      dockerfile: Dockerfile.tika
-    image: salehsaas-tika-fonts:latest
+    image: apache/tika:latest
     container_name: salehsaas_tika
     restart: unless-stopped
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.32
-    labels:
-      - "salehsaas.service=tika"
-      - "salehsaas.description=استخراج النصوص من PDF وWord وExcel - مع خطوط Arial وHelvetica وTimes New Roman"
 
-  # ── 6. SearXNG - البحث المحلي على الإنترنت ──────────────────────────────
   searxng:
     image: searxng/searxng:latest
     container_name: salehsaas_searxng
     restart: unless-stopped
+    environment:
+      - SEARXNG_SECRET=salehsaas-searxng-secret-2026
     volumes:
-      - ./config/searxng:/etc/searxng:rw
+      - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - ./config/searxng/limiter.toml:/etc/searxng/limiter.toml:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.33
-    environment:
-      - SEARXNG_BASE_URL=http://localhost:8080/
-    labels:
-      - "salehsaas.service=search"
-      - "salehsaas.description=بحث محلي على الإنترنت بدون تتبع"
 
-  # ── 7. n8n - الأتمتة والنشر على الميديا ─────────────────────────────────
   n8n:
-    image: n8nio/n8n:2.11.0
+    image: n8nio/n8n:2.14.2
     container_name: salehsaas_n8n
     restart: unless-stopped
     depends_on:
@@ -226,149 +146,86 @@ services:
       - DB_TYPE=postgresdb
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
-      - DB_POSTGRESDB_DATABASE=n8n
-      - DB_POSTGRESDB_USER=${POSTGRES_USER:-salehsaas}
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-salehsaas_pass}
+      - DB_POSTGRESDB_DATABASE=salehsaas
+      - DB_POSTGRESDB_USER=salehsaas
+      - DB_POSTGRESDB_PASSWORD=salehsaas_pass
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin123}
-      - N8N_ENCRYPTION_KEY=salehsaas-n8n-fixed-key-32chars!!
-      - WEBHOOK_URL=http://localhost:${N8N_PORT:-5678}/
-      - N8N_PERSONALIZATION_ENABLED=false
-      - N8N_DIAGNOSTICS_ENABLED=false
-      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=salehsaas_pass
+      - N8N_HOST=76dd8b219703a4.lhr.life
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://76dd8b219703a4.lhr.life/
+      - N8N_EDITOR_BASE_URL=https://76dd8b219703a4.lhr.life/
       - GENERIC_TIMEZONE=Asia/Riyadh
-      - N8N_ALLOW_EXEC=true
-      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
-      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
-      - EXECUTIONS_DATA_MAX_AGE=168
-      - EXECUTIONS_DATA_PRUNE=true
-      - N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE=true
-      # N8N_RUNNERS_ENABLED removed - deprecated in n8n v2.9+
-      # N8N_RUNNERS_MODE=internal (default) - JS runner only, Python not needed
-      - N8N_PUBLIC_API_DISABLED=false
-      - N8N_API_KEY=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA}
+      - TZ=Asia/Riyadh
+      - N8N_VARIABLES_WEBUI_API_KEY=sk-773169e4bcce483fb5e8268e9bf393dc
+      - N8N_VARIABLES_COUNCIL_MODEL=qwen2.5:7b
+      - N8N_VARIABLES_SALEH_TELEGRAM_CHAT_ID=161458544
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./knowledge_inbox:/knowledge_inbox
-      - ./knowledge_processed:/knowledge_processed
-      - ./n8n/workflows:/home/node/.n8n/workflows
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:5678/healthz || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
+      - ./core:/app/core
+      - ./logs:/app/logs
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
     ports:
-      - "${N8N_PORT:-5678}:5678"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=automation"
-      - "salehsaas.description=أتمتة النشر على الميديا وإرسال التقارير"
+      - "5678:5678"
 
-
-  # ── 9. Knowledge Watcher - Professional Document Ingestion Pipeline ─────────
-  # Drop any file in knowledge_inbox -> auto-processed into ChromaDB
-  # Supports: PDF, Word, Excel, TXT, CSV, PowerPoint, and more
   knowledge_watcher:
     build:
-      context: ./services/knowledge_watcher
-      dockerfile: Dockerfile
+      context: ./file_watcher
     container_name: salehsaas_watcher
     restart: unless-stopped
     depends_on:
-      chromadb:
-        condition: service_started
-      tika:
-        condition: service_started
+      - tika
+      - data_pipeline
     environment:
-      - INBOX_DIR=/knowledge_inbox
-      - PROCESSING_DIR=/knowledge_processing
-      - ARCHIVE_DIR=/knowledge_archive
-      - FAILED_DIR=/knowledge_failed
       - TIKA_URL=http://tika:9998/tika
-      - CHROMADB_URL=http://chromadb:8000
-      - OLLAMA_URL=http://host.docker.internal:11434
-      - EMBED_MODEL=${EMBEDDING_MODEL:-nomic-embed-text:latest}
-      - COLLECTION_NAME=saleh_legal_knowledge
-      - SCAN_INTERVAL=10
-      - MAX_RETRIES=3
-      - CHUNK_SIZE=400
-      - CHUNK_OVERLAP=40
+      - PIPELINE_URL=http://data_pipeline:8001/process-file/
+      - OPEN_WEBUI_URL=http://open_webui:8080
+      - WEBUI_API_KEY=salehsaas-pipelines-key-2026
     volumes:
-      - ./knowledge_inbox:/knowledge_inbox
-      - ./knowledge_processing:/knowledge_processing
-      - ./knowledge_archive:/knowledge_archive
-      - ./knowledge_failed:/knowledge_failed
+      - ./knowledge_inbox:/data/incoming
+      - ./knowledge_processed:/data/processed
+      - ./knowledge_failed:/data/failed
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.61
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=knowledge-watcher"
-      - "salehsaas.description=Professional ingestion pipeline - inbox/processing/archive/failed"
 
-  # ── 10. n8n OpenAI Bridge - n8n workflows كنماذج OpenAI ────────────────
-  # يُحوّل n8n workflows إلى نماذج OpenAI-compatible
-  # كل workflow مُعلَّم بـ n8n-openai-bridge يظهر كنموذج في Open WebUI
-  # يدعم: Streaming، Session Memory، User Context، File Uploads
-  n8n_bridge:
-    image: ghcr.io/sveneisenschmidt/n8n-openai-bridge:latest
-    container_name: salehsaas_n8n_bridge
+  data_pipeline:
+    build:
+      context: ./data_pipeline
+    container_name: salehsaas_data_pipeline
     restart: unless-stopped
     depends_on:
-      n8n:
-        condition: service_healthy
-    environment:
-      - PORT=3333
-      - BEARER_TOKEN=${BRIDGE_API_KEY:-salehsaas-bridge-key}
-      - MODEL_LOADER_TYPE=n8n-api
-      - N8N_BASE_URL=http://n8n:5678
-      - N8N_API_BEARER_TOKEN=${N8N_API_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA}
-      - AUTO_DISCOVERY_TAG=n8n-openai-bridge
-      - AUTO_DISCOVERY_POLL_INTERVAL=60
-      - LOG_REQUESTS=false
-    networks:
-      salehsaas_net:
-        ipv4_address: 172.20.0.60
-    ports:
-      - "${BRIDGE_PORT:-3333}:3333"
+      - chromadb
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=n8n-bridge"
-      - "salehsaas.description=n8n OpenAI Bridge - n8n workflows كنماذج في Open WebUI"
-
-
-  # ──── 11. File API - خدمة إدارة الملفات لـ n8n ────────────────────────────
-  # تتيح لـ n8n قراءة/كتابة/نقل الملفات عبر HTTP بدلاً من عمليات الملفات المباشرة
-  # مطلوبة لأن n8n يعمل في وضع الحماية المقيّد (Sandbox Mode)
-  file_api:
-    build:
-      context: ./dev_studio/file_api
-      dockerfile: Dockerfile
-    container_name: salehsaas_file_api
-    restart: unless-stopped
-    ports:
-      - "8765:8765"
-    volumes:
-      - ./url_inbox:/data/url_inbox
-      - ./url_processed:/data/url_processed
-      - ./knowledge_inbox:/data/knowledge_inbox
-      - ./knowledge_processed:/data/knowledge_processed
-      - ./logs:/data/logs
     environment:
-      - ALLOWED_BASE=/data
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - OLLAMA_URL=http://host.docker.internal:11434
+      - EMBEDDING_MODEL=nomic-embed-text:latest
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.62
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    labels:
-      - "salehsaas.service=file-api"
-      - "salehsaas.description=File API - إدارة الملفات عبر HTTP لـ n8n"
+    ports:
+      - "8001:8001"
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: salehsaas_open-terminal
+    restart: unless-stopped
+    profiles:
+      - open-terminal
+    environment:
+      - OPEN_TERMINAL_API_KEY=uytyutujhgjhgh7640k!
+    volumes:
+      - open-terminal-data:/home/user
+      - C:/saleh26/salehsaas/SaleHSaaS3/saleh:/home/user/projects
+      - C:/Users/SALEH ALMAJNOUNI/.ssh:/home/user/.ssh
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.80
+    ports:
+      - "8000:8000"

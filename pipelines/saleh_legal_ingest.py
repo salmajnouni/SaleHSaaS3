@@ -21,9 +21,10 @@ from pydantic import BaseModel
 
 class Pipeline:
     class Valves(BaseModel):
+        pipelines: List[str] = ["*"]
         CHROMADB_URL: str = "http://chromadb:8000"
         TIKA_URL: str = "http://tika:9998"
-        COLLECTION_NAME: str = "saleh_legal_docs"
+        COLLECTION_NAME: str = "saleh_knowledge"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
         EMBEDDING_MODEL: str = "nomic-embed-text:latest"
         CHUNK_SIZE: int = 1000
@@ -43,7 +44,11 @@ class Pipeline:
                 timeout=5
             )
             if resp.status_code == 200:
-                collections = [c["name"] for c in resp.json().get("collections", [])]
+                payload = resp.json()
+                if isinstance(payload, list):
+                    collections = [c.get("name") for c in payload if isinstance(c, dict)]
+                else:
+                    collections = [c.get("name") for c in payload.get("collections", [])]
                 if self.valves.COLLECTION_NAME not in collections:
                     requests.post(
                         f"{self.valves.CHROMADB_URL}/api/v1/collections",

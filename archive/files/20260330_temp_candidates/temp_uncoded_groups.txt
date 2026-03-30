@@ -1,0 +1,48 @@
+﻿=== OFFICIAL / NEED NAME+VERSION ===
+docs\guides\ACCOUNT_AUTOMATION_ONBOARDING.md
+docs\guides\ENGINEERING_OFFICES_SERVICES.md
+docs\guides\LINKEDIN_PAGE_SETUP_AND_PLAYBOOK.md
+docs\guides\SOLO_MARKETING_AUTOMATION.md
+docs\guides\TECHNICAL_ROADMAP_ENGINEERING.md
+docs\sales\CLIENT_OFFER_STACK_AR.md
+docs\sales\CLIENT_SCENARIOS_AND_PACKAGES_AR.md
+docs\sales\DISCOVERY_MEETING_CHECKLIST_AR.md
+docs\sales\HOTEL_QUOTATION_MODEL_AR.md
+docs\services\SERVICE_CATALOG_AR.md
+docs\services\SERVICE_DELIVERY_WORKFLOW_AR.md
+docs\services\SERVICE_SCOPE_TEMPLATE_AR.md
+SERVICES.md
+USER_GUIDE_AR.md
+الأمانة - v0.1.md
+دليل السياسات والإجراءات - نظام الوكلاء الذكيين.md
+
+=== TECHNICAL REFERENCE / KEEP AS REFERENCE ===
+ARCHITECTURE.md
+CHANGELOG.md
+data_pipeline\README.md
+dev_studio\knowledge\01_json_structure.md
+dev_studio\knowledge\02_rest_api.md
+dev_studio\knowledge\03_common_nodes.md
+dev_studio\knowledge\04_expressions.md
+dev_studio\knowledge\05_error_handling_and_n8n_node.md
+dev_studio\knowledge\06_complete_workflow_examples.md
+dev_studio\knowledge\07_salehsaas_project.md
+dev_studio\knowledge\08_openwebui_guide.md
+dev_studio\knowledge\09_github_and_communities.md
+dev_studio\README.md
+docs\guides\knowledge_watcher.md
+docs\guides\mep_summary_only_rag.md
+docs\guides\sbc_rag_bootstrap.md
+file_watcher\README.md
+INSTALL_GUIDE.md
+IntegraAI\backend\ADVANCED_SERVICES_GUIDE.md
+IntegraAI\backend\README.md
+MCP_SETUP_GUIDE.md
+n8n_workflows\README.md
+README.md
+saleh_brain\README.md
+saleh_dashboard\README.md
+
+=== GENERATED OR RECORD OUTPUT ===
+core\grc_engine\reports\GRC_Report_20260326_151533.md
+saleh_core_data\uploads\5f7039af-6737-4f54-a3bd-e05c50a28c68_System Prompt — وكيل المهندس المستشار الميكانيكي.md

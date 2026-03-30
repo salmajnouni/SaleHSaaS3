@@ -1,0 +1,6 @@
+{
+  "n8n_url": "http://n8n:5678",
+  "n8n_api_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOTJhNTYwYS1iOTBkLTRiY2YtODljNy0zODIyMWRiYTQ4YmQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjMxZDAzM2YtNzc1MC00YzdlLWE1OGMtYWMyN2JkNDA4ODdiIiwiaWF0IjoxNzc0NjIwOTEyLCJleHAiOjE4MDYxNTYwMDB9.hEVgXGIjcJtbYg8xxLV_eFNN3Q8SxeSwng_GeE3yYP8",
+  "ollama_url": "http://host.docker.internal:11434",
+  "llm_model": "qwen2.5:7b"
+}

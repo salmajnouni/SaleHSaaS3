@@ -17,22 +17,25 @@
 
 **SaleH SaaS** منصة ذكاء اصطناعي محلية متكاملة مصممة للمؤسسات القانونية والحكومية السعودية. تعمل بالكامل على البنية التحتية المحلية دون إرسال أي بيانات خارجياً، وتوفر قدرات RAG (الاسترجاع المعزز بالتوليد) متقدمة على الوثائق القانونية السعودية مع أتمتة كاملة لسير العمل عبر n8n.
 
+> تنبيه تشغيلي: هذا الملف يصف التشغيل الحالي المعتمد في `docker-compose.yml`. عند أي تعارض بين هذه الصفحة وبين أي وثيقة أخرى، يكون المرجع الأعلى هو `docker-compose.yml` ثم `ARCHITECTURE.md`.
+
 ---
 
 ## المكونات الرئيسية
 
 | # | الخدمة | الصورة | المنفذ | الوصف |
 |---|---|---|---|---|
-| 1 | **Open WebUI** | `ghcr.io/open-webui/open-webui:main` | `3000` | واجهة المحادثة الرئيسية + RAG |
+| 1 | **Open WebUI** | `ghcr.io/open-webui/open-webui:v0.8.12` | `3000` | واجهة المحادثة الرئيسية + RAG |
 | 2 | **PostgreSQL** | `postgres:16-alpine` | داخلي | قاعدة البيانات الرئيسية |
-| 3 | **ChromaDB** | `chromadb/chroma:latest` | `8010` | قاعدة البيانات المتجهية للوثائق |
-| 4 | **Apache Tika** | `salehsaas-tika-fonts:latest` | داخلي | استخراج النصوص من PDF وWord وExcel |
+| 3 | **ChromaDB** | `chromadb/chroma:0.5.3` | `8010` | قاعدة البيانات المتجهية للوثائق |
+| 4 | **Apache Tika** | `apache/tika:latest` | داخلي | استخراج النصوص من PDF وWord وExcel |
 | 5 | **Ollama** | Windows Host | `11434` | نماذج اللغة والتضمين المحلية |
 | 6 | **Knowledge Watcher** | مبني محلياً | داخلي | خط أنابيب استيعاب الوثائق التلقائي v3.0 |
 | 7 | **n8n** | `n8nio/n8n:latest` | `5678` | أتمتة سير العمل |
-| 8 | **mcpo** | مبني محلياً | `8020` | وكيل MCP-to-OpenAPI |
-| 9 | **SearXNG** | `searxng/searxng:latest` | داخلي | بحث محلي على الإنترنت |
-| 10 | **Code Server** | `codercom/code-server:latest` | `8443` | بيئة التطوير من المتصفح |
+| 8 | **SearXNG** | `searxng/searxng:latest` | داخلي | بحث محلي على الإنترنت |
+| 9 | **Data Pipeline** | مبني محلياً | `8001` | استقبال الملفات، التقطيع، وتخزينها في ChromaDB |
+| 10 | **Browserless** | `browserless/chrome:latest` | `3001` | متصفح آلي للخدمات التي تحتاج تنفيذًا متصفحياً |
+| 11 | **Open Terminal** | `ghcr.io/open-webui/open-terminal` | `8000` | طرفية داخلية مرتبطة بالمجلد المحلي `saleh/` |
 
 ---
 
@@ -74,10 +77,10 @@ docker-compose ps
 | الخدمة | الرابط | بيانات الدخول الافتراضية |
 |---|---|---|
 | Open WebUI | http://localhost:3000 | أنشئ حساباً عند أول تشغيل |
-| n8n | http://localhost:5678 | admin / admin123 |
-| Code Server | http://localhost:8443 | salehsaas123 |
+| n8n | http://localhost:5678 | admin / `salehsaas_pass` من `docker-compose.yml` |
+| Open Terminal | http://localhost:8000 | يتطلب `OPEN_TERMINAL_API_KEY` |
+| Browserless | http://localhost:3001 | — |
 | ChromaDB API | http://localhost:8010 | — |
-| mcpo API | http://localhost:8020 | — |
 
 ---
 
@@ -87,8 +90,7 @@ docker-compose ps
 
 ```
 knowledge_inbox/          ← ضع الملفات هنا
-knowledge_processing/     ← قيد المعالجة (تلقائي)
-knowledge_archive/        ← مؤرشف بنجاح (مرتب بالتاريخ)
+knowledge_processed/      ← الملفات الناجحة بعد الاستيعاب
 knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
 ```
 
@@ -98,28 +100,23 @@ knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
 
 1. يكتشف الملف في `knowledge_inbox` خلال 10 ثوانٍ
 2. يستخرج النص عبر Apache Tika (مع دعم كامل للخطوط العربية والغربية)
-3. يقسّم النص إلى أجزاء (400 حرف، تداخل 40)
+3. يقسّم النص إلى أجزاء عبر `data_pipeline`
 4. يولّد التضمينات عبر Ollama (`nomic-embed-text:latest`)
-5. يخزّن في ChromaDB v2 API (مجموعة: `saleh_legal_knowledge`)
-6. يؤرشف الملف في `knowledge_archive/YYYY-MM-DD/`
+5. يخزّن في ChromaDB عبر واجهة `v1` (مجموعة: `saleh_knowledge`)
+6. ينقل الملف الناجح إلى `knowledge_processed/`
 
 ---
 
-## أدوات MCP المتاحة
+## ملاحظة حول أدوات MCP
 
-يوفر **mcpo** ثلاثة أدوات قابلة للاستخدام مباشرة من Open WebUI:
+ملفات أدوات MCP موجودة داخل المستودع كمرجع تاريخي فقط، ومسار `mcpo` ملغي في التشغيل الحالي.
+ولا يجوز اعتبار أي أصول legacy مرتبطة به جزءًا من الشجرة التشغيلية الحية أو مرجعًا حاكمًا للتشغيل.
 
-| الأداة | الوصف | الوظائف الرئيسية |
-|---|---|---|
-| `ollama_model_builder` | إدارة نماذج Ollama | تحميل، حذف، عرض النماذج |
-| `saleh_legal_rag` | بحث قانوني متقدم | بحث دلالي في الوثائق السعودية |
-| `n8n_builder` | بناء سير العمل | إنشاء، تفعيل، تنفيذ workflows في n8n |
+بالتالي:
 
-**إعداد mcpo في Open WebUI:**
-
-1. اذهب إلى: Settings → Tools → Add Tool
-2. أدخل URL: `http://localhost:8020`
-3. أدخل API Key: `salehsaas-mcpo-key`
+1. لا يجوز للوكلاء افتراض وجود endpoint حي على `localhost:8020`.
+2. لا يعتمد هذا المشروع حاليًا أي مسار تشغيل عبر `mcpo`.
+3. البديل التشغيلي المعتمد للأدوات/المعالجات هو `pipelines` و`data_pipeline` حسب `docker-compose.yml`.
 
 ---
 
@@ -127,7 +124,7 @@ knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
 
 ```
 URL:     http://localhost:5678
-API Key: salehsaas-n8n-api-key
+Header:  X-N8N-API-KEY: salehsaas-n8n-api-key
 ```
 
 يمكن للنموذج الذكي إنشاء وإدارة workflows تلقائياً عبر أداة `n8n_builder` من خلال المحادثة الطبيعية في Open WebUI.
@@ -139,15 +136,13 @@ API Key: salehsaas-n8n-api-key
 ```
 SaleHSaaS3/
 ├── config/
-│   ├── mcpo/config.json          # إعدادات أدوات MCP (3 أدوات)
 │   ├── postgres/init.sql         # تهيئة قاعدة البيانات
 │   └── searxng/settings.yml      # إعدادات البحث المحلي
 ├── docker/
-│   ├── mcpo/Dockerfile           # صورة mcpo المخصصة
-│   └── code-server/              # إعدادات Code Server
+│   └── code-server/              # ملفات بيئة تطوير غير مفعلة في التشغيل الحالي
 ├── docs/guides/                  # توثيق تقني مفصّل
 ├── knowledge_inbox/              # مجلد إدخال الوثائق
-├── knowledge_archive/            # أرشيف الوثائق المعالجة
+├── knowledge_processed/          # الملفات الناجحة بعد الاستيعاب
 ├── knowledge_failed/             # الوثائق الفاشلة + تقارير الأخطاء
 ├── n8n/workflows/                # قوالب سير العمل الجاهزة
 ├── pipelines/                    # معالجات Open WebUI
@@ -190,7 +185,7 @@ docker-compose build --no-cache tika
 docker-compose up -d tika
 
 # التحقق من حالة ChromaDB
-Invoke-WebRequest -Uri "http://localhost:8010/api/v2/heartbeat"
+Invoke-WebRequest -Uri "http://localhost:8010/api/v1/collections"
 
 # التحقق من n8n API
 Invoke-WebRequest -Uri "http://localhost:5678/api/v1/workflows" `
@@ -211,8 +206,8 @@ docker-compose up -d --build
 | ChromaDB لا يستجيب | `docker-compose restart chromadb` |
 | Ollama لا يولّد تضمينات | تأكد من تشغيل Ollama على Windows وتحميل `nomic-embed-text` |
 | تحذيرات خطوط Tika | تم الحل في v4.0 — أعد بناء Tika: `docker-compose build --no-cache tika` |
-| mcpo لا يتصل | `docker logs salehsaas_mcpo --tail 20` |
-| n8n API لا يستجيب | تحقق من المتغير `N8N_PUBLIC_API_DISABLED=false` في docker-compose.yml |
+| Open Terminal لا يعمل | تحقق من `OPEN_TERMINAL_API_KEY` ومن ربط المجلد `saleh/` في `docker-compose.yml` |
+| n8n API لا يستجيب | تحقق من الوصول إلى `http://localhost:5678/api/v1/workflows` باستخدام Header `X-N8N-API-KEY` |
 
 ---
 
@@ -231,8 +226,9 @@ docker-compose up -d --build
 |---|---|
 | [CHANGELOG.md](./CHANGELOG.md) | سجل جميع التغييرات والإصدارات |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | المخطط المعماري التفصيلي |
+| [RUNTIME_STATUS_CARD.md](./RUNTIME_STATUS_CARD.md) | بطاقة سريعة: ما هو حي الآن وما هو ملغى/Legacy |
+| [الحقائق التشغيلية الحاكمة - v0.1.md](./الحقائق التشغيلية الحاكمة%20-%20v0.1.md) | المرجع المختصر الحاكم للحقائق التشغيلية الحالية |
 | [INSTALL_GUIDE.md](./INSTALL_GUIDE.md) | دليل التثبيت المفصّل |
-| [MCP_SETUP_GUIDE.md](./MCP_SETUP_GUIDE.md) | دليل إعداد أدوات MCP |
 | [docs/guides/knowledge_watcher.md](./docs/guides/knowledge_watcher.md) | توثيق خدمة استيعاب الوثائق |
 
 ---

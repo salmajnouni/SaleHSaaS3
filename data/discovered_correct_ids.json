@@ -1,0 +1,188 @@
+[
+  {
+    "law_id": "ea1765a3-dec3-41a0-a32f-a9a700f26d58",
+    "law_name": "نظام القضاء",
+    "category": "judiciary",
+    "old_id": "a1f7da9a-88bc-4ea2-9b00-a9a700f17e51"
+  },
+  {
+    "law_id": "f0eaae46-9f84-40ee-815e-a9a700f268b3",
+    "law_name": "نظام المرافعات الشرعية",
+    "category": "litigation",
+    "old_id": "4a3e7a10-3ce1-4e44-be7c-a9a700f1c437"
+  },
+  {
+    "law_id": "9a0249b7-f835-48fa-8d1e-a9a700f1981a",
+    "law_name": "نظام الإجراءات الجزائية",
+    "category": "criminal_procedure",
+    "old_id": "92b3e530-5b76-4a50-bfc5-a9a700f1cda7"
+  },
+  {
+    "law_id": "d7e8efd3-4021-4413-8255-ae7c00f190de",
+    "law_name": "نظام التنفيذ",
+    "category": "execution_law",
+    "old_id": "5e0585b3-f66c-439e-94e3-a9a700f1d8fd"
+  },
+  {
+    "law_id": "2716057c-c097-4bad-8e1e-ae1400c678d5",
+    "law_name": "نظام الإثبات",
+    "category": "evidence_law",
+    "old_id": "d4287a87-d19a-441c-badf-aec400946d62"
+  },
+  {
+    "law_id": "12752a60-2a4a-4cab-a05d-a9a700f274a5",
+    "law_name": "نظام التحكيم",
+    "category": "arbitration",
+    "old_id": "55f3d2fb-6a9b-449c-b2c7-a9a700f1ca8f"
+  },
+  {
+    "law_id": "4d72d829-947b-45d5-b9b5-ae5800d6bac2",
+    "law_name": "نظام الأحوال الشخصية",
+    "category": "personal_status",
+    "old_id": "f3a24e2b-26a0-4fc0-bf93-b20800c3497c"
+  },
+  {
+    "law_id": "eaee8a20-3a54-4aaf-b0d9-b1ad00998962",
+    "law_name": "نظام التأمينات الاجتماعية",
+    "category": "social_insurance",
+    "old_id": "0bb94bbd-48a5-4540-b498-a9a700f2ab55"
+  },
+  {
+    "law_id": "32f651e6-2976-439c-b418-a9a700f23fb2",
+    "law_name": "نظام الخدمة المدنية",
+    "category": "civil_service",
+    "old_id": "1f72ed4e-80b1-4953-96f7-a9a700f2be0c"
+  },
+  {
+    "law_id": "a8376aea-1bc3-49d4-9027-aed900b555af",
+    "law_name": "نظام الشركات",
+    "category": "companies_law",
+    "old_id": "5ca2a3c6-3a6c-46f5-8e33-abbb00a1fe52"
+  },
+  {
+    "law_id": "4763eb94-047b-46f1-9697-a9a700f1b7ed",
+    "law_name": "نظام الأوراق التجارية",
+    "category": "commercial_law",
+    "old_id": "c7f1b44c-9e33-4176-8db0-a9a700f2d6f0"
+  },
+  {
+    "law_id": "c58ba10c-4e89-4c06-98d7-a9a700f1c706",
+    "law_name": "نظام المحكمة التجارية",
+    "category": "commercial_law",
+    "old_id": "e99b0a92-f970-4c2e-acdd-a9a700f2c36e"
+  },
+  {
+    "law_id": "a748e485-620c-45c4-8ca8-a9f40166406d",
+    "law_name": "نظام الإفلاس",
+    "category": "bankruptcy",
+    "old_id": "2d024e93-7830-4e83-81f7-b1e700c4e0da"
+  },
+  {
+    "law_id": "e3605c0d-ef87-4cff-b5da-aa3f0102bbb4",
+    "law_name": "نظام المنافسة",
+    "category": "competition",
+    "old_id": "2ef2b05a-39cc-4763-a2ec-a9a700f28e63"
+  },
+  {
+    "law_id": "b93d0275-775f-482a-9d52-a9a700f2ca15",
+    "law_name": "نظام الجمارك الموحد",
+    "category": "customs",
+    "old_id": "89c74e71-c0f5-45e3-a2f0-a9a700f20af7"
+  },
+  {
+    "law_id": "b7cfae89-828e-4994-b167-adaa00e37188",
+    "law_name": "نظام حماية البيانات الشخصية",
+    "category": "data_protection",
+    "old_id": "6f78baa6-3fe5-4747-889a-b28e00cdb0d2"
+  },
+  {
+    "law_id": "360de590-0286-4fa5-a243-aa9100c31979",
+    "law_name": "نظام التجارة الإلكترونية",
+    "category": "ecommerce_law",
+    "old_id": "6f72e26d-b8fe-4aba-ac39-b28e00cdb5a7"
+  },
+  {
+    "law_id": "06272e6b-1fb9-4226-90b7-a9a700f21dc0",
+    "law_name": "نظام نزع ملكية العقارات للمنفعة العامة",
+    "category": "real_estate",
+    "old_id": "25450917-e26c-4532-a75f-a9a700f21996"
+  },
+  {
+    "law_id": "c9756bfb-ff81-4226-a820-ae8200dc074c",
+    "law_name": "نظام التسجيل العيني للعقار",
+    "category": "real_estate",
+    "old_id": "76e8bdbd-e4b6-4f14-8e86-a9a700f22e40"
+  },
+  {
+    "law_id": "75e963c8-9ff3-4d10-88a4-a9a700f17f21",
+    "law_name": "نظام مكافحة الرشوة",
+    "category": "criminal_law",
+    "old_id": "e1dcecb8-3dc5-4a8b-b55d-a9a700f2ed97"
+  },
+  {
+    "law_id": "4a8842df-9cd1-4ee7-bf97-a9a700f180d4",
+    "law_name": "نظام مكافحة غسل الأموال",
+    "category": "aml_law",
+    "old_id": "6d0c2f66-1620-403c-8a33-a9a700f2d993"
+  },
+  {
+    "law_id": "e7bd6fcc-c29c-4696-8032-aae9009b113a",
+    "law_name": "نظام الرهن التجاري",
+    "category": "commercial_law",
+    "old_id": "85e79cf5-3c9b-4233-afcc-b1eb009f80f2"
+  },
+  {
+    "law_id": "63831ff6-63d9-4212-8b54-abf800e146bd",
+    "law_name": "نظام البيئة",
+    "category": "environment",
+    "old_id": "c7c5e0f1-86aa-47f5-bfa1-b0ac00b88e2f"
+  },
+  {
+    "law_id": "64e307c5-ac8c-49d8-9174-a9a700f285a0",
+    "law_name": "نظام المؤسسات الصحية الخاصة",
+    "category": "health",
+    "old_id": "60a93866-c6e4-44d1-b495-a9a700f29dd8"
+  },
+  {
+    "law_id": "f1de206c-eef4-4a76-904a-a9a700f2899a",
+    "law_name": "نظام مزاولة المهن الصحية",
+    "category": "health",
+    "old_id": "d3e87bc4-0f61-49f6-9f01-a9a700f29c83"
+  },
+  {
+    "law_id": "a6843359-3237-4553-8271-a9a700f1fcda",
+    "law_name": "نظام مجلس التعليم العالي والجامعات",
+    "category": "education",
+    "old_id": "35d0e419-5bce-4f22-a2d1-a9a700f2c91a"
+  },
+  {
+    "law_id": "67d159e6-ee98-4efc-a2ee-a9a700f17083",
+    "law_name": "نظام حماية حقوق المؤلف",
+    "category": "intellectual_property",
+    "old_id": "97ece26b-8cc3-47b9-b44e-a9a700f2e38d"
+  },
+  {
+    "law_id": "b2d0decd-a691-45b9-9af0-a9a700f1e86f",
+    "law_name": "نظام العلامات التجارية",
+    "category": "intellectual_property",
+    "old_id": "4fc34a70-f9e7-4c1d-b5e3-a9a700f2e0e0"
+  },
+  {
+    "law_id": "6cfde53b-e803-49be-b2c6-a9a700f1c434",
+    "law_name": "نظام براءات الاختراع",
+    "category": "intellectual_property",
+    "old_id": "f8e4ba26-1f89-4e2f-bb9a-a9a700f2e1f1"
+  },
+  {
+    "law_id": "ecaaec43-8ff9-46b8-b269-a9a700f16e66",
+    "law_name": "نظام المطبوعات والنشر",
+    "category": "media",
+    "old_id": "a8d23b0c-9dfe-42a5-8e01-a9a700f2ea0a"
+  },
+  {
+    "law_id": "a445af93-671f-496b-818a-a9a700f19150",
+    "law_name": "نظام الأسلحة والذخائر",
+    "category": "security",
+    "old_id": "f51f0e75-2bc8-4a55-b6f3-a9a700f1e42c"
+  }
+]

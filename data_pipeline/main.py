@@ -1,11 +1,13 @@
 import os
 import json
 import uuid
+import tempfile
+import requests as http_requests
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
+from langchain_core.documents import Document
 import chromadb
 from dotenv import load_dotenv
 
@@ -14,9 +16,9 @@ load_dotenv()
 # --- Environment Variables ---
 CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT = int(os.getenv("CHROMA_PORT", 8000))
-CHROMA_TOKEN = os.getenv("CHROMA_TOKEN", "salehsaas-chroma-token")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "nomic-embed-text:latest")
+TIKA_URL = os.getenv("TIKA_URL", "http://tika:9998/tika")
 LORA_QUEUE_DIR = os.getenv("LORA_QUEUE_DIR", "./lora_queue")
 INCOMING_DIR = os.getenv("INCOMING_DIR", "./incoming")
 
@@ -31,7 +33,7 @@ app = FastAPI(title="SaleHSaaS Data Pipeline API", version="1.0.0")
 chroma_client = chromadb.HttpClient(
     host=CHROMA_HOST,
     port=CHROMA_PORT,
-    headers={"Authorization": f"Bearer {CHROMA_TOKEN}"}
+    settings=chromadb.config.Settings(anonymized_telemetry=False)
 )
 
 # --- Ollama Embeddings ---
@@ -46,11 +48,11 @@ text_splitter = RecursiveCharacterTextSplitter(
 
 
 @app.post("/process-file/", summary="Process an uploaded file, chunk it, store in ChromaDB and LoRA queue")
-async def process_file(file: UploadFile = File(...), collection_name: str = "salehsaas_knowledge"):
+async def process_file(file: UploadFile = File(...), collection_name: str = "saleh_knowledge"):
     """
     Accepts any file (PDF, Word, Excel, TXT, etc.),
-    splits it into chunks, stores them in ChromaDB for RAG,
-    and appends them to a JSONL file for LoRA fine-tuning.
+    extracts text via Apache Tika, splits into chunks,
+    stores them in ChromaDB for RAG, and appends to LoRA queue.
     """
     try:
         # Save the uploaded file temporarily
@@ -59,13 +61,21 @@ async def process_file(file: UploadFile = File(...), collection_name: str = "sal
             content = await file.read()
             buffer.write(content)
 
-        # Load the document using Unstructured
-        loader = UnstructuredFileLoader(file_path)
-        documents = loader.load()
+        # Extract text using Apache Tika
+        with open(file_path, "rb") as f:
+            tika_response = http_requests.put(
+                TIKA_URL,
+                data=f,
+                headers={"Accept": "text/plain"},
+                timeout=120
+            )
 
-        if not documents:
+        if tika_response.status_code != 200 or not tika_response.text.strip():
             os.remove(file_path)
             raise HTTPException(status_code=400, detail="Could not extract any text from the document.")
+
+        extracted_text = tika_response.text.strip()
+        documents = [Document(page_content=extracted_text, metadata={"source": file.filename})]
 
         # Split the document into chunks
         chunks = text_splitter.split_documents(documents)

@@ -8,6 +8,68 @@
 
 # Changelog
 
+## [4.3.3] - 2026-03-30
+
+### توثيق تشغيلي
+- إضافة طبقة تحذير وتصحيح تشغيلي في `dev_studio/knowledge/07_salehsaas_project.md` و `dev_studio/knowledge/08_openwebui_guide.md` و `USER_GUIDE_AR.md` لمنع اعتماد الوكلاء على وصف قديم أو تجريبي.
+- إزالة أكثر السطور المضللة مباشرة من ملفات المعرفة الداخلية ودليل المستخدم، خصوصًا ما يتعلق بـ `mcpo` و `Code Server` و `saleh_legal_knowledge` و `AnythingLLM`.
+- إضافة وثيقة مرجعية مختصرة: `الحقائق التشغيلية الحاكمة - v0.1.md` وربطها بالوثائق الأساسية لتكون مرجعًا سريعًا قبل اتخاذ القرار.
+- تصحيح `docs/guides/sbc_rag_bootstrap.md` بحيث يشير نجاح الاستيعاب إلى `knowledge_processed/` بدل المسار القديم.
+- ربط وثائق الخدمات والجودة والأدلة المتخصصة بالمرجع الحاكم حتى لا تُقرأ كمصدر مستقل لحقيقة التشغيل التقني.
+- إضافة تنبيهات موحدة على ملفات `dev_studio/knowledge` العامة حتى لا يخلط الوكيل بين المعرفة التعليمية العامة وحقيقة التشغيل الحالية.
+- تنظيف الجذر من الضوضاء الصغيرة عبر نقل `temp_doc_code_report.txt` و `temp_uncoded_groups.txt` و `temp_wf.json` إلى حزمة حفظ تاريخية خارج المسار الحي.
+- نقل `test_results.json` إلى حزمة نواتج تاريخية باعتباره ناتج اختبار مولدًا.
+- إزالة `__pycache__/` من الجذر، ونقل ملفات التحقق والنصوص المتناثرة من المجلد الحي `saleh/` إلى حفظ تاريخي خارج المسار الحي.
+- توسيع تنظيف الكاش ليشمل جميع مجلدات `__pycache__` المولدة داخل المشروع خارج `.venv`، بما في ذلك المسارات البرمجية النشطة وبعض بقايا الأرشيف المؤقت.
+- تثبيت فرق تشغيلي إضافي في الوثائق: watcher الحي الحالي هو `file_watcher/watcher.py`، و`knowledge_processing/` ليس مسار نجاح حيًا، بينما `knowledge_archive/` يبقى مستخدمًا لأرشفة مرجعية مثل مخرجات UQN.
+- تثبيت أن `saleh_dashboard/` مشروع قديم/مرجعي غير مفعل في التشغيل الحالي، مع تحذير صريح داخل ملفاته ومنع الخلط بينه وبين واجهة `Open WebUI` الحية.
+- إضافة تقييم مستقل لإعادة `AnythingLLM` كخدمة اختيارية مستقبلية، مع حفظ الأصول المتبقية والمخاطر وشروط الإرجاع المنضبط دون خلطه بالتشغيل الحالي.
+- إضافة تحذيرات تشغيلية صريحة داخل ملفات Legacy ذات الخطورة المعرفية (`INSTALL_GUIDE.md` و `scripts/windows/SETUP_SALEHSAAS3.ps1` و `scripts/windows/SETUP_SALEHSAAS3.bat` و `saleh_brain/agent.py`) لمنع قراءتها كمرجع حاكم للتشغيل الحالي.
+- إغلاق دفعة تضليل إضافية: تصحيح منفذ `AnythingLLM` التاريخي في `USER_GUIDE_AR.md` إلى `3002`، وتحديث تسميات `setup.ps1` و `final_system_report.py` من `Code Server` إلى `Open Terminal` على `8000`، مع تحذيرات Legacy في سكربتات التثبيت القديمة.
+- تحسين مخرجات سكربتات Windows القديمة (`SETUP_SALEHSAAS3.ps1` و `SETUP_SALEHSAAS3.bat` و `INSTALL_SALEHSAAS.bat`) لتفصل بوضوح بين Profile Legacy والتشغيل الحالي المتحقق، وتصحيح فتح الواجهة الافتراضية إلى `Open WebUI`.
+- تشديد إضافي على مخرجات التثبيت القديمة: إزالة عرض الخدمات غير المفعلة من قائمة الخدمات الجاهزة، وقصر القائمة على الخدمات الحية الحالية مع إبقاء `AnythingLLM` و`Code Server` و`Grafana` كخيارات Legacy اختيارية فقط.
+- توسيع وسم Legacy/Optional في ملفات الإعداد المرجعية (`.env.example` و `SETUP_SALEHSAAS3.ps1` و `SETUP_SALEHSAAS3.bat` و `INSTALL_GUIDE.md` و `dev_studio/README.md`) لتقليل أي خلط بين المسارات الاختيارية والتشغيل الأساسي الحالي.
+- إضافة وسم Legacy/Optional صريح على إعدادات `mcpo` و`Qdrant` و`Dashboard` داخل قوالب البيئة وسكربتات الإعداد القديمة حتى لا تُفهم كخدمات تشغيل افتراضية حالية.
+- دفعة تحصين إضافية للملفات المتبقية عالية الخطورة: تحويل `MCP_SETUP_GUIDE.md` لصياغة تاريخية صريحة، وتشديد تنبيه `dev_studio/README.md`، وتوسيم `docs/guides/TECHNICAL_ROADMAP_ENGINEERING.md` كخارطة منتج غير حاكمة للتشغيل.
+- مواءمة سكربتات الإدخال القانونية (`auto_update_laws.py` و `scripts/uqn_scraper.py`) مع افتراضات التشغيل الحي عبر `CHROMA_COLLECTION=saleh_knowledge` و`EMBEDDING_MODEL=nomic-embed-text:latest` مع إبقاء قابلية override بالبيئة.
+- إضافة guard آمن في `apply_n8n_builder.ps1` لمنع محاولة تشغيل مسار `mcpo` عندما لا تكون الخدمة مفعلة، مع رسالة إرشادية بدل فشل مضلل.
+- تحصين سكربتات Legacy التقنية المتبقية: جعل `scripts/fix_vectordb2.js` لا يعمل إلا بتفعيل صريح عبر `ALLOW_LEGACY_ANYTHINGLLM_FIX=true`.
+- تقليل التضليل في `saleh_brain/agent.py` عبر إزالة افتراض مراقبة `AnythingLLM/Redis` افتراضيًا، واعتماد قائمة خدمات حرجة قابلة للتخصيص عبر `CRITICAL_SERVICES`.
+- توضيح مسار `scripts/reembed_qwen3.py` كمسار ترحيل اختياري قديم، مع دعم override للهدف عبر `TARGET_COLLECTION` و`TARGET_EMBED_MODEL`.
+- تشديد سكربت `scripts/windows/INSTALL_CONTINUE.bat` بإيقافه افتراضيًا ما لم يُفعَّل صراحة عبر `ALLOW_LEGACY_CODE_SERVER=true`، مع تحقق مسبق من تشغيل الحاوية `salehsaas_code_server` لتجنب تنفيذ مضلل.
+- تحسين صياغة `MCP_SETUP_GUIDE.md` عند مثال `Server URL` لتأكيد أنه مثال تاريخي لمسار اختياري وليس دلالة على خدمة مفعلة حاليًا.
+- تحسين `docs/guides/mep_summary_only_rag.md` لتوسيم `saleh_knowledge_qwen3` كمسار ترحيل legacy يتطلب override موثق، بدل فهمه كمسار افتراضي.
+- إضافة قسم مرجعي مباشر داخل `دليل السياسات والإجراءات - نظام الوكلاء الذكيين.md` يحدد بوضوح ملفات القرار التشغيلي الآمنة مقابل الملفات السياقية/الاختيارية.
+- مواءمة سكربتات الإعداد القديمة على Windows (`SETUP_SALEHSAAS3.ps1` و`SETUP_SALEHSAAS3.bat`) مع مسار التضمين الحي عبر `nomic-embed-text:latest` بدل سحب `qwen3-embedding` تلقائياً.
+- جعل تنزيل `qwen3-embedding:0.6b` في سكربتات الإعداد القديمة اختياريًا فقط عبر opt-in صريح: `ALLOW_LEGACY_QWEN3=true`.
+- تحسين رسالة النجاح في `INSTALL_SALEHSAAS.bat` لإزالة اللبس حول Profile Legacy وتثبيت قاعدة أن المرجع الأعلى هو `docker-compose.yml`.
+- تثبيت قرار تشغيلي جديد: `mcpo` مسار ملغى حاليًا في المشروع (Cancelled)، وليس مجرد خدمة غير مفعلة.
+- تحويل `apply_n8n_builder.ps1` إلى سكربت ملغى يتوقف مباشرة بدون تنفيذ خطوات MCPO.
+- تحديث الوثائق الحاكمة (`README.md`, `ARCHITECTURE.md`, `MCP_SETUP_GUIDE.md` حينها، `الحقائق التشغيلية الحاكمة - v0.1.md`, `دليل السياسات والإجراءات - نظام الوكلاء الذكيين.md`) لتوصيف `mcpo` كمسار ملغى.
+- تدقيق لغوي نهائي للملفات الحاكمة مع تثبيت صياغة `MCP_SETUP_GUIDE.md` كمرجع تاريخي غير قابل للتنفيذ في التشغيل الحالي.
+- إضافة توضيح تشغيلي مباشر في `SERVICES.md` بأن مسار `mcpo` ملغى وغير داخل خدمات التشغيل الحالية.
+- وسم `docker/mcpo/Dockerfile` كأثر تاريخي فقط لمنع تفسيره كمكوّن runtime نشط.
+- إضافة بطاقة مرجعية سريعة `RUNTIME_STATUS_CARD.md` لتحديد الخدمات الحية مقابل المسارات الملغاة/Legacy وتثبيت ترتيب فضّ التعارض بين الوثائق.
+- توحيد الصياغة الرسمية في الوثائق الحاكمة إلى: `mcpo` مسار/خدمة ملغاة في التشغيل الحالي.
+- إضافة توضيح مباشر للمسار البديل بعد إلغاء `mcpo`: الاعتماد على `pipelines` و`data_pipeline` في `README.md` ورسالة `apply_n8n_builder.ps1`.
+- تشديد `MCP_SETUP_GUIDE.md` بإضافة نص صريح أن البديل التشغيلي الحالي هو `pipelines` و`data_pipeline`، وتحويل المقدمة الإجرائية إلى صيغة تاريخية بالكامل.
+- إضافة قسم مستقل داخل `MCP_SETUP_GUIDE.md` بعنوان "المسار التشغيلي البديل الحالي" يوضح المنافذ والخدمات الفعلية (`Open WebUI`/`pipelines`/`data_pipeline`).
+- تعزيز `MCP_SETUP_GUIDE.md` بتحذير واضح أنه مرجع تاريخي غير تنفيذي، مع توجيه مباشر لقراءة `RUNTIME_STATUS_CARD.md` و`docker-compose.yml` قبل أي إجراء.
+- نقل ملف `MCP_SETUP_GUIDE.md` ومواد `mcpo` القديمة إلى حفظ تاريخي خارج المسار الحي، مع تحديث المراجع الحاكمة المرتبطة به.
+- توحيد توثيق المواد التاريخية الخاصة بـ `mcpo` داخل الملفات الحاكمة (`README.md` و`ARCHITECTURE.md` و`SERVICES.md`) لمنع أي لبس بين التشغيل الحالي والمحتوى التاريخي.
+- مواءمة ملفات المعرفة الداخلية (`dev_studio/knowledge/07_salehsaas_project.md` و`dev_studio/knowledge/08_openwebui_guide.md`) لتثبيت أن مواد `mcpo` أصبحت تاريخية وخارج الشجرة التشغيلية الحية.
+- استكمال المواءمة في الوثائق الحاكمة المرجعية: إضافة توضيح صريح بشأن خروج مواد `mcpo` من المسار التشغيلي الحي داخل `الحقائق التشغيلية الحاكمة - v0.1.md` و`دليل السياسات والإجراءات - نظام الوكلاء الذكيين.md`.
+- تحييد لبس `Code Server` في التوثيق الحي: تشديد `dev_studio/README.md` و`INSTALL_GUIDE.md` وخريطة `dev_studio/knowledge/07_salehsaas_project.md` لتأكيد أنه مسار تطوير اختياري منفصل وليس جزءًا من runtime الأساسي.
+- توحيد مرجع `AnythingLLM` في الوثائق الحية بحيث يبقى غير مفعّل حاليًا، ويُحال أي تقييم مستقبلي له حصريًا إلى `docs/guides/anythingllm_optional_return_assessment.md`.
+- مواءمة سكربتات Python المساعدة في الجذر مع مسار التضمين الحي: تحديث `run_scraper_now.py` و`test_rag.py` لاستخدام `EMBEDDING_MODEL` مع افتراضي `nomic-embed-text:latest`.
+- إضافة قفل أمان تدميري في `scripts/cleanup_chromadb.py` بحيث لا ينفذ إلا عند التفعيل الصريح `ALLOW_LEGACY_CHROMA_CLEANUP=true`.
+
+## [4.3.2] - 2026-03-30
+
+### توثيق الحوكمة
+- إضافة كود وثيقة مسودة لملف الأمانة: `DRAFT-GOV-CHARTER-001` بإصدار `v0.1`.
+- إضافة سجل تغييرات داخل ملف الأمانة لتتبع أي تعديل لاحق بشكل رسمي.
+
 ## [4.3.1] - 2026-03-03
 
 ### إصلاح mcpo - إضافة n8n_builder
@@ -88,7 +150,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [3.0.0] - 2026-03-01
 
 ### Added
-- **MCP Setup Guide** (`MCP_SETUP_GUIDE.md`): Complete guide for configuring MCP tools in Open WebUI.
+- **MCP Setup Guide** (`MCP_SETUP_GUIDE.md` حينها، ثم أُخرج لاحقًا من المسار الحي): Complete guide for configuring MCP tools in Open WebUI.
 - **saleh_legal_rag MCP Tool**: Semantic search over ingested legal documents.
 - **ollama_model_builder MCP Tool**: Manage Ollama models from chat.
 - **mcpo service**: MCP-to-OpenAPI proxy at port `8020`.

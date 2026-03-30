@@ -2,6 +2,10 @@
 
 خدمة هضم المعرفة التلقائي في منصة SaleH SaaS. تراقب مجلد `knowledge_inbox` وتعالج الملفات تلقائياً وتحفظها في قاعدة البيانات المتجهية ChromaDB.
 
+> ملاحظة تشغيلية: هذا الدليل يصف السلوك الحي لخدمة `file_watcher/watcher.py` كما هو مستخدم الآن. عند أي تعارض، يكون المرجع الأعلى هو الكود ثم `docker-compose.yml`.
+
+> توضيح مهم: `knowledge_processing/` ليس جزءًا من مسار النجاح الحي الحالي لهذه الخدمة، و`knowledge_archive/` ليس وجهة النجاح الخاصة بها؛ يبقى `knowledge_archive/` مستخدمًا في أرشفة مصادر أخرى مثل سحب UQN.
+
 ---
 
 ## كيفية الاستخدام
@@ -26,10 +30,8 @@
 ```
 D:\SaleHSaaS3\
   knowledge_inbox\        <- ضع ملفاتك هنا
-  knowledge_processing\   <- مؤقت أثناء المعالجة (تلقائي)
-  knowledge_archive\      <- الملفات الناجحة مرتبة بالتاريخ
-    2026-03-02\
-      120000_document.pdf
+  knowledge_processed\    <- الملفات الناجحة بعد الاستيعاب
+    20260302_120000_document.pdf
   knowledge_failed\       <- الملفات الفاشلة + تقرير خطأ
     20260302_120000_doc.pdf
     20260302_120000_doc_error.txt
@@ -42,12 +44,12 @@ D:\SaleHSaaS3\
 عند وضع ملف في `knowledge_inbox` تمر بهذه المراحل:
 
 1. **الاكتشاف** - تكتشف الخدمة الملف خلال 10 ثوانٍ
-2. **القفل** - ينتقل الملف إلى `knowledge_processing` لمنع المعالجة المكررة
+2. **التحقق** - تنتظر الخدمة حتى يثبت حجم الملف قبل إرساله للمعالجة
 3. **استخراج النص** - يُرسل إلى Apache Tika لاستخراج النص (يدعم العربية والإنجليزية)
-4. **التقطيع** - يُقسّم النص إلى أجزاء (400 كلمة مع تداخل 40 كلمة)
+4. **التقطيع** - يُقسّم النص داخل `data_pipeline`
 5. **الـ Embedding** - يُولّد Ollama تمثيلاً رقمياً لكل جزء
-6. **الحفظ** - يُحفظ في ChromaDB تحت collection `saleh_legal_knowledge`
-7. **الأرشفة** - ينتقل الملف إلى `knowledge_archive/YYYY-MM-DD/`
+6. **الحفظ** - يُحفظ في ChromaDB تحت collection `saleh_knowledge`
+7. **النقل** - ينتقل الملف الناجح إلى `knowledge_processed/`
 
 ---
 
@@ -64,27 +66,22 @@ D:\SaleHSaaS3\
 
 ---
 
-## مجلد knowledge_processing
+## مجلد knowledge_processed
 
-هذا المجلد **تلقائي** ولا يجب التعامل معه يدوياً.
-
-- الملفات تظهر هنا مؤقتاً أثناء المعالجة
-- عند إعادة تشغيل الخدمة، أي ملف عالق هنا يُعاد تلقائياً إلى `knowledge_inbox`
-
----
-
-## مجلد knowledge_archive
-
-الملفات الناجحة تُحفظ هنا مرتبة بالتاريخ:
+الملفات الناجحة تُنقل هنا مباشرة مع بادئة زمنية لمنع التعارض:
 
 ```
-knowledge_archive/
-  2026-03-02/
-    120000_document1.pdf    <- وقت المعالجة + اسم الملف الأصلي
-    143022_law_article.docx
-  2026-03-03/
-    ...
+knowledge_processed/
+  20260302_120000_document1.pdf
+  20260302_143022_law_article.docx
 ```
+
+هذا هو المسار النهائي الحي للملفات الناجحة في watcher الحالي.
+
+## ملاحظات على المجلدات المشابهة
+
+- `knowledge_processing/`: ليس مستخدمًا في المسار الحي الحالي المبني من `file_watcher/`، لذلك لا يجوز لوكيل أن يفترض أن الملف الناجح يمر به أو يستقر فيه.
+- `knowledge_archive/`: ليس وجهة نجاح watcher الحالي، لكنه ما زال مستخدمًا لأرشفة بعض المواد المرجعية، خصوصًا مخرجات `scripts/uqn_scraper.py` داخل `knowledge_archive/uqn/`.
 
 ---
 
@@ -94,12 +91,11 @@ knowledge_archive/
 
 | المتغير | القيمة الافتراضية | الوصف |
 |---|---|---|
-| `SCAN_INTERVAL` | `10` | الفترة بين كل مسح (ثانية) |
-| `CHUNK_SIZE` | `400` | حجم كل جزء (كلمة) |
-| `CHUNK_OVERLAP` | `40` | التداخل بين الأجزاء (كلمة) |
-| `MAX_RETRIES` | `3` | عدد محاولات إعادة الاتصال |
-| `EMBED_MODEL` | `nomic-embed-text:latest` | نموذج الـ Embedding |
-| `COLLECTION_NAME` | `saleh_legal_knowledge` | اسم الـ collection في ChromaDB |
+| `POLL_INTERVAL` | `10` | الفترة بين كل فحص (ثانية) |
+| `PIPELINE_URL` | `http://data_pipeline:8001/process-file/` | عنوان خدمة الاستيعاب |
+| `PROCESSED_DIR` | `/data/processed` | مسار الملفات الناجحة |
+| `FAILED_DIR` | `/data/failed` | مسار الملفات الفاشلة |
+| `EMBEDDING_MODEL` | `nomic-embed-text:latest` | نموذج الـ Embedding المستخدم في `data_pipeline` |
 
 ---
 
@@ -109,4 +105,4 @@ knowledge_archive/
 
 > "ما هي شروط عقد الإيجار في نظام الإيجار السعودي؟"
 
-أو عبر أداة MCP `saleh_legal_rag` في الـ chat.
+أما تكاملات MCP فهي مرجعية فقط ما لم تُفعّل خدمة مستقلة لها في التشغيل الحالي.

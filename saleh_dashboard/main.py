@@ -1,6 +1,9 @@
 """
 SaleH SaaS - Dashboard API
 واجهة مراقبة النظام + Chat API مع RAG (ChromaDB + Ollama)
+
+ملاحظة تشغيلية: هذا المشروع غير مفعل ضمن `docker-compose.yml` الحالي،
+وبعض افتراضاته ما زالت تاريخية مثل `AnythingLLM` واسم المضيف `salehsaas_pipeline`.
 """
 
 import os
@@ -160,7 +163,7 @@ async def get_stats():
 
 
 @app.get("/api/chromadb/search")
-async def search_chromadb(q: str, collection: str = "salehsaas_knowledge", n: int = 5):
+async def search_chromadb(q: str, collection: str = "saleh_knowledge", n: int = 10):
     """بحث دلالي في ChromaDB باستخدام Ollama embeddings"""
     try:
         # الحصول على embedding من Ollama
@@ -198,8 +201,8 @@ async def search_chromadb(q: str, collection: str = "salehsaas_knowledge", n: in
 
 class ChatRequest(BaseModel):
     message: str
-    collection: str = "salehsaas_knowledge"
-    n_context: int = 3
+    collection: str = "saleh_knowledge"
+    n_context: int = 10
 
 
 @app.post("/api/chat")
@@ -281,6 +284,34 @@ async def chat(req: ChatRequest):
 @app.get("/api/health")
 async def health():
     return {"status": "ok", "service": "SaleH Dashboard v2.0"}
+
+# ─── GRC API (المحرك القانوني والامتثال) ──────────────────────────────────────
+@app.get("/api/grc/assessment")
+async def run_grc_assessment():
+    """تشغيل فحص امتثال كامل وإرجاع النتائج"""
+    import sys
+    sys.path.append("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine")
+    try:
+        from grc_engine import GRC_Engine
+        engine = GRC_Engine()
+        mock_data = {
+            "system_logs": ["/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/logs/watcher.log"],
+            "databases": ["postgresql://salehsaas:salehsaas_pass@postgres:5432/salehsaas"],
+            "network_traffic": ["internal_scan"]
+        }
+        return engine.run_full_assessment(mock_data)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/api/grc/reports")
+async def get_grc_reports():
+    """الحصول على قائمة بآخر تقارير الامتثال المولدة"""
+    report_dir = Path("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine/reports")
+    if not report_dir.exists(): return []
+    reports = []
+    for f in sorted(report_dir.glob("GRC_Report_*.md"), key=lambda x: x.stat().st_mtime, reverse=True):
+        reports.append({"name": f.name, "created": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")})
+    return reports
 
 # ─── Glossary API ─────────────────────────────────────────────────────────────
 
@@ -679,3 +710,45 @@ async def get_translation_stats():
         "fallback": "llama3.1 (AI)",
         "categories": cats
     }
+
+# ─── GRC API (المحرك القانوني والامتثال) ──────────────────────────────────────
+import sys
+sys.path.append("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine")
+from grc_engine import GRC_Engine
+
+grc_engine = GRC_Engine()
+
+@app.get("/api/grc/assessment")
+async def run_grc_assessment():
+    """تشغيل فحص امتثال كامل وإرجاع النتائج"""
+    mock_data = {
+        "system_logs": ["/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/logs/watcher.log"],
+        "databases": ["postgresql://salehsaas:salehsaas_pass@postgres:5432/salehsaas"],
+        "network_traffic": ["internal_network_scan"]
+    }
+    results = grc_engine.run_full_assessment(mock_data)
+    return results
+
+@app.get("/api/grc/reports")
+async def get_grc_reports():
+    """الحصول على قائمة بآخر تقارير الامتثال المولدة"""
+    report_dir = Path("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine/reports")
+    if not report_dir.exists():
+        return []
+    
+    reports = []
+    for f in sorted(report_dir.glob("GRC_Report_*.md"), key=lambda x: x.stat().st_mtime, reverse=True):
+        reports.append({
+            "name": f.name,
+            "path": str(f),
+            "created": datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+        })
+    return reports
+
+@app.get("/api/grc/report/{report_name}")
+async def get_report_content(report_name: str):
+    """قراءة محتوى تقرير معين"""
+    report_path = Path("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine/reports") / report_name
+    if not report_path.exists():
+        return JSONResponse({"error": "Report not found"}, status_code=404)
+    return {"name": report_name, "content": report_path.read_text(encoding="utf-8")}

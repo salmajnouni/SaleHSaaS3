@@ -10,7 +10,7 @@ from mcp.server.fastmcp import FastMCP
 CHROMADB_URL = "http://chromadb:8000"
 OLLAMA_URL = "http://host.docker.internal:11434"
 EMBEDDING_MODEL = "nomic-embed-text:latest"
-COLLECTION_NAME = "saleh_legal_docs"
+COLLECTION_NAME = "saleh_knowledge"
 
 mcp = FastMCP("saleh-legal-rag")
 
@@ -29,13 +29,28 @@ def get_embedding(text: str):
     return None
 
 
-def search_chromadb(query: str, top_k: int = 5):
+def get_collection_id() -> str | None:
+    try:
+        resp = requests.get(f"{CHROMADB_URL}/api/v1/collections", timeout=10)
+        if resp.status_code == 200:
+            for collection in resp.json():
+                if collection.get("name") == COLLECTION_NAME:
+                    return collection.get("id")
+    except Exception:
+        pass
+    return None
+
+
+def search_chromadb(query: str, top_k: int = 10):
     embedding = get_embedding(query)
     if not embedding:
         return []
+    collection_id = get_collection_id()
+    if not collection_id:
+        return []
     try:
         resp = requests.post(
-            f"{CHROMADB_URL}/api/v1/collections/{COLLECTION_NAME}/query",
+            f"{CHROMADB_URL}/api/v1/collections/{collection_id}/query",
             json={
                 "query_embeddings": [embedding],
                 "n_results": top_k,
@@ -60,12 +75,12 @@ def search_chromadb(query: str, top_k: int = 5):
 
 
 @mcp.tool()
-def search_saudi_legal_documents(query: str, top_k: int = 5) -> str:
+def search_saudi_legal_documents(query: str, top_k: int = 10) -> str:
     """البحث في قاعدة المعرفة القانونية السعودية (نظام العمل، نظام الشركات، نظام التجارة، وغيرها)
 
     Args:
         query: السؤال أو الموضوع القانوني للبحث عنه
-        top_k: عدد النتائج المطلوبة (الافتراضي 5)
+        top_k: عدد النتائج المطلوبة (الافتراضي 10)
     """
     if not query:
         return "يرجى تحديد موضوع البحث."

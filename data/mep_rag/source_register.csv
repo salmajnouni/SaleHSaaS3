@@ -1,0 +1,6 @@
+source_id,title_ar,title_en,publisher,code_family,code_number,edition,publication_date,effective_date,language,license_status,ingest_scope,source_url,local_file_path,owner_notes,approval_by,approval_date
+SBC-501-BASE,SBC 501 Mechanical Code,Saudi Mechanical Code (SBC 501),Saudi Building Code National Committee,SBC,501,TBD,TBD,TBD,ar+en,pending,full_text,TBD,,Primary HVAC reference,,
+SBC-701-BASE,SBC 701 Plumbing Code,Saudi Plumbing Code (SBC 701),Saudi Building Code National Committee,SBC,701,TBD,TBD,TBD,ar+en,pending,full_text,TBD,,Primary plumbing reference,,
+SBC-801-BASE,SBC 801 Fire Code,Saudi Fire Code (SBC 801),Saudi Building Code National Committee,SBC,801,TBD,TBD,TBD,ar+en,pending,full_text,TBD,,Primary fire protection reference,,
+ASHRAE-62.1,ASHRAE 62.1,ASHRAE 62.1,ASHRAE,ASHRAE,62.1,TBD,TBD,TBD,en,pending,summary_only,TBD,,Check license terms before full text ingestion,,
+NFPA-13,NFPA 13,NFPA 13,NFPA,NFPA,13,TBD,TBD,TBD,en,pending,summary_only,TBD,,Check license terms before full text ingestion,,

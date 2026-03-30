@@ -1,0 +1,179 @@
+searxng           | 2026-03-24 18:29:59.990 | SearXNG 2026.3.18-3810dc9d1
+searxng           | 2026-03-24 18:30:00.055 | Updating certificates in /etc/ssl/certs...
+postgres          | 2026-03-24 18:30:00.135 | 
+postgres          | 2026-03-24 18:30:00.135 | PostgreSQL Database directory appears to contain a database; Skipping initialization
+postgres          | 2026-03-24 18:30:00.135 | 
+postgres          | 2026-03-24 18:30:00.276 | 2026-03-24 15:30:00.276 UTC [1] LOG:  starting PostgreSQL 16.13 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+postgres          | 2026-03-24 18:30:00.276 | 2026-03-24 15:30:00.276 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+postgres          | 2026-03-24 18:30:00.276 | 2026-03-24 15:30:00.276 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+postgres          | 2026-03-24 18:30:00.286 | 2026-03-24 15:30:00.286 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+postgres          | 2026-03-24 18:30:00.299 | 2026-03-24 15:30:00.299 UTC [29] LOG:  database system was shut down at 2026-03-24 15:28:18 UTC
+postgres          | 2026-03-24 18:30:00.315 | 2026-03-24 15:30:00.315 UTC [1] LOG:  database system is ready to accept connections
+open-terminal     | 2026-03-24 18:30:00.687 | 
+open-terminal     | 2026-03-24 18:30:00.687 |    ____                    _____                   _             _
+open-terminal     | 2026-03-24 18:30:00.687 |   / __ \                  |_   _|                 (_)           | |
+open-terminal     | 2026-03-24 18:30:00.687 |  | |  | |_ __   ___ _ __   | | ___ _ __ _ __ ___  _ _ __   __ _| |
+open-terminal     | 2026-03-24 18:30:00.687 |  | |  | | '_ \ / _ | '_ \  | |/ _ | '__| '_ ` _ \| | '_ \ / _` | |
+open-terminal     | 2026-03-24 18:30:00.687 |  | |__| | |_) |  __| | | | | |  __| |  | | | | | | | | | | (_| | |
+open-terminal     | 2026-03-24 18:30:00.687 |   \____/| .__/ \___|_| |_| \_/\___|_|  |_| |_| |_|_|_| |_|\__,_|_|
+open-terminal     | 2026-03-24 18:30:00.687 |         | |
+open-terminal     | 2026-03-24 18:30:00.687 |         |_|
+open-terminal     | 2026-03-24 18:30:00.687 | 
+open-terminal     | 2026-03-24 18:30:00.687 |   Local:    http://localhost:8000
+open-terminal     | 2026-03-24 18:30:00.687 |   Network:  http://172.20.0.80:8000
+open-terminal     | 2026-03-24 18:30:00.687 | 
+open-terminal     | 2026-03-24 18:30:00.687 |   Warning: Listening on all network interfaces.
+open-terminal     | 2026-03-24 18:30:00.687 |   Use --host 127.0.0.1 to restrict to this machine.
+open-terminal     | 2026-03-24 18:30:00.687 | 
+searxng           | 2026-03-24 18:30:00.798 | 0 added, 0 removed; done.
+searxng           | 2026-03-24 18:30:00.798 | Running hooks in /etc/ca-certificates/update.d...
+searxng           | 2026-03-24 18:30:00.800 | done.
+knowledge_watcher | 2026-03-24 18:30:01.002 | 🔍 SaleH Native Watcher v5.3 Started
+searxng           | 2026-03-24 18:30:01.034 | [INFO] Starting granian (main PID: 1)
+searxng           | 2026-03-24 18:30:01.036 | [INFO] Listening at: http://:::8080
+searxng           | 2026-03-24 18:30:01.040 | [INFO] Spawning worker-1 with PID: 924
+tika              | 2026-03-24 18:30:01.463 | INFO  [main] 15:30:01,461 org.apache.tika.server.core.TikaServerProcess Starting Apache Tika 3.2.3 server
+browserless       | 2026-03-24 18:30:01.609 | 2026-03-24T15:30:01.609Z browserless:server Using configuration: 
+browserless       | 2026-03-24 18:30:01.610 | 2026-03-24T15:30:01.610Z browserless:server {
+browserless       | 2026-03-24 18:30:01.610 |   CONNECTION_TIMEOUT: 60000,
+browserless       | 2026-03-24 18:30:01.610 |   MAX_CONCURRENT_SESSIONS: 10,
+browserless       | 2026-03-24 18:30:01.610 |   QUEUE_LENGTH: 10,
+browserless       | 2026-03-24 18:30:01.610 |   SINGLE_RUN: false,
+browserless       | 2026-03-24 18:30:01.610 |   CHROME_REFRESH_TIME: 1800000,
+browserless       | 2026-03-24 18:30:01.610 |   KEEP_ALIVE: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_BLOCK_ADS: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_HEADLESS: 'new',
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_LAUNCH_ARGS: [],
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_IGNORE_DEFAULT_ARGS: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_IGNORE_HTTPS_ERRORS: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_DUMPIO: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_STEALTH: false,
+browserless       | 2026-03-24 18:30:01.610 |   DEFAULT_USER_DATA_DIR: undefined,
+browserless       | 2026-03-24 18:30:01.610 |   PREBOOT_CHROME: false,
+browserless       | 2026-03-24 18:30:01.610 |   PREBOOT_QUANTITY: 0,
+browserless       | 2026-03-24 18:30:01.610 |   PRINT_GET_STARTED_LINKS: true,
+browserless       | 2026-03-24 18:30:01.610 |   PRINT_NETWORK_INFO: true,
+browserless       | 2026-03-24 18:30:01.610 |   DEBUG: 'browserless*',
+browserless       | 2026-03-24 18:30:01.610 |   DISABLED_FEATURES: [],
+browserless       | 2026-03-24 18:30:01.610 |   ENABLE_CORS: false,
+browserless       | 2026-03-24 18:30:01.610 |   ENABLE_API_GET: false,
+browserless       | 2026-03-24 18:30:01.610 |   TOKEN: null,
+browserless       | 2026-03-24 18:30:01.610 |   ENABLE_HEAP_DUMP: false,
+browserless       | 2026-03-24 18:30:01.610 |   ALLOW_FILE_PROTOCOL: false,
+browserless       | 2026-03-24 18:30:01.610 |   DISABLE_AUTO_SET_DOWNLOAD_BEHAVIOR: false,
+browserless       | 2026-03-24 18:30:01.610 |   FUNCTION_BUILT_INS: [ 'url' ],
+browserless       | 2026-03-24 18:30:01.610 |   FUNCTION_ENV_VARS: [],
+browserless       | 2026-03-24 18:30:01.610 |   FUNCTION_ENABLE_INCOGNITO_MODE: false,
+browserless       | 2026-03-24 18:30:01.610 |   FUNCTION_EXTERNALS: [ 'lighthouse', 'node-pdftk', 'sharp' ],
+browserless       | 2026-03-24 18:30:01.610 |   WORKSPACE_DIR: '/usr/src/app/workspace',
+browserless       | 2026-03-24 18:30:01.610 |   WORKSPACE_DELETE_EXPIRED: false,
+browserless       | 2026-03-24 18:30:01.610 |   WORKSPACE_EXPIRE_DAYS: 30,
+browserless       | 2026-03-24 18:30:01.610 |   FAILED_HEALTH_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   QUEUE_ALERT_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   REJECT_ALERT_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   TIMEOUT_ALERT_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   ERROR_ALERT_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   SESSION_CHECK_FAIL_URL: null,
+browserless       | 2026-03-24 18:30:01.610 |   PRE_REQUEST_HEALTH_CHECK: false,
+browserless       | 2026-03-24 18:30:01.610 |   EXIT_ON_HEALTH_FAILURE: false,
+browserless       | 2026-03-24 18:30:01.610 |   MAX_CPU_PERCENT: 99,
+browserless       | 2026-03-24 18:30:01.610 |   MAX_MEMORY_PERCENT: 99,
+browserless       | 2026-03-24 18:30:01.610 |   METRICS_JSON_PATH: null,
+browserless       | 2026-03-24 18:30:01.610 |   HOST: '0.0.0.0',
+browserless       | 2026-03-24 18:30:01.610 |   PORT: 3000,
+browserless       | 2026-03-24 18:30:01.610 |   SOCKET_CLOSE_METHOD: 'http',
+browserless       | 2026-03-24 18:30:01.610 |   PROXY_URL: undefined,
+browserless       | 2026-03-24 18:30:01.610 |   MAX_PAYLOAD_SIZE: '5mb'
+browserless       | 2026-03-24 18:30:01.610 | }
+browserless       | 2026-03-24 18:30:01.611 | 2026-03-24T15:30:01.611Z browserless:server 
+browserless       | 2026-03-24 18:30:01.611 | 
+browserless       | 2026-03-24 18:30:01.611 | Running on port 3000
+browserless       | 2026-03-24 18:30:01.611 | 	Localhost	 ws:localhost:3000
+browserless       | 2026-03-24 18:30:01.611 | 	Local network	 ws:172.20.0.70:3000
+browserless       | 2026-03-24 18:30:01.611 | 2026-03-24T15:30:01.611Z browserless:server 
+browserless       | 2026-03-24 18:30:01.611 | Get started at	 https://www.browserless.io/docs/start
+browserless       | 2026-03-24 18:30:01.611 | Get a license at	 https://www.browserless.io/sign-up?type=commercial
+browserless       | 2026-03-24 18:30:01.611 | Get support at	 https://www.browserless.io/contact
+browserless       | 2026-03-24 18:30:01.611 | 
+browserless       | 2026-03-24 18:30:01.611 | Happy coding!
+browserless       | 2026-03-24 18:30:01.611 | 
+tika              | 2026-03-24 18:30:01.900 | INFO  [main] 15:30:01,899 org.apache.tika.server.core.TikaServerProcess loading resource from SPI: class org.apache.tika.server.standard.resource.XMPMetadataResource
+tika              | 2026-03-24 18:30:02.038 | INFO  [main] 15:30:02,038 org.apache.cxf.endpoint.ServerImpl Setting the server's publish address to be http://0.0.0.0:9998/
+tika              | 2026-03-24 18:30:02.123 | INFO  [main] 15:30:02,123 org.eclipse.jetty.server.Server jetty-11.0.26; built: 2025-08-14T18:03:14.457Z; git: 7559873b6e46eea7c2c6da2b58327ea2ecf941f4; jvm 21.0.8+9-Ubuntu-0ubuntu125.04.1
+tika              | 2026-03-24 18:30:02.183 | INFO  [main] 15:30:02,182 org.eclipse.jetty.server.AbstractConnector Started ServerConnector@2fb69ff6{HTTP/1.1, (http/1.1)}{0.0.0.0:9998}
+tika              | 2026-03-24 18:30:02.186 | INFO  [main] 15:30:02,186 org.eclipse.jetty.server.Server Started Server@7ea4d397{STARTING}[11.0.26,sto=0] @1226ms
+tika              | 2026-03-24 18:30:02.202 | INFO  [main] 15:30:02,202 org.eclipse.jetty.server.handler.ContextHandler Started o.a.c.t.h.JettyContextHandler@72ab05ed{/,null,AVAILABLE}
+tika              | 2026-03-24 18:30:02.215 | INFO  [main] 15:30:02,215 org.apache.tika.server.core.TikaServerProcess Started Apache Tika server 597774c8-aa63-469c-8e2f-cb659f51d43c at http://0.0.0.0:9998/
+open-terminal     | 2026-03-24 18:30:02.498 | INFO:     Started server process [7]
+open-terminal     | 2026-03-24 18:30:02.498 | INFO:     Waiting for application startup.
+open-terminal     | 2026-03-24 18:30:02.498 | INFO:     Application startup complete.
+open-terminal     | 2026-03-24 18:30:02.501 | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+searxng           | 2026-03-24 18:30:03.179 | [INFO] Started worker-1
+n8n               | 2026-03-24 18:30:13.018 | Initializing n8n process
+n8n               | 2026-03-24 18:30:13.439 | n8n ready on ::, port 5678
+n8n               | 2026-03-24 18:30:13.491 | n8n Task Broker ready on 127.0.0.1, port 5679
+n8n               | 2026-03-24 18:30:13.518 | Failed to start Python task runner in internal mode. because Python 3 is missing from this system. Launching a Python runner in internal mode is intended only for debugging and is not recommended for production. Users are encouraged to deploy in external mode. See: https://docs.n8n.io/hosting/configuration/task-runners/#setting-up-external-mode
+n8n               | 2026-03-24 18:30:13.542 | [license SDK] Skipping renewal on init: license cert is not initialized
+n8n               | 2026-03-24 18:30:14.407 | Registered runner "JS Task Runner" (jA5-fnnzJ-r_iYhyx-4ui) 
+n8n               | 2026-03-24 18:30:14.721 | initializing ChatHub event relay...
+n8n               | 2026-03-24 18:30:15.565 | Version: 2.12.3
+n8n               | 2026-03-24 18:30:15.566 | Building workflow dependency index...
+n8n               | 2026-03-24 18:30:15.604 | Finished building workflow dependency index. Processed 0 draft workflows, 0 published workflows.
+n8n               | 2026-03-24 18:30:15.604 | 
+n8n               | 2026-03-24 18:30:15.604 | Editor is now accessible via:
+n8n               | 2026-03-24 18:30:15.604 | http://localhost:5678
+open-terminal     | 2026-03-24 18:30:27.819 | INFO:     172.20.0.1:33018 - "GET / HTTP/1.1" 404 Not Found
+postgres          | 2026-03-24 18:35:00.291 | 2026-03-24 15:35:00.291 UTC [27] LOG:  checkpoint starting: time
+postgres          | 2026-03-24 18:35:00.656 | 2026-03-24 15:35:00.655 UTC [27] LOG:  checkpoint complete: wrote 6 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.312 s, sync=0.023 s, total=0.365 s; sync files=5, longest=0.017 s, average=0.005 s; distance=7 kB, estimate=7 kB; lsn=0/22EBB60, redo lsn=0/22EBB28
+browserless       | 2026-03-24 18:35:01.618 | 2026-03-24T15:35:01.618Z browserless:server Health check stats: CPU 0, MEM: 4%,
+browserless       | 2026-03-24 18:35:01.618 | 2026-03-24T15:35:01.618Z browserless:server Current period usage: {"date":1774366201608,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 18:40:01.581 | 2026-03-24T15:40:01.581Z browserless:server Health check stats: CPU 4%,0 MEM: 4%,4%
+browserless       | 2026-03-24 18:40:01.582 | 2026-03-24T15:40:01.581Z browserless:server Current period usage: {"date":1774366501618,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 18:45:01.562 | 2026-03-24T15:45:01.562Z browserless:server Health check stats: CPU 4%,4% MEM: 3%,4%
+browserless       | 2026-03-24 18:45:01.562 | 2026-03-24T15:45:01.562Z browserless:server Current period usage: {"date":1774366801581,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 18:50:01.542 | 2026-03-24T15:50:01.542Z browserless:server Health check stats: CPU 3%,4% MEM: 4%,3%
+browserless       | 2026-03-24 18:50:01.542 | 2026-03-24T15:50:01.542Z browserless:server Current period usage: {"date":1774367101562,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:08:59.566 | 2026-03-24T16:08:59.566Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:08:59.566 | 2026-03-24T16:08:59.566Z browserless:server Current period usage: {"date":1774367401542,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:13:59.550 | 2026-03-24T16:13:59.550Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:13:59.550 | 2026-03-24T16:13:59.550Z browserless:server Current period usage: {"date":1774368539566,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:18:59.551 | 2026-03-24T16:18:59.549Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:18:59.551 | 2026-03-24T16:18:59.550Z browserless:server Current period usage: {"date":1774368839550,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:23:59.521 | 2026-03-24T16:23:59.520Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:23:59.521 | 2026-03-24T16:23:59.520Z browserless:server Current period usage: {"date":1774369139549,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:28:59.504 | 2026-03-24T16:28:59.504Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:28:59.504 | 2026-03-24T16:28:59.504Z browserless:server Current period usage: {"date":1774369439520,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+n8n               | 2026-03-24 19:30:48.081 | (node:7) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+n8n               | 2026-03-24 19:30:48.081 | (Use `node --trace-deprecation ...` to show where the warning was created)
+n8n               | 2026-03-24 19:30:48.818 | (node:7) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+n8n               | 2026-03-24 19:30:52.430 | (node:7) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+postgres          | 2026-03-24 19:33:59.282 | 2026-03-24 16:33:59.282 UTC [27] LOG:  checkpoint starting: time
+browserless       | 2026-03-24 19:33:59.488 | 2026-03-24T16:33:59.487Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:33:59.488 | 2026-03-24T16:33:59.487Z browserless:server Current period usage: {"date":1774369739503,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+postgres          | 2026-03-24 19:34:02.963 | 2026-03-24 16:34:02.963 UTC [27] LOG:  checkpoint complete: wrote 37 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.625 s, sync=0.021 s, total=3.681 s; sync files=17, longest=0.008 s, average=0.002 s; distance=178 kB, estimate=178 kB; lsn=0/2318620, redo lsn=0/23185E8
+browserless       | 2026-03-24 19:38:59.459 | 2026-03-24T16:38:59.459Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:38:59.459 | 2026-03-24T16:38:59.459Z browserless:server Current period usage: {"date":1774370039487,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-24 19:43:59.864 | 2026-03-24T16:43:59.853Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-24 19:43:59.866 | 2026-03-24T16:43:59.866Z browserless:server Current period usage: {"date":1774370339459,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 00:50:54.237 | 2026-03-24T21:50:54.233Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 00:50:54.238 | 2026-03-24T21:50:54.237Z browserless:server Current period usage: {"date":1774370639846,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+postgres          | 2026-03-25 00:50:54.800 | 2026-03-24 21:50:54.799 UTC [27] LOG:  checkpoint starting: time
+postgres          | 2026-03-25 00:50:59.478 | 2026-03-24 21:50:59.478 UTC [27] LOG:  checkpoint complete: wrote 46 buffers (0.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=4.616 s, sync=0.019 s, total=4.680 s; sync files=18, longest=0.005 s, average=0.002 s; distance=236 kB, estimate=236 kB; lsn=0/2353950, redo lsn=0/2353918
+browserless       | 2026-03-25 00:55:54.101 | 2026-03-24T21:55:54.100Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 00:55:54.102 | 2026-03-24T21:55:54.101Z browserless:server Current period usage: {"date":1774389054230,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:00:54.123 | 2026-03-24T22:00:54.121Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 01:00:54.123 | 2026-03-24T22:00:54.123Z browserless:server Current period usage: {"date":1774389354100,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:05:54.038 | 2026-03-24T22:05:54.037Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 01:05:54.039 | 2026-03-24T22:05:54.037Z browserless:server Current period usage: {"date":1774389654119,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:10:54.019 | 2026-03-24T22:10:54.019Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 01:10:54.019 | 2026-03-24T22:10:54.019Z browserless:server Current period usage: {"date":1774389954037,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:15:53.992 | 2026-03-24T22:15:53.991Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 01:15:53.992 | 2026-03-24T22:15:53.991Z browserless:server Current period usage: {"date":1774390254019,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:20:53.973 | 2026-03-24T22:20:53.973Z browserless:server Health check stats: CPU 3%,3% MEM: 3%,4%
+browserless       | 2026-03-25 01:20:53.973 | 2026-03-24T22:20:53.973Z browserless:server Current period usage: {"date":1774390553989,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:25:53.955 | 2026-03-24T22:25:53.954Z browserless:server Health check stats: CPU 4%,3% MEM: 4%,3%
+browserless       | 2026-03-25 01:25:53.955 | 2026-03-24T22:25:53.954Z browserless:server Current period usage: {"date":1774390853973,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:30:53.961 | 2026-03-24T22:30:53.961Z browserless:server Health check stats: CPU 3%,4% MEM: 4%,4%
+browserless       | 2026-03-25 01:30:53.961 | 2026-03-24T22:30:53.961Z browserless:server Current period usage: {"date":1774391153954,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}
+browserless       | 2026-03-25 01:35:53.927 | 2026-03-24T22:35:53.926Z browserless:server Health check stats: CPU 3%,3% MEM: 4%,4%
+browserless       | 2026-03-25 01:35:53.927 | 2026-03-24T22:35:53.926Z browserless:server Current period usage: {"date":1774391453960,"error":0,"rejected":0,"successful":0,"timedout":0,"totalTime":0,"maxTime":0,"minTime":0,"meanTime":0,"maxConcurrent":0,"units":0}

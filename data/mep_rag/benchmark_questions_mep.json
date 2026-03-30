@@ -1,0 +1,191 @@
+{
+  "version": "1.0",
+  "created_at": "2026-03-28",
+  "domains": {
+    "hvac": 8,
+    "plumbing": 6,
+    "fire": 6
+  },
+  "questions": [
+    {
+      "id": "HVAC-01",
+      "domain": "hvac",
+      "question_ar": "ما متطلبات الحد الادنى للتهوية في المناطق المأهولة للمباني المكتبية؟",
+      "expected_source": "SBC-501",
+      "expected_answer_shape": "requirement + clause citation + unit",
+      "must_cite_clause": true,
+      "pass_criteria": "Cites correct code family and clause, includes units and applicability"
+    },
+    {
+      "id": "HVAC-02",
+      "domain": "hvac",
+      "question_ar": "كيف يتم اختيار سعة وحدة مناولة الهواء لمبنى إداري متوسط؟",
+      "expected_source": "SBC-501 + ASHRAE",
+      "expected_answer_shape": "inputs -> formula/method -> result",
+      "must_cite_clause": true,
+      "pass_criteria": "Explains method and assumptions with references"
+    },
+    {
+      "id": "HVAC-03",
+      "domain": "hvac",
+      "question_ar": "ما حدود سرعة الهواء الموصى بها في الدكت الرئيسي والفرعي؟",
+      "expected_source": "SBC-501",
+      "expected_answer_shape": "table-style guidance + citation",
+      "must_cite_clause": true,
+      "pass_criteria": "Provides practical ranges and code-grounded references"
+    },
+    {
+      "id": "HVAC-04",
+      "domain": "hvac",
+      "question_ar": "ما اشتراطات العزل الحراري للدكتات في المناطق الحارة؟",
+      "expected_source": "SBC-501",
+      "expected_answer_shape": "requirements list + material notes",
+      "must_cite_clause": true,
+      "pass_criteria": "Includes condition-based requirements and citation"
+    },
+    {
+      "id": "HVAC-05",
+      "domain": "hvac",
+      "question_ar": "كيف يتم التعامل مع متطلبات جودة الهواء الداخلي في العيادات؟",
+      "expected_source": "SBC-501 + ASHRAE 62.1",
+      "expected_answer_shape": "occupancy-specific requirements",
+      "must_cite_clause": true,
+      "pass_criteria": "Identifies occupancy class and ventilation implications"
+    },
+    {
+      "id": "HVAC-06",
+      "domain": "hvac",
+      "question_ar": "ما متطلبات موقع مداخل الهواء الخارجي بالنسبة لمصادر التلوث؟",
+      "expected_source": "SBC-501",
+      "expected_answer_shape": "clearances + placement rules",
+      "must_cite_clause": true,
+      "pass_criteria": "Mentions spacing/placement constraints and exceptions"
+    },
+    {
+      "id": "HVAC-07",
+      "domain": "hvac",
+      "question_ar": "ما آلية التحقق من الضغط الساكن لتوازن الشبكة؟",
+      "expected_source": "SBC-501/engineering procedure",
+      "expected_answer_shape": "procedure steps + equation references",
+      "must_cite_clause": true,
+      "pass_criteria": "Provides stepwise verification method"
+    },
+    {
+      "id": "HVAC-08",
+      "domain": "hvac",
+      "question_ar": "ما المتطلبات الخاصة بغرف المعدات الميكانيكية من ناحية التهوية والصيانة؟",
+      "expected_source": "SBC-501",
+      "expected_answer_shape": "checklist",
+      "must_cite_clause": true,
+      "pass_criteria": "Outputs an actionable checklist with references"
+    },
+    {
+      "id": "PLB-01",
+      "domain": "plumbing",
+      "question_ar": "كيف يتم حساب وحدات التصريف (DFU) لمبنى سكني متعدد الشقق؟",
+      "expected_source": "SBC-701",
+      "expected_answer_shape": "fixture count -> DFU mapping -> total",
+      "must_cite_clause": true,
+      "pass_criteria": "Shows mapping logic and final total"
+    },
+    {
+      "id": "PLB-02",
+      "domain": "plumbing",
+      "question_ar": "ما اشتراطات أقطار مواسير الصرف الرئيسية والفرعية؟",
+      "expected_source": "SBC-701",
+      "expected_answer_shape": "diameter rules + conditions",
+      "must_cite_clause": true,
+      "pass_criteria": "Includes branch/main differentiation"
+    },
+    {
+      "id": "PLB-03",
+      "domain": "plumbing",
+      "question_ar": "ما الانحدار الأدنى المقبول لخطوط الصرف الأفقية؟",
+      "expected_source": "SBC-701",
+      "expected_answer_shape": "slope requirements by size",
+      "must_cite_clause": true,
+      "pass_criteria": "Provides slope with unit and scope"
+    },
+    {
+      "id": "PLB-04",
+      "domain": "plumbing",
+      "question_ar": "ما شروط التهوية الصحية (Venting) لمنع سحب السيفونات؟",
+      "expected_source": "SBC-701",
+      "expected_answer_shape": "rules + exceptions",
+      "must_cite_clause": true,
+      "pass_criteria": "Mentions trap protection and vent arrangement"
+    },
+    {
+      "id": "PLB-05",
+      "domain": "plumbing",
+      "question_ar": "ما المسافات المسموحة بين نقاط التنظيف (Cleanouts)؟",
+      "expected_source": "SBC-701",
+      "expected_answer_shape": "distance criteria",
+      "must_cite_clause": true,
+      "pass_criteria": "Distance limits are presented with context"
+    },
+    {
+      "id": "PLB-06",
+      "domain": "plumbing",
+      "question_ar": "كيف يتم تحديد سعة خزان المياه بناء على الإشغال؟",
+      "expected_source": "SBC-701/local authority guidance",
+      "expected_answer_shape": "assumptions + demand calculation",
+      "must_cite_clause": true,
+      "pass_criteria": "Transparent assumptions and code-grounded method"
+    },
+    {
+      "id": "FIRE-01",
+      "domain": "fire",
+      "question_ar": "كيف يتم تصنيف الخطورة (Occupancy Hazard) لمبنى تجاري؟",
+      "expected_source": "SBC-801 + NFPA 13",
+      "expected_answer_shape": "classification decision path",
+      "must_cite_clause": true,
+      "pass_criteria": "Clear logic and cited category basis"
+    },
+    {
+      "id": "FIRE-02",
+      "domain": "fire",
+      "question_ar": "ما كثافة الرش المطلوبة ومساحة التشغيل التصميمية؟",
+      "expected_source": "SBC-801 + NFPA 13",
+      "expected_answer_shape": "density/area selection method",
+      "must_cite_clause": true,
+      "pass_criteria": "Correct unit handling and hazard-dependent selection"
+    },
+    {
+      "id": "FIRE-03",
+      "domain": "fire",
+      "question_ar": "ما متطلبات تغذية شبكة الإطفاء بالمياه ومدة التخزين؟",
+      "expected_source": "SBC-801 + NFPA",
+      "expected_answer_shape": "supply options + storage criteria",
+      "must_cite_clause": true,
+      "pass_criteria": "Lists acceptable supply configurations"
+    },
+    {
+      "id": "FIRE-04",
+      "domain": "fire",
+      "question_ar": "كيف يتم اختيار قطر الناهضات (Standpipes) ومتطلبات الضغط؟",
+      "expected_source": "SBC-801 + NFPA 14",
+      "expected_answer_shape": "sizing + pressure check",
+      "must_cite_clause": true,
+      "pass_criteria": "Explains both hydraulic and code conditions"
+    },
+    {
+      "id": "FIRE-05",
+      "domain": "fire",
+      "question_ar": "ما المسافات القصوى بين الرشاشات وحدود التباعد من الجدران؟",
+      "expected_source": "NFPA 13 / SBC-801",
+      "expected_answer_shape": "spacing rules",
+      "must_cite_clause": true,
+      "pass_criteria": "Provides spacing limits and applicability"
+    },
+    {
+      "id": "FIRE-06",
+      "domain": "fire",
+      "question_ar": "ما متطلبات اختبار واعتماد شبكة الحريق قبل التسليم؟",
+      "expected_source": "SBC-801 + NFPA procedures",
+      "expected_answer_shape": "commissioning checklist",
+      "must_cite_clause": true,
+      "pass_criteria": "Checklist includes testing sequence and records"
+    }
+  ]
+}

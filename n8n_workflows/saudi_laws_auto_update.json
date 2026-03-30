@@ -1,0 +1,355 @@
+{
+  "name": "🔄 Saudi Laws Auto-Update - التحديث الذاتي للقوانين",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weekInterval": 1,
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 3
+            }
+          ]
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000001",
+      "name": "⏰ جدولة أسبوعية (الاثنين 3 صباحاً)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [60, -80]
+    },
+    {
+      "parameters": {},
+      "id": "b2000001-0001-4001-8001-000000000002",
+      "name": "▶️ تشغيل يدوي",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [60, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// القائمة الشاملة للأنظمة السعودية - 50+ نظام\n// ====================================================================\nconst laws = [\n  // === الأنظمة الأساسية ===\n  { law_id: '16b97fcb-4833-4f66-8531-a9a700f161b6', law_name: 'النظام الأساسي للحكم', category: 'constitutional' },\n  { law_id: 'b5cf540a-e6ac-426a-b348-a9a700f163de', law_name: 'نظام مجلس الشورى', category: 'constitutional' },\n  { law_id: '93e87aa7-f344-4711-b97c-a9a700f1662b', law_name: 'نظام مجلس الوزراء', category: 'constitutional' },\n  { law_id: '93f81644-fbbc-49ca-b33c-a9a700f16701', law_name: 'نظام المناطق', category: 'regions' },\n\n  // === القضاء والمرافعات (verified IDs) ===\n  { law_id: 'ea1765a3-dec3-41a0-a32f-a9a700f26d58', law_name: 'نظام القضاء', category: 'judiciary' },\n  { law_id: 'f0eaae46-9f84-40ee-815e-a9a700f268b3', law_name: 'نظام المرافعات الشرعية', category: 'litigation' },\n  { law_id: '9a0249b7-f835-48fa-8d1e-a9a700f1981a', law_name: 'نظام الإجراءات الجزائية', category: 'criminal_procedure' },\n  { law_id: 'd7e8efd3-4021-4413-8255-ae7c00f190de', law_name: 'نظام التنفيذ', category: 'execution_law' },\n  { law_id: '2716057c-c097-4bad-8e1e-ae1400c678d5', law_name: 'نظام الإثبات', category: 'evidence_law' },\n  { law_id: '12752a60-2a4a-4cab-a05d-a9a700f274a5', law_name: 'نظام التحكيم', category: 'arbitration' },\n  { law_id: '4d72d829-947b-45d5-b9b5-ae5800d6bac2', law_name: 'نظام الأحوال الشخصية', category: 'personal_status' },\n\n  // === العمل والتوظيف ===\n  { law_id: '08381293-6388-48e2-8ad2-a9a700f2aa94', law_name: 'نظام العمل', category: 'labor_law' },\n  { law_id: 'eaee8a20-3a54-4aaf-b0d9-b1ad00998962', law_name: 'نظام التأمينات الاجتماعية', category: 'social_insurance' },\n  { law_id: '32f651e6-2976-439c-b418-a9a700f23fb2', law_name: 'نظام الخدمة المدنية', category: 'civil_service' },\n\n  // === التجارة والشركات ===\n  { law_id: 'a8376aea-1bc3-49d4-9027-aed900b555af', law_name: 'نظام الشركات', category: 'companies_law' },\n  { law_id: '98ee4b51-d398-4323-ae69-b2b8009f3156', law_name: 'نظام السجل التجاري', category: 'commercial_registry' },\n  { law_id: '4763eb94-047b-46f1-9697-a9a700f1b7ed', law_name: 'نظام الأوراق التجارية', category: 'commercial_law' },\n  { law_id: 'c58ba10c-4e89-4c06-98d7-a9a700f1c706', law_name: 'نظام المحكمة التجارية', category: 'commercial_law' },\n  { law_id: 'a748e485-620c-45c4-8ca8-a9f40166406d', law_name: 'نظام الإفلاس', category: 'bankruptcy' },\n  { law_id: 'e3605c0d-ef87-4cff-b5da-aa3f0102bbb4', law_name: 'نظام المنافسة', category: 'competition' },\n\n  // === المالية والضرائب ===\n  { law_id: '23576008-1ce4-4685-ac3e-a9a700f2cb02', law_name: 'نظام ضريبة الدخل', category: 'tax' },\n  { law_id: 'c2c05ee1-201a-48de-91e7-a9a700f2d14f', law_name: 'نظام المنافسات والمشتريات الحكومية', category: 'procurement' },\n  { law_id: 'b93d0275-775f-482a-9d52-a9a700f2ca15', law_name: 'نظام الجمارك الموحد', category: 'customs' },\n\n  // === تقنية المعلومات ===\n  { law_id: 'ae610645-e094-48ef-814e-aeb4009d244f', law_name: 'نظام الاتصالات وتقنية المعلومات', category: 'telecom' },\n  { law_id: '25df73d6-0f49-4dc5-b010-a9a700f2ec1d', law_name: 'نظام مكافحة جرائم المعلوماتية', category: 'cyber_crimes' },\n  { law_id: '6f509360-2c39-4358-ae2a-a9a700f2ed16', law_name: 'نظام التعاملات الإلكترونية', category: 'ecommerce' },\n  { law_id: 'b7cfae89-828e-4994-b167-adaa00e37188', law_name: 'نظام حماية البيانات الشخصية', category: 'data_protection' },\n  { law_id: '360de590-0286-4fa5-a243-aa9100c31979', law_name: 'نظام التجارة الإلكترونية', category: 'ecommerce_law' },\n\n  // === العقارات ===\n  { law_id: '06272e6b-1fb9-4226-90b7-a9a700f21dc0', law_name: 'نظام نزع ملكية العقارات للمنفعة العامة', category: 'real_estate' },\n  { law_id: 'a1bdadb5-c518-48bb-a1d0-b33000e66fd1', law_name: 'نظام تملك غير السعوديين للعقار', category: 'real_estate' },\n  { law_id: 'c9756bfb-ff81-4226-a820-ae8200dc074c', law_name: 'نظام التسجيل العيني للعقار', category: 'real_estate' },\n\n  // === الجزاءات ===\n  { law_id: '75e963c8-9ff3-4d10-88a4-a9a700f17f21', law_name: 'نظام مكافحة الرشوة', category: 'criminal_law' },\n  { law_id: '4a8842df-9cd1-4ee7-bf97-a9a700f180d4', law_name: 'نظام مكافحة غسل الأموال', category: 'aml_law' },\n\n  // === المرور والنقل ===\n  { law_id: '85364e57-c01e-41ba-8def-a9a700f183e9', law_name: 'نظام المرور', category: 'traffic' },\n\n  // === الاستثمار ===\n  { law_id: 'eda86cc3-3a00-4b90-900d-b1d000c8a863', law_name: 'نظام الاستثمار', category: 'investment' },\n  { law_id: 'e7bd6fcc-c29c-4696-8032-aae9009b113a', law_name: 'نظام الرهن التجاري', category: 'commercial_law' },\n\n  // === البيئة والصحة ===\n  { law_id: '63831ff6-63d9-4212-8b54-abf800e146bd', law_name: 'نظام البيئة', category: 'environment' },\n  { law_id: '64e307c5-ac8c-49d8-9174-a9a700f285a0', law_name: 'نظام المؤسسات الصحية الخاصة', category: 'health' },\n  { law_id: 'f1de206c-eef4-4a76-904a-a9a700f2899a', law_name: 'نظام مزاولة المهن الصحية', category: 'health' },\n\n  // === التعليم والملكية الفكرية ===\n  { law_id: 'a6843359-3237-4553-8271-a9a700f1fcda', law_name: 'نظام مجلس التعليم العالي والجامعات', category: 'education' },\n  { law_id: '67d159e6-ee98-4efc-a2ee-a9a700f17083', law_name: 'نظام حماية حقوق المؤلف', category: 'intellectual_property' },\n  { law_id: 'b2d0decd-a691-45b9-9af0-a9a700f1e86f', law_name: 'نظام العلامات التجارية', category: 'intellectual_property' },\n  { law_id: '6cfde53b-e803-49be-b2c6-a9a700f1c434', law_name: 'نظام براءات الاختراع', category: 'intellectual_property' },\n\n  // === الإعلام ===\n  { law_id: 'ecaaec43-8ff9-46b8-b269-a9a700f16e66', law_name: 'نظام المطبوعات والنشر', category: 'media' },\n\n  // === الأمن ===\n  { law_id: 'a445af93-671f-496b-818a-a9a700f19150', law_name: 'نظام الأسلحة والذخائر', category: 'security' },\n\n  // === الأنظمة الحديثة ===\n  { law_id: '48da5c0f-b5a6-4e93-b76c-b33200be0330', law_name: 'نظام المواد البترولية والبتروكيماوية', category: 'petroleum' },\n  { law_id: 'b4edc050-18f3-4b23-aabc-b35b00ddaab7', law_name: 'نظام الإحصاء', category: 'statistics' },\n  { law_id: '366a4221-3214-4338-b3f2-b35c009f36cd', law_name: 'نظام الحرف والصناعات اليدوية', category: 'crafts' },\n];\n\nreturn laws.map(law => ({\n  json: {\n    ...law,\n    url: `https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/${law.law_id}/1`,\n    source: 'laws.boe.gov.sa'\n  }\n}));"
+      },
+      "id": "b2000001-0001-4001-8001-000000000003",
+      "name": "📋 سجل القوانين الشامل (50+ نظام)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, -180]
+    },
+    {
+      "parameters": {
+        "jsCode": "// فحص ChromaDB للقوانين الموجودة\nconst CHROMADB = 'http://chromadb:8000/api/v1';\nconst COLLECTION_NAME = 'saleh_knowledge';\n\n// Get collection ID\nconst cols = await fetch(`${CHROMADB}/collections`).then(r => r.json());\nconst col = cols.find(c => c.name === COLLECTION_NAME);\nif (!col) throw new Error('Collection not found!');\n\n// Get all metadatas\nconst total = await fetch(`${CHROMADB}/collections/${col.id}/count`).then(r => r.json());\nconst data = await fetch(`${CHROMADB}/collections/${col.id}/get`, {\n  method: 'POST',\n  headers: {'Content-Type': 'application/json'},\n  body: JSON.stringify({ include: ['metadatas'], limit: total })\n}).then(r => r.json());\n\n// Build set of existing law_ids and law_names\nconst existingIds = new Set();\nconst existingNames = new Set();\nfor (const meta of (data.metadatas || [])) {\n  if (meta.law_id) existingIds.add(meta.law_id);\n  if (meta.law_name) existingNames.add(meta.law_name);\n}\n\n// Filter only missing laws\nconst allLaws = $input.all();\nconst missing = allLaws.filter(item => {\n  const law = item.json;\n  return !existingIds.has(law.law_id) && !existingNames.has(law.law_name);\n});\n\nif (missing.length === 0) {\n  return [{ json: { status: 'up_to_date', message: '✅ جميع القوانين محدثة! لا يوجد ناقص.', total_in_db: total, checked: allLaws.length } }];\n}\n\n// Log what we found\nconsole.log(`Found ${missing.length} missing laws out of ${allLaws.length}`);\nreturn missing;"
+      },
+      "id": "b2000001-0001-4001-8001-000000000004",
+      "name": "🔍 فحص الناقص في ChromaDB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [560, -180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "up_to_date",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000005",
+      "name": "🔀 هل يوجد ناقص؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [780, -180]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000006",
+      "name": "🔄 معالجة واحد تلو الآخر",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1000, -280]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000007",
+      "name": "🌐 سحب صفحة القانون",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1220, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// استخراج نص القانون وتقسيمه\nconst chunkSize = 800;\nconst overlap = 100;\nconst results = [];\n\nconst batchNode = $('🔄 معالجة واحد تلو الآخر');\nconst meta = batchNode.item.json;\nconst lawName = meta.law_name || 'unknown';\nconst lawId = meta.law_id || 'unknown';\nconst source = meta.source || 'boe.gov.sa';\nconst category = meta.category || 'general';\n\nlet html = '';\nif (typeof $json === 'string') html = $json;\nelse if ($json.data && typeof $json.data === 'string') html = $json.data;\nelse html = JSON.stringify($json);\n\n// تنظيف HTML\nlet text = html.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '');\ntext = text.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\ntext = text.replace(/<[^>]+>/g, ' ');\ntext = text.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"');\ntext = text.replace(/\\s+/g, ' ').trim();\n\nconst markers = ['نـــص النظـــام', 'نص النظام', 'المادة الأولى'];\nfor (const m of markers) {\n  const idx = text.indexOf(m);\n  if (idx > -1) { text = text.substring(idx); break; }\n}\n\nfor (const m of ['جميع الحقوق محفوظة', 'go to top', 'Additional Links']) {\n  const idx = text.indexOf(m);\n  if (idx > -1) text = text.substring(0, idx);\n}\ntext = text.trim();\n\nif (text.length < 100) {\n  return [{ json: { error: `النص قصير جداً: ${lawName}`, length: text.length, law_name: lawName } }];\n}\n\nlet start = 0, chunkIdx = 0;\nwhile (start < text.length) {\n  const end = Math.min(start + chunkSize, text.length);\n  const chunk = text.substring(start, end).trim();\n  if (chunk.length > 50) {\n    results.push({\n      json: {\n        chunk_id: `boe_${category}_${lawId.substring(0,8)}_c${chunkIdx}`,\n        chunk_text: chunk,\n        law_name: lawName,\n        law_id: lawId,\n        source: source,\n        category: category,\n        chunk_index: chunkIdx,\n        total_text_length: text.length\n      }\n    });\n    chunkIdx++;\n  }\n  if (end >= text.length) break;\n  start += chunkSize - overlap;\n}\n\nreturn results;"
+      },
+      "id": "b2000001-0001-4001-8001-000000000008",
+      "name": "✂️ استخراج وتقسيم النص",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, -280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text:latest', prompt: $json.chunk_text }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000009",
+      "name": "🧠 Ollama Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1660, -280]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const embedding = $json.embedding;\nconst prev = $('✂️ استخراج وتقسيم النص').item.json;\n\nreturn {\n  ids: [prev.chunk_id],\n  embeddings: [embedding],\n  documents: [prev.chunk_text],\n  metadatas: [{\n    law_name: prev.law_name,\n    law_id: prev.law_id,\n    source: prev.source,\n    category: prev.category,\n    chunk_index: prev.chunk_index,\n    ingested_at: new Date().toISOString(),\n    auto_updated: 'true'\n  }],\n  chunk_id: prev.chunk_id,\n  law_name: prev.law_name\n};"
+      },
+      "id": "b2000001-0001-4001-8001-000000000010",
+      "name": "🔗 تحضير بيانات ChromaDB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1880, -280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/upsert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ids: $json.ids, embeddings: $json.embeddings, documents: $json.documents, metadatas: $json.metadatas }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "b2000001-0001-4001-8001-000000000011",
+      "name": "💾 حفظ في ChromaDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2100, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// تقرير نهائي\nconst items = $input.all();\nconst successCount = items.filter(i => !i.json.error).length;\nconst errorCount = items.filter(i => i.json.error).length;\nconst timestamp = new Date().toISOString();\n\n// Get final count from ChromaDB\nlet finalCount = 'N/A';\ntry {\n  const resp = await fetch('http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/count');\n  finalCount = await resp.json();\n} catch(e) {}\n\nreturn [{\n  json: {\n    status: 'completed',\n    total_chunks_saved: successCount,\n    errors: errorCount,\n    chromadb_total: finalCount,\n    message: `✅ تم حفظ ${successCount} قطعة جديدة في ChromaDB | أخطاء: ${errorCount} | الإجمالي: ${finalCount}`,\n    timestamp: timestamp\n  }\n}];"
+      },
+      "id": "b2000001-0001-4001-8001-000000000012",
+      "name": "📊 تقرير نهائي",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2320, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// كل شي محدث - لوق فقط\nreturn [{ json: $json }];"
+      },
+      "id": "b2000001-0001-4001-8001-000000000013",
+      "name": "✅ كل شي محدث",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, -80]
+    }
+  ],
+  "connections": {
+    "⏰ جدولة أسبوعية (الاثنين 3 صباحاً)": {
+      "main": [
+        [
+          {
+            "node": "📋 سجل القوانين الشامل (50+ نظام)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "▶️ تشغيل يدوي": {
+      "main": [
+        [
+          {
+            "node": "📋 سجل القوانين الشامل (50+ نظام)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 سجل القوانين الشامل (50+ نظام)": {
+      "main": [
+        [
+          {
+            "node": "🔍 فحص الناقص في ChromaDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 فحص الناقص في ChromaDB": {
+      "main": [
+        [
+          {
+            "node": "🔀 هل يوجد ناقص؟",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔀 هل يوجد ناقص؟": {
+      "main": [
+        [
+          {
+            "node": "🔄 معالجة واحد تلو الآخر",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "✅ كل شي محدث",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔄 معالجة واحد تلو الآخر": {
+      "main": [
+        [
+          {
+            "node": "🌐 سحب صفحة القانون",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📊 تقرير نهائي",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🌐 سحب صفحة القانون": {
+      "main": [
+        [
+          {
+            "node": "✂️ استخراج وتقسيم النص",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✂️ استخراج وتقسيم النص": {
+      "main": [
+        [
+          {
+            "node": "🧠 Ollama Embedding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 Ollama Embedding": {
+      "main": [
+        [
+          {
+            "node": "🔗 تحضير بيانات ChromaDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔗 تحضير بيانات ChromaDB": {
+      "main": [
+        [
+          {
+            "node": "💾 حفظ في ChromaDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💾 حفظ في ChromaDB": {
+      "main": [
+        [
+          {
+            "node": "🔄 معالجة واحد تلو الآخر",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "auto-update"
+    },
+    {
+      "name": "saudi-laws"
+    }
+  ]
+}

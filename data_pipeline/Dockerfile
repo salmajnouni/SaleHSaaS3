@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies required for unstructured
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagic-dev \
     poppler-utils \
     tesseract-ocr \
@@ -17,7 +17,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 EXPOSE 8001
-
-ENV NAME DataPipeline
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]

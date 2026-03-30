@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}المجلس الاستشاري{% endblock %}
+{% block page_title %}المجلس الاستشاري{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-panel {
+        background:
+            radial-gradient(circle at top right, rgba(245, 166, 35, 0.2), transparent 28%),
+            linear-gradient(135deg, #101827, #18263f 58%, #0f3460);
+        border: 1px solid rgba(245, 166, 35, 0.22);
+    }
+
+    .member-card,
+    .session-card,
+    .request-card {
+        border-radius: 16px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        height: 100%;
+    }
+
+    .member-icon {
+        font-size: 2rem;
+        width: 58px;
+        height: 58px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: rgba(245, 166, 35, 0.12);
+        border: 1px solid rgba(245, 166, 35, 0.15);
+    }
+
+    .session-status,
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .status-awaiting {
+        background: rgba(253, 203, 110, 0.15);
+        color: #fdcb6e;
+        border: 1px solid rgba(253, 203, 110, 0.25);
+    }
+
+    .status-completed {
+        background: rgba(0, 184, 148, 0.16);
+        color: #00d7a7;
+        border: 1px solid rgba(0, 184, 148, 0.22);
+    }
+
+    .status-queued {
+        background: rgba(116, 185, 255, 0.14);
+        color: #74b9ff;
+        border: 1px solid rgba(116, 185, 255, 0.22);
+    }
+
+    .decision-box {
+        white-space: pre-line;
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed rgba(255,255,255,0.12);
+        border-radius: 12px;
+        padding: 1rem;
+        color: rgba(255,255,255,0.82);
+        font-size: 0.92rem;
+        line-height: 1.8;
+    }
+
+    .council-form textarea,
+    .council-form select,
+    .council-form input {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #fff;
+    }
+
+    .council-form textarea::placeholder,
+    .council-form input::placeholder {
+        color: rgba(255,255,255,0.35);
+    }
+
+    .council-form .form-control:focus,
+    .council-form .form-select:focus {
+        background: rgba(255,255,255,0.06);
+        color: #fff;
+        border-color: rgba(245, 166, 35, 0.6);
+        box-shadow: 0 0 0 0.2rem rgba(245, 166, 35, 0.12);
+    }
+
+    .timeline-line {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent);
+        margin: 0.8rem 0 1rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: rgba(255,255,255,0.55);
+        border: 1px dashed rgba(255,255,255,0.12);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.02);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card hero-panel mb-4">
+    <div class="card-body p-4 p-lg-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="badge-soft status-awaiting mb-3">
+                    <i class="fas fa-landmark"></i>
+                    طبقة قرار جماعي داخلية
+                </div>
+                <h2 class="mb-2" style="font-weight: 800;">🏛️ المجلس الاستشاري داخل التطبيق</h2>
+                <p class="mb-3" style="color: rgba(255,255,255,0.72); line-height: 1.9;">
+                    هذه الشاشة تجمع طلبات الدراسة، آراء أعضاء المجلس، والقرار الموحد قبل إرساله إلى تيليجرام أو اعتماده داخليًا.
+                    الفكرة هنا أن تكون الشاشة هي مركز القيادة، بينما يبقى تيليجرام قناة تنبيه واعتماد سريع.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge-soft status-completed"><i class="fas fa-users"></i> {{ summary.members }} أعضاء</span>
+                    <span class="badge-soft status-awaiting"><i class="fas fa-hourglass-half"></i> {{ summary.awaiting_approval }} بانتظار اعتماد</span>
+                    <span class="badge-soft status-queued"><i class="fas fa-inbox"></i> {{ summary.queued_requests }} طلبات جديدة</span>
+                    <span class="badge-soft status-queued"><i class="fas fa-diagram-project"></i> {{ summary.submitted_to_workflow }} قيد المعالجة عبر workflow</span>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card session-card">
+                    <div class="card-body">
+                        <div class="small text-muted mb-2">آخر جلسة مسجلة</div>
+                        <div class="h5 mb-3">{{ summary.latest_session }}</div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="stat-card gold h-100">
+                                    <div class="stat-value" style="font-size: 2rem; color: #f5a623;">{{ summary.sessions }}</div>
+                                    <div class="stat-label">جلسة محفوظة</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="stat-card green h-100">
+                                    <div class="stat-value" style="font-size: 2rem; color: #00d7a7;">{{ summary.completed }}</div>
+                                    <div class="stat-label">جلسة مكتملة</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-5">
+        <div class="card member-card council-form">
+            <div class="card-header">
+                <i class="fas fa-feather-pointed me-2"></i>
+                اطلب دراسة جديدة من المجلس
+            </div>
+            <div class="card-body">
+                <form id="councilRequestForm">
+                    <div class="mb-3">
+                        <label class="form-label">الموضوع أو الفكرة</label>
+                        <textarea id="topic" class="form-control" rows="6" placeholder="مثال: هل نضيف شاشة موافقات داخلية تربط المجلس الاستشاري مع تيليجرام و n8n؟" required></textarea>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">نوع الدراسة</label>
+                            <select id="studyType" class="form-select">
+                                <option value="general">دراسة عامة</option>
+                                <option value="technical">دراسة تقنية</option>
+                                <option value="governance">دراسة حوكمة</option>
+                                <option value="business">دراسة جدوى وقيمة</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">مقدم الطلب</label>
+                            <input id="requestedBy" class="form-control" value="صالح">
+                        </div>
+                    </div>
+                    <div class="timeline-line"></div>
+                    <div id="requestFeedback" class="small mb-3" style="min-height: 20px; color: rgba(255,255,255,0.65);"></div>
+                    <button type="submit" class="btn btn-gold w-100 py-3">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        إرسال الطلب إلى مسار المجلس
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card member-card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-user-tie me-2"></i>أعضاء المجلس</span>
+                <span class="text-muted small">كل عضو يرى الموضوع من زاوية مختلفة</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for member in members %}
+                    <div class="col-md-6">
+                        <div class="member-card p-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="member-icon">{{ member.icon }}</div>
+                                <div>
+                                    <div style="font-weight: 700;">{{ member.name }}</div>
+                                    <div class="small text-muted mt-1" style="line-height: 1.8;">{{ member.focus }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card session-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-scroll me-2"></i>سجل جلسات المجلس</span>
+                <button class="btn btn-sm btn-outline-light" onclick="refreshCouncilData()">
+                    <i class="fas fa-rotate me-1"></i>
+                    تحديث
+                </button>
+            </div>
+            <div class="card-body" id="sessionsContainer">
+                {% if sessions %}
+                    {% for session in sessions %}
+                    <div class="session-card p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                            <div>
+                                <div class="small text-muted mb-1">{{ session.session_id }}</div>
+                                <h5 class="mb-1">{{ session.topic }}</h5>
+                                <div class="small text-muted">{{ session.session_date }} · طلب من {{ session.requested_by }}</div>
+                            </div>
+                            <span class="session-status {% if session.status == 'awaiting_approval' %}status-awaiting{% else %}status-completed{% endif %}">
+                                {% if session.status == 'awaiting_approval' %}
+                                    <i class="fas fa-hourglass-half"></i> بانتظار اعتماد
+                                {% else %}
+                                    <i class="fas fa-check-circle"></i> مكتملة
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="timeline-line"></div>
+                        <div class="decision-box">{{ session.chair_decision or 'لا يوجد قرار موحد محفوظ بعد.' }}</div>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <button class="btn btn-sm btn-outline-success" onclick="submitSessionDecision('{{ session.session_id }}', 'approve')">
+                                <i class="fas fa-check me-1"></i>
+                                اعتماد
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="submitSessionDecision('{{ session.session_id }}', 'restudy')">
+                                <i class="fas fa-rotate me-1"></i>
+                                إعادة دراسة
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="submitSessionDecision('{{ session.session_id }}', 'reject')">
+                                <i class="fas fa-ban me-1"></i>
+                                رفض
+                            </button>
+                            {% if session.dashboard_decision %}
+                            <span class="session-status status-completed">{{ session.dashboard_decision }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="fs-2 mb-3">🧭</div>
+                        <div class="mb-2">لا توجد جلسات محفوظة بعد</div>
+                        <div class="small">بمجرد تشغيل workflow المجلس أو إرسال طلب دراسة من هذه الشاشة، ستظهر الجلسات هنا.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card request-card h-100">
+            <div class="card-header">
+                <i class="fas fa-inbox me-2"></i>
+                الطلبات المرسلة من الشاشة
+            </div>
+            <div class="card-body" id="requestsContainer">
+                {% if queued_requests %}
+                    {% for request in queued_requests %}
+                    <div class="request-card p-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <div style="font-weight: 700;">{{ request.topic }}</div>
+                                <div class="small text-muted mt-1">{{ request.requested_by }} · {{ request.created_at }}</div>
+                            </div>
+                            <span class="session-status {% if request.status == 'submitted_to_workflow' %}status-completed{% else %}status-queued{% endif %}"><i class="fas fa-clock"></i> {{ request.status }}</span>
+                        </div>
+                        <div class="small mt-3 text-muted">نوع الدراسة: {{ request.study_type }}</div>
+                        {% if request.delivery_error %}
+                        <div class="small mt-2" style="color: #ffb4a9;">فشل الربط: {{ request.delivery_error }}</div>
+                        {% endif %}
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn btn-sm btn-outline-info" onclick="dispatchRequest('{{ request.requestId }}')">
+                                <i class="fas fa-paper-plane me-1"></i>
+                                إرسال إلى workflow
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="fs-2 mb-3">📬</div>
+                        <div class="mb-2">لا توجد طلبات جديدة</div>
+                        <div class="small">أرسل موضوعًا من النموذج أعلاه وسيُحفظ هنا كمدخل جديد للمجلس.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function refreshCouncilData() {
+    const response = await fetch('/api/advisory-council/sessions');
+    const payload = await response.json();
+    if (payload.status !== 'success') {
+        return;
+    }
+    location.reload();
+}
+
+async function dispatchRequest(requestId) {
+    const response = await fetch(`/api/advisory-council/request/${requestId}/dispatch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const result = await response.json();
+    alert((response.ok ? '✅ ' : '❌ ') + result.message);
+    if (response.ok) {
+        refreshCouncilData();
+    }
+}
+
+async function submitSessionDecision(sessionId, decision) {
+    const response = await fetch(`/api/advisory-council/session/${sessionId}/decision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision })
+    });
+    const result = await response.json();
+    alert((response.ok ? '✅ ' : '❌ ') + result.message);
+    if (response.ok) {
+        refreshCouncilData();
+    }
+}
+
+const form = document.getElementById('councilRequestForm');
+const feedback = document.getElementById('requestFeedback');
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    feedback.textContent = '⏳ جاري إرسال الطلب إلى مسار المجلس...';
+
+    const payload = {
+        topic: document.getElementById('topic').value.trim(),
+        study_type: document.getElementById('studyType').value,
+        requested_by: document.getElementById('requestedBy').value.trim() || 'صالح'
+    };
+
+    const response = await fetch('/api/advisory-council/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+        feedback.style.color = '#00d7a7';
+        feedback.textContent = '✅ ' + result.message;
+        form.reset();
+        document.getElementById('requestedBy').value = 'صالح';
+        setTimeout(refreshCouncilData, 800);
+    } else {
+        feedback.style.color = '#ff7675';
+        feedback.textContent = '❌ ' + (result.message || 'تعذر إرسال الطلب');
+    }
+});
+</script>
+{% endblock %}

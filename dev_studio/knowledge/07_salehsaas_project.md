@@ -1,5 +1,17 @@
 # SaleH SaaS 4.0 — دليل المشروع الشامل
 
+> تنبيه حاكم: هذه الوثيقة معرفة داخلية مساندة وليست المرجع التشغيلي الأعلى. عند أي تعارض، تكون الأولوية لـ `docker-compose.yml` ثم `ARCHITECTURE.md` ثم `README.md`.
+
+## تصحيح تشغيلي إلزامي
+
+- خدمة `mcpo` ملغاة حاليًا في المشروع ولا تُستخدم كمسار تشغيلي.
+- أي مواد تاريخية مرتبطة بـ `mcpo` تبقى خارج المسار التشغيلي الحي.
+- لا توجد خدمة `Code Server` مفعلة ضمن `docker-compose.yml` الحالي.
+- الخدمات التشغيلية المضافة فعليًا في البيئة الحالية تشمل `data_pipeline` و `browserless` و `open-terminal`.
+- الاستيعاب الحي يستخدم `ChromaDB v1` في المسارات النشطة، والمجموعة الحية هي `saleh_knowledge`.
+- الملفات الناجحة من `knowledge_watcher` تنتهي في `knowledge_processed/`، وليس `knowledge_archive/`.
+- المجلد المحلي `saleh/` يظهر داخل `open-terminal` على المسار `/home/user/projects`.
+
 ## نظرة عامة
 
 **SaleH SaaS** منصة ذكاء اصطناعي محلية متكاملة مصممة للمؤسسات القانونية والحكومية السعودية. تعمل بالكامل على البنية التحتية المحلية (On-Premise) دون إرسال أي بيانات خارجياً، وتوفر قدرات RAG (الاسترجاع المعزز بالتوليد) متقدمة على الوثائق القانونية السعودية مع أتمتة كاملة لسير العمل عبر n8n.
@@ -22,10 +34,11 @@
 | **Ollama** | 11434 | Windows Host | نماذج اللغة والتضمين المحلية |
 | **Knowledge Watcher** | داخلي | 172.20.0.61 | خط أنابيب استيعاب الوثائق v3.0 |
 | **n8n** | 5678 | 172.20.0.40 | أتمتة سير العمل |
-| **mcpo** | 8020 | 172.20.0.60 | وكيل MCP-to-OpenAPI |
 | **SearXNG** | 8080 (داخلي) | 172.20.0.33 | بحث محلي على الإنترنت |
-| **Code Server** | 8443 | 172.20.0.50 | بيئة التطوير من المتصفح (VS Code) |
 | **Pipelines** | 9099 | 172.20.0.31 | خط أنابيب RAG القانوني |
+| **Data Pipeline** | 8001 | 172.20.0.62 | خدمة استيعاب الملفات والتقطيع |
+| **Browserless** | 3001 | 172.20.0.70 | متصفح آلي بلا واجهة |
+| **Open Terminal** | 8000 | 172.20.0.80 | طرفية داخلية مرتبطة بـ `saleh/` |
 
 **شبكة Docker:** `salehsaas_net` — Subnet: `172.20.0.0/16`
 
@@ -40,7 +53,7 @@ D:\SaleHSaaS3\
 ├── core/                ← الكود الأساسي للمنصة
 ├── data/                ← البيانات المحلية
 ├── data_pipeline/       ← خط أنابيب معالجة البيانات
-├── dev_studio/          ← بيئة التطوير (Code Server)
+├── dev_studio/          ← بيئة تطوير اختيارية مستقلة (مسار Code Server غير مفعّل افتراضيًا)
 │   ├── Dockerfile
 │   ├── docker-compose.dev-studio.yml
 │   ├── config/
@@ -53,16 +66,14 @@ D:\SaleHSaaS3\
 ├── docs/                ← التوثيق
 ├── file_watcher/        ← مراقب الملفات
 ├── knowledge_inbox/     ← ← ← ضع الملفات هنا للهضم التلقائي
-├── knowledge_processing/← قيد المعالجة (تلقائي)
-├── knowledge_archive/   ← مؤرشف بنجاح (مرتب بالتاريخ)
+├── knowledge_processed/ ← الملفات الناجحة بعد الاستيعاب
 ├── knowledge_failed/    ← فشل المعالجة + تقرير الخطأ
-├── knowledge_processed/ ← ملفات تمت معالجتها يدوياً
 ├── logs/                ← سجلات النظام والتقارير
 ├── n8n/                 ← إعدادات n8n
 ├── n8n_workflows/       ← سير عمل n8n المصدّرة
 ├── pipelines/           ← خطوط أنابيب OpenWebUI
 ├── saleh_brain/         ← قاعدة المعرفة الذكية
-├── saleh_dashboard/     ← لوحة التحكم
+├── saleh_dashboard/     ← مشروع Dashboard قديم/مرجعي غير مفعل في التشغيل الحالي
 ├── scripts/             ← سكريبتات PowerShell والأتمتة
 ├── services/            ← تعريفات الخدمات
 ├── tools/               ← أدوات مساعدة
@@ -73,7 +84,6 @@ D:\SaleHSaaS3\
 ├── ARCHITECTURE.md      ← المخطط المعماري
 ├── CHANGELOG.md         ← سجل التغييرات
 ├── INSTALL_GUIDE.md     ← دليل التثبيت
-├── MCP_SETUP_GUIDE.md   ← دليل إعداد MCP
 ├── README.md            ← نظرة عامة
 └── SERVICES.md          ← تفاصيل الخدمات
 ```
@@ -91,8 +101,8 @@ Knowledge Watcher (172.20.0.61)
       ├──► Apache Tika :9998  → استخراج النص (1000+ صيغة)
       ├──► Ollama :11434      → توليد التضمينات (nomic-embed-text)
       ├──► ChromaDB :8010     → تخزين chunks + embeddings
-      │         Collection: saleh_legal_knowledge
-      ├──► knowledge_archive/YYYY-MM-DD/  (نجاح)
+      │         Collection: saleh_knowledge
+      ├──► knowledge_processed/          (نجاح)
       └──► knowledge_failed/              (فشل + تقرير .txt)
 ```
 
@@ -116,16 +126,15 @@ Open WebUI → Pipelines :9099 (saleh_legal_pipeline.py)
 
 ---
 
-## تدفق أدوات MCP
+## ملاحظة عن أدوات MCP
 
 ```
-المستخدم في Open WebUI
-      │
-      ▼
-Open WebUI → mcpo :8020 (REST API)
-      ├──► ollama_model_builder.py  → Ollama :11434 (إدارة النماذج)
-      ├──► legal_rag_mcp.py         → ChromaDB :8010 (بحث قانوني)
-      └──► n8n_builder.py           → n8n :5678 (إنشاء/تفعيل workflows)
+الأدوات الخاصة بـ MCP موجودة داخل المستودع كملفات تكامل،
+لكن مسار mcpo ملغى حاليًا ضمن هذا المشروع.
+وأي مواد تاريخية مرتبطة به تبقى خارج المسار التشغيلي الحي.
+
+لذلك لا يجوز اعتبار المنفذ 8020 جزءًا من التشغيل الحالي
+إلا بعد تحقق مباشر من تشغيل خدمة مستقلة لهذا الغرض.
 ```
 
 ---
@@ -133,25 +142,15 @@ Open WebUI → mcpo :8020 (REST API)
 ## متغيرات البيئة الرئيسية (.env)
 
 ```env
-# كلمات المرور
-CODE_SERVER_PASSWORD=ze#nrgmkUhQpD*gq^TbX
-N8N_BASIC_AUTH_PASSWORD=admin123
-POSTGRES_PASSWORD=salehsaas_secure_2024
+# ملاحظة
+# القيم الفعلية يجب أن تُقرأ من docker-compose.yml وقت التشغيل.
+# لا تعتمد هذا المقتطف كمرجع كلمات مرور أو منافذ حاكم.
 
-# المنافذ
-CODE_SERVER_PORT=8443
-N8N_PORT=5678
-OPENWEBUI_PORT=3000
-CHROMA_PORT=8010
-
-# Ollama
 OLLAMA_BASE_URL=http://host.docker.internal:11434
 EMBEDDING_MODEL=nomic-embed-text:latest
-
-# ChromaDB
 CHROMA_HOST=chromadb
 CHROMA_PORT_INTERNAL=8000
-CHROMA_COLLECTION=saleh_legal_knowledge
+CHROMA_COLLECTION=saleh_knowledge
 ```
 
 ---
@@ -191,9 +190,8 @@ docker-compose ps
 # عرض سجلات خدمة معينة
 docker-compose logs -f knowledge_watcher
 
-# إعادة بناء خدمة معينة
-docker-compose build --no-cache code-server
-docker-compose up -d code-server
+# تشغيل Dev Studio (اختياري - Compose منفصل)
+docker compose -f dev_studio\docker-compose.dev-studio.yml up -d
 ```
 
 ---
@@ -204,9 +202,9 @@ docker-compose up -d code-server
 |--------|--------|
 | Open WebUI (الشات) | http://localhost:3000 |
 | n8n (الأتمتة) | http://localhost:5678 |
-| Code Server (التطوير) | http://localhost:8443 |
 | ChromaDB API | http://localhost:8010 |
-| mcpo API | http://localhost:8020 |
+| Open Terminal | http://localhost:8000 |
+| Browserless | http://localhost:3001 |
 
 ---
 
@@ -215,5 +213,5 @@ docker-compose up -d code-server
 - **Ollama يعمل على Windows مباشرة** وليس داخل Docker — يُصل إليه عبر `host.docker.internal:11434`
 - **ملف .env لا يُرفع إلى GitHub** — يحتوي على كلمات مرور حساسة
 - **knowledge_inbox** هو الطريق الوحيد لإضافة معرفة جديدة تلقائياً
-- **ChromaDB collection** الرئيسية: `saleh_legal_knowledge`
+- **ChromaDB collection** الرئيسية: `saleh_knowledge`
 - **شبكة Docker الداخلية:** `salehsaas_net` — الخدمات تتواصل بأسمائها مباشرة

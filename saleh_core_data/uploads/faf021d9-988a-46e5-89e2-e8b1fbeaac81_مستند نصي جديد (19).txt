@@ -1,0 +1,733 @@
+2026-03-25 01:22:50.522 | Loading WEBUI_SECRET_KEY from file, not provided as an environment variable.
+2026-03-25 01:22:50.523 | Generating WEBUI_SECRET_KEY
+2026-03-25 01:22:50.526 | Loading WEBUI_SECRET_KEY from .webui_secret_key
+2026-03-25 01:22:55.143 | INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+2026-03-25 01:22:55.144 | INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+2026-03-25 01:22:55.198 | WARNI [open_webui.env] 
+2026-03-25 01:22:55.198 | 
+2026-03-25 01:22:55.198 | WARNING: CORS_ALLOW_ORIGIN IS SET TO '*' - NOT RECOMMENDED FOR PRODUCTION DEPLOYMENTS.
+2026-03-25 01:22:55.198 | 
+2026-03-25 01:22:59.190 | WARNI [langchain_community.utils.user_agent] USER_AGENT environment variable not set, consider setting it to identify your requests.
+2026-03-25 01:23:02.386 | 
+2026-03-25 01:23:02.386 |  ██████╗ ██████╗ ███████╗███╗   ██╗    ██╗    ██╗███████╗██████╗ ██╗   ██╗██╗
+2026-03-25 01:23:02.386 | ██╔═══██╗██╔══██╗██╔════╝████╗  ██║    ██║    ██║██╔════╝██╔══██╗██║   ██║██║
+2026-03-25 01:23:02.386 | ██║   ██║██████╔╝█████╗  ██╔██╗ ██║    ██║ █╗ ██║█████╗  ██████╔╝██║   ██║██║
+2026-03-25 01:23:02.386 | ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║    ██║███╗██║██╔══╝  ██╔══██╗██║   ██║██║
+2026-03-25 01:23:02.386 | ╚██████╔╝██║     ███████╗██║ ╚████║    ╚███╔███╔╝███████╗██████╔╝╚██████╔╝██║
+2026-03-25 01:23:02.386 |  ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝     ╚══╝╚══╝ ╚══════╝╚═════╝  ╚═════╝ ╚═╝
+2026-03-25 01:23:02.386 | 
+2026-03-25 01:23:02.386 | 
+2026-03-25 01:23:02.386 | v0.8.10 - building the best AI user interface.
+2026-03-25 01:23:02.386 | 
+2026-03-25 01:23:02.386 | https://github.com/open-webui/open-webui
+2026-03-25 01:23:02.386 | 
+2026-03-25 01:23:02.765 | 
+2026-03-25 01:23:02.765 | Fetching 30 files:   0%|          | 0/30 [00:00<?, ?it/s]
+2026-03-25 01:23:02.765 | Fetching 30 files: 100%|██████████| 30/30 [00:00<00:00, 1794.51it/s]
+2026-03-25 01:23:03.035 | 
+2026-03-25 01:23:03.035 | Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]
+2026-03-25 01:23:03.035 | Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1337.42it/s]
+2026-03-25 01:23:03.038 | BertModel LOAD REPORT from: /app/backend/data/cache/embedding/models/models--sentence-transformers--all-MiniLM-L6-v2/snapshots/c9745ed1d9f207416be6d2e6f8de32d1f16199bf
+2026-03-25 01:23:03.038 | Key                     | Status     |  | 
+2026-03-25 01:23:03.038 | ------------------------+------------+--+-
+2026-03-25 01:23:03.038 | embeddings.position_ids | UNEXPECTED |  | 
+2026-03-25 01:23:03.038 | 
+2026-03-25 01:23:03.038 | Notes:
+2026-03-25 01:23:03.038 | - UNEXPECTED	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+2026-03-25 01:23:03.407 | INFO:     Started server process [1]
+2026-03-25 01:23:03.407 | INFO:     Waiting for application startup.
+2026-03-25 01:23:03.412 | 2026-03-24 22:23:03.412 | INFO     | open_webui.utils.logger:start_logger:198 - GLOBAL_LOG_LEVEL: INFO
+2026-03-25 01:23:03.412 | 2026-03-24 22:23:03.412 | INFO     | open_webui.main:lifespan:627 - Installing external dependencies of functions and tools...
+2026-03-25 01:23:03.469 | 2026-03-24 22:23:03.469 | INFO     | open_webui.utils.plugin:install_frontmatter_requirements:422 - Installing requirements: diagrams youtube-transcript-api requests aiohttp loguru crawl4ai orjson tiktoken ddgs aiohttp asyncio requests
+2026-03-25 01:23:04.211 | Collecting diagrams
+2026-03-25 01:23:04.448 |   Downloading diagrams-0.25.1-py3-none-any.whl.metadata (6.9 kB)
+2026-03-25 01:23:04.463 | Requirement already satisfied: youtube-transcript-api in /usr/local/lib/python3.11/site-packages (1.2.4)
+2026-03-25 01:23:04.464 | Requirement already satisfied: requests in /usr/local/lib/python3.11/site-packages (2.32.5)
+2026-03-25 01:23:04.465 | Requirement already satisfied: aiohttp in /usr/local/lib/python3.11/site-packages (3.13.2)
+2026-03-25 01:23:04.466 | Requirement already satisfied: loguru in /usr/local/lib/python3.11/site-packages (0.7.3)
+2026-03-25 01:23:04.583 | Collecting crawl4ai
+2026-03-25 01:23:04.650 |   Downloading crawl4ai-0.8.6-py3-none-any.whl.metadata (55 kB)
+2026-03-25 01:23:04.734 |      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 55.9/55.9 kB 626.0 kB/s eta 0:00:00
+2026-03-25 01:23:04.739 | Requirement already satisfied: orjson in /usr/local/lib/python3.11/site-packages (3.11.7)
+2026-03-25 01:23:04.740 | Requirement already satisfied: tiktoken in /usr/local/lib/python3.11/site-packages (0.12.0)
+2026-03-25 01:23:04.740 | Requirement already satisfied: ddgs in /usr/local/lib/python3.11/site-packages (9.11.2)
+2026-03-25 01:23:04.834 | Collecting asyncio
+2026-03-25 01:23:04.901 |   Downloading asyncio-4.0.0-py3-none-any.whl.metadata (994 bytes)
+2026-03-25 01:23:05.031 | Collecting graphviz<0.21.0,>=0.13.2 (from diagrams)
+2026-03-25 01:23:05.099 |   Downloading graphviz-0.20.3-py3-none-any.whl.metadata (12 kB)
+2026-03-25 01:23:05.115 | Requirement already satisfied: jinja2<4.0,>=2.10 in /usr/local/lib/python3.11/site-packages (from diagrams) (3.1.6)
+2026-03-25 01:23:05.302 | Collecting pre-commit<5,>=4.0.1 (from diagrams)
+2026-03-25 01:23:05.372 |   Downloading pre_commit-4.5.1-py2.py3-none-any.whl.metadata (1.2 kB)
+2026-03-25 01:23:05.388 | Requirement already satisfied: defusedxml<0.8.0,>=0.7.1 in /usr/local/lib/python3.11/site-packages (from youtube-transcript-api) (0.7.1)
+2026-03-25 01:23:05.392 | Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.11/site-packages (from requests) (3.4.5)
+2026-03-25 01:23:05.392 | Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.11/site-packages (from requests) (3.11)
+2026-03-25 01:23:05.393 | Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/site-packages (from requests) (2.6.3)
+2026-03-25 01:23:05.394 | Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.11/site-packages (from requests) (2026.2.25)
+2026-03-25 01:23:05.399 | Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.11/site-packages (from aiohttp) (2.6.1)
+2026-03-25 01:23:05.399 | Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.11/site-packages (from aiohttp) (1.4.0)
+2026-03-25 01:23:05.400 | Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.11/site-packages (from aiohttp) (25.4.0)
+2026-03-25 01:23:05.401 | Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.11/site-packages (from aiohttp) (1.8.0)
+2026-03-25 01:23:05.401 | Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.11/site-packages (from aiohttp) (6.7.1)
+2026-03-25 01:23:05.402 | Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.11/site-packages (from aiohttp) (0.4.1)
+2026-03-25 01:23:05.404 | Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.11/site-packages (from aiohttp) (1.23.0)
+2026-03-25 01:23:05.433 | Requirement already satisfied: aiofiles>=24.1.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (25.1.0)
+2026-03-25 01:23:05.528 | Collecting aiosqlite~=0.20 (from crawl4ai)
+2026-03-25 01:23:05.598 |   Downloading aiosqlite-0.22.1-py3-none-any.whl.metadata (4.3 kB)
+2026-03-25 01:23:05.620 | Requirement already satisfied: anyio>=4.0.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (4.12.1)
+2026-03-25 01:23:06.011 | Collecting lxml~=5.3 (from crawl4ai)
+2026-03-25 01:23:06.079 |   Downloading lxml-5.4.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (3.5 kB)
+2026-03-25 01:23:06.183 | Collecting unclecode-litellm==1.81.13 (from crawl4ai)
+2026-03-25 01:23:06.251 |   Downloading unclecode_litellm-1.81.13-py3-none-any.whl.metadata (26 kB)
+2026-03-25 01:23:06.276 | Requirement already satisfied: numpy<3,>=1.26.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (2.3.5)
+2026-03-25 01:23:06.277 | Requirement already satisfied: pillow>=10.4 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (12.1.1)
+2026-03-25 01:23:06.277 | Requirement already satisfied: playwright>=1.49.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (1.58.0)
+2026-03-25 01:23:06.373 | Collecting patchright>=1.49.0 (from crawl4ai)
+2026-03-25 01:23:06.443 |   Downloading patchright-1.58.2-py3-none-manylinux1_x86_64.whl.metadata (11 kB)
+2026-03-25 01:23:06.458 | Requirement already satisfied: python-dotenv~=1.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (1.2.2)
+2026-03-25 01:23:06.459 | Requirement already satisfied: beautifulsoup4~=4.12 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (4.14.3)
+2026-03-25 01:23:06.553 | Collecting playwright-stealth>=2.0.0 (from crawl4ai)
+2026-03-25 01:23:06.619 |   Downloading playwright_stealth-2.0.2-py3-none-any.whl.metadata (4.5 kB)
+2026-03-25 01:23:06.634 | Requirement already satisfied: xxhash~=3.4 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (3.6.0)
+2026-03-25 01:23:06.635 | Requirement already satisfied: rank-bm25~=0.2 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (0.2.2)
+2026-03-25 01:23:06.727 | Collecting snowballstemmer~=2.2 (from crawl4ai)
+2026-03-25 01:23:06.792 |   Downloading snowballstemmer-2.2.0-py2.py3-none-any.whl.metadata (6.5 kB)
+2026-03-25 01:23:06.808 | Requirement already satisfied: pydantic>=2.10 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (2.12.5)
+2026-03-25 01:23:06.903 | Collecting pyOpenSSL>=25.3.0 (from crawl4ai)
+2026-03-25 01:23:06.969 |   Downloading pyopenssl-26.0.0-py3-none-any.whl.metadata (18 kB)
+2026-03-25 01:23:06.994 | Requirement already satisfied: psutil>=6.1.1 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (7.2.2)
+2026-03-25 01:23:06.994 | Requirement already satisfied: PyYAML>=6.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (6.0.3)
+2026-03-25 01:23:06.995 | Requirement already satisfied: nltk>=3.9.1 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (3.9.3)
+2026-03-25 01:23:06.996 | Requirement already satisfied: rich>=13.9.4 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (13.9.4)
+2026-03-25 01:23:07.089 | Collecting cssselect>=1.2.0 (from crawl4ai)
+2026-03-25 01:23:07.159 |   Downloading cssselect-1.4.0-py3-none-any.whl.metadata (2.4 kB)
+2026-03-25 01:23:07.175 | Requirement already satisfied: httpx>=0.27.2 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (0.28.1)
+2026-03-25 01:23:07.176 | Requirement already satisfied: fake-useragent>=2.0.3 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (2.2.0)
+2026-03-25 01:23:07.177 | Requirement already satisfied: click>=8.1.7 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (8.3.1)
+2026-03-25 01:23:07.177 | Requirement already satisfied: chardet>=5.2.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (5.2.0)
+2026-03-25 01:23:07.178 | Requirement already satisfied: brotli>=1.1.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (1.1.0)
+2026-03-25 01:23:07.278 | Collecting humanize>=4.10.0 (from crawl4ai)
+2026-03-25 01:23:07.347 |   Downloading humanize-4.15.0-py3-none-any.whl.metadata (7.8 kB)
+2026-03-25 01:23:07.462 | Collecting lark>=1.2.2 (from crawl4ai)
+2026-03-25 01:23:07.529 |   Downloading lark-1.3.1-py3-none-any.whl.metadata (1.8 kB)
+2026-03-25 01:23:07.642 | Collecting alphashape>=1.3.1 (from crawl4ai)
+2026-03-25 01:23:07.712 |   Downloading alphashape-1.3.1-py2.py3-none-any.whl.metadata (18 kB)
+2026-03-25 01:23:07.730 | Requirement already satisfied: shapely>=2.0.0 in /usr/local/lib/python3.11/site-packages (from crawl4ai) (2.1.2)
+2026-03-25 01:23:07.837 | Collecting fastuuid>=0.13.0 (from unclecode-litellm==1.81.13->crawl4ai)
+2026-03-25 01:23:07.905 |   Downloading fastuuid-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.1 kB)
+2026-03-25 01:23:07.919 | Requirement already satisfied: openai>=2.8.0 in /usr/local/lib/python3.11/site-packages (from unclecode-litellm==1.81.13->crawl4ai) (2.26.0)
+2026-03-25 01:23:07.920 | Requirement already satisfied: importlib-metadata>=6.8.0 in /usr/local/lib/python3.11/site-packages (from unclecode-litellm==1.81.13->crawl4ai) (8.7.1)
+2026-03-25 01:23:07.920 | Requirement already satisfied: tokenizers in /usr/local/lib/python3.11/site-packages (from unclecode-litellm==1.81.13->crawl4ai) (0.22.2)
+2026-03-25 01:23:07.922 | Requirement already satisfied: jsonschema<5.0.0,>=4.23.0 in /usr/local/lib/python3.11/site-packages (from unclecode-litellm==1.81.13->crawl4ai) (4.26.0)
+2026-03-25 01:23:07.926 | Requirement already satisfied: regex>=2022.1.18 in /usr/local/lib/python3.11/site-packages (from tiktoken) (2026.2.28)
+2026-03-25 01:23:07.935 | Requirement already satisfied: primp==1.1.2 in /usr/local/lib/python3.11/site-packages (from ddgs) (1.1.2)
+2026-03-25 01:23:07.950 | Requirement already satisfied: typing-extensions>=4.2 in /usr/local/lib/python3.11/site-packages (from aiosignal>=1.4.0->aiohttp) (4.15.0)
+2026-03-25 01:23:08.052 | Collecting click-log>=0.3.2 (from alphashape>=1.3.1->crawl4ai)
+2026-03-25 01:23:08.118 |   Downloading click_log-0.4.0-py2.py3-none-any.whl.metadata (1.2 kB)
+2026-03-25 01:23:08.278 | Collecting trimesh>=3.9.8 (from alphashape>=1.3.1->crawl4ai)
+2026-03-25 01:23:08.344 |   Downloading trimesh-4.11.4-py3-none-any.whl.metadata (13 kB)
+2026-03-25 01:23:08.359 | Requirement already satisfied: networkx>=2.5 in /usr/local/lib/python3.11/site-packages (from alphashape>=1.3.1->crawl4ai) (3.6.1)
+2026-03-25 01:23:08.456 | Collecting rtree>=0.9.7 (from alphashape>=1.3.1->crawl4ai)
+2026-03-25 01:23:08.526 |   Downloading rtree-1.4.1-py3-none-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+2026-03-25 01:23:08.546 | Requirement already satisfied: scipy>=1.0.0 in /usr/local/lib/python3.11/site-packages (from alphashape>=1.3.1->crawl4ai) (1.17.1)
+2026-03-25 01:23:08.580 | Requirement already satisfied: soupsieve>=1.6.1 in /usr/local/lib/python3.11/site-packages (from beautifulsoup4~=4.12->crawl4ai) (2.8.3)
+2026-03-25 01:23:08.602 | Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.11/site-packages (from httpx>=0.27.2->crawl4ai) (1.0.9)
+2026-03-25 01:23:08.606 | Requirement already satisfied: h11>=0.16 in /usr/local/lib/python3.11/site-packages (from httpcore==1.*->httpx>=0.27.2->crawl4ai) (0.16.0)
+2026-03-25 01:23:08.613 | Requirement already satisfied: h2<5,>=3 in /usr/local/lib/python3.11/site-packages (from httpx[http2]>=0.27.2->crawl4ai) (4.3.0)
+2026-03-25 01:23:08.620 | Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.11/site-packages (from jinja2<4.0,>=2.10->diagrams) (3.0.2)
+2026-03-25 01:23:08.635 | Requirement already satisfied: joblib in /usr/local/lib/python3.11/site-packages (from nltk>=3.9.1->crawl4ai) (1.5.3)
+2026-03-25 01:23:08.636 | Requirement already satisfied: tqdm in /usr/local/lib/python3.11/site-packages (from nltk>=3.9.1->crawl4ai) (4.67.3)
+2026-03-25 01:23:08.643 | Requirement already satisfied: pyee<14,>=13 in /usr/local/lib/python3.11/site-packages (from patchright>=1.49.0->crawl4ai) (13.0.1)
+2026-03-25 01:23:08.644 | Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /usr/local/lib/python3.11/site-packages (from patchright>=1.49.0->crawl4ai) (3.3.2)
+2026-03-25 01:23:08.759 | Collecting cfgv>=2.0.0 (from pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:08.825 |   Downloading cfgv-3.5.0-py2.py3-none-any.whl.metadata (8.9 kB)
+2026-03-25 01:23:08.960 | Collecting identify>=1.0.0 (from pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:09.026 |   Downloading identify-2.6.18-py2.py3-none-any.whl.metadata (4.4 kB)
+2026-03-25 01:23:09.139 | Collecting nodeenv>=0.11.1 (from pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:09.205 |   Downloading nodeenv-1.10.0-py2.py3-none-any.whl.metadata (24 kB)
+2026-03-25 01:23:09.359 | Collecting virtualenv>=20.10.0 (from pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:09.424 |   Downloading virtualenv-21.2.0-py3-none-any.whl.metadata (3.5 kB)
+2026-03-25 01:23:09.462 | Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.11/site-packages (from pydantic>=2.10->crawl4ai) (0.7.0)
+2026-03-25 01:23:09.462 | Requirement already satisfied: pydantic-core==2.41.5 in /usr/local/lib/python3.11/site-packages (from pydantic>=2.10->crawl4ai) (2.41.5)
+2026-03-25 01:23:09.463 | Requirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.11/site-packages (from pydantic>=2.10->crawl4ai) (0.4.2)
+2026-03-25 01:23:09.471 | Requirement already satisfied: cryptography<47,>=46.0.0 in /usr/local/lib/python3.11/site-packages (from pyOpenSSL>=25.3.0->crawl4ai) (46.0.5)
+2026-03-25 01:23:09.488 | Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.11/site-packages (from rich>=13.9.4->crawl4ai) (4.0.0)
+2026-03-25 01:23:09.488 | Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.11/site-packages (from rich>=13.9.4->crawl4ai) (2.19.2)
+2026-03-25 01:23:09.529 | Requirement already satisfied: cffi>=2.0.0 in /usr/local/lib/python3.11/site-packages (from cryptography<47,>=46.0.0->pyOpenSSL>=25.3.0->crawl4ai) (2.0.0)
+2026-03-25 01:23:09.540 | Requirement already satisfied: hyperframe<7,>=6.1 in /usr/local/lib/python3.11/site-packages (from h2<5,>=3->httpx[http2]>=0.27.2->crawl4ai) (6.1.0)
+2026-03-25 01:23:09.540 | Requirement already satisfied: hpack<5,>=4.1 in /usr/local/lib/python3.11/site-packages (from h2<5,>=3->httpx[http2]>=0.27.2->crawl4ai) (4.1.0)
+2026-03-25 01:23:09.552 | Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.11/site-packages (from importlib-metadata>=6.8.0->unclecode-litellm==1.81.13->crawl4ai) (3.23.0)
+2026-03-25 01:23:09.561 | Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.11/site-packages (from jsonschema<5.0.0,>=4.23.0->unclecode-litellm==1.81.13->crawl4ai) (2025.9.1)
+2026-03-25 01:23:09.562 | Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.11/site-packages (from jsonschema<5.0.0,>=4.23.0->unclecode-litellm==1.81.13->crawl4ai) (0.37.0)
+2026-03-25 01:23:09.562 | Requirement already satisfied: rpds-py>=0.25.0 in /usr/local/lib/python3.11/site-packages (from jsonschema<5.0.0,>=4.23.0->unclecode-litellm==1.81.13->crawl4ai) (0.30.0)
+2026-03-25 01:23:09.572 | Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich>=13.9.4->crawl4ai) (0.1.2)
+2026-03-25 01:23:09.599 | Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.11/site-packages (from openai>=2.8.0->unclecode-litellm==1.81.13->crawl4ai) (1.9.0)
+2026-03-25 01:23:09.600 | Requirement already satisfied: jiter<1,>=0.10.0 in /usr/local/lib/python3.11/site-packages (from openai>=2.8.0->unclecode-litellm==1.81.13->crawl4ai) (0.13.0)
+2026-03-25 01:23:09.601 | Requirement already satisfied: sniffio in /usr/local/lib/python3.11/site-packages (from openai>=2.8.0->unclecode-litellm==1.81.13->crawl4ai) (1.3.1)
+2026-03-25 01:23:09.771 | Collecting distlib<1,>=0.3.7 (from virtualenv>=20.10.0->pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:09.840 |   Downloading distlib-0.4.0-py2.py3-none-any.whl.metadata (5.2 kB)
+2026-03-25 01:23:09.958 | Collecting filelock<4,>=3.24.2 (from virtualenv>=20.10.0->pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:10.026 |   Downloading filelock-3.25.2-py3-none-any.whl.metadata (2.0 kB)
+2026-03-25 01:23:10.043 | Requirement already satisfied: platformdirs<5,>=3.9.1 in /usr/local/lib/python3.11/site-packages (from virtualenv>=20.10.0->pre-commit<5,>=4.0.1->diagrams) (4.9.4)
+2026-03-25 01:23:10.137 | Collecting python-discovery>=1 (from virtualenv>=20.10.0->pre-commit<5,>=4.0.1->diagrams)
+2026-03-25 01:23:10.211 |   Downloading python_discovery-1.2.0-py3-none-any.whl.metadata (5.4 kB)
+2026-03-25 01:23:10.244 | Requirement already satisfied: huggingface-hub<2.0,>=0.16.4 in /usr/local/lib/python3.11/site-packages (from tokenizers->unclecode-litellm==1.81.13->crawl4ai) (1.6.0)
+2026-03-25 01:23:10.249 | Requirement already satisfied: pycparser in /usr/local/lib/python3.11/site-packages (from cffi>=2.0.0->cryptography<47,>=46.0.0->pyOpenSSL>=25.3.0->crawl4ai) (3.0)
+2026-03-25 01:23:10.310 | Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.11/site-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (2025.3.0)
+2026-03-25 01:23:10.311 | Requirement already satisfied: hf-xet<2.0.0,>=1.3.2 in /usr/local/lib/python3.11/site-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (1.3.2)
+2026-03-25 01:23:10.312 | Requirement already satisfied: packaging>=20.9 in /usr/local/lib/python3.11/site-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (26.0)
+2026-03-25 01:23:10.313 | Requirement already satisfied: typer in /usr/local/lib/python3.11/site-packages (from huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (0.24.1)
+2026-03-25 01:23:10.411 | Requirement already satisfied: shellingham>=1.3.0 in /usr/local/lib/python3.11/site-packages (from typer->huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (1.5.4)
+2026-03-25 01:23:10.412 | Requirement already satisfied: annotated-doc>=0.0.2 in /usr/local/lib/python3.11/site-packages (from typer->huggingface-hub<2.0,>=0.16.4->tokenizers->unclecode-litellm==1.81.13->crawl4ai) (0.0.4)
+2026-03-25 01:23:10.496 | Downloading diagrams-0.25.1-py3-none-any.whl (34.5 MB)
+2026-03-25 01:23:12.429 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 34.5/34.5 MB 16.2 MB/s eta 0:00:00
+2026-03-25 01:23:12.498 | Downloading crawl4ai-0.8.6-py3-none-any.whl (501 kB)
+2026-03-25 01:23:12.529 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 501.9/501.9 kB 16.7 MB/s eta 0:00:00
+2026-03-25 01:23:12.599 | Downloading unclecode_litellm-1.81.13-py3-none-any.whl (18.0 MB)
+2026-03-25 01:23:13.392 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 18.0/18.0 MB 20.7 MB/s eta 0:00:00
+2026-03-25 01:23:13.459 | Downloading asyncio-4.0.0-py3-none-any.whl (5.6 kB)
+2026-03-25 01:23:13.540 | Downloading aiosqlite-0.22.1-py3-none-any.whl (17 kB)
+2026-03-25 01:23:13.620 | Downloading alphashape-1.3.1-py2.py3-none-any.whl (13 kB)
+2026-03-25 01:23:13.705 | Downloading cssselect-1.4.0-py3-none-any.whl (18 kB)
+2026-03-25 01:23:13.790 | Downloading graphviz-0.20.3-py3-none-any.whl (47 kB)
+2026-03-25 01:23:13.807 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 47.1/47.1 kB 2.5 MB/s eta 0:00:00
+2026-03-25 01:23:13.874 | Downloading humanize-4.15.0-py3-none-any.whl (132 kB)
+2026-03-25 01:23:13.893 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.2/132.2 kB 7.4 MB/s eta 0:00:00
+2026-03-25 01:23:13.958 | Downloading lark-1.3.1-py3-none-any.whl (113 kB)
+2026-03-25 01:23:13.980 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 113.2/113.2 kB 5.6 MB/s eta 0:00:00
+2026-03-25 01:23:14.048 | Downloading lxml-5.4.0-cp311-cp311-manylinux_2_28_x86_64.whl (4.9 MB)
+2026-03-25 01:23:14.284 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.9/4.9 MB 21.2 MB/s eta 0:00:00
+2026-03-25 01:23:14.353 | Downloading patchright-1.58.2-py3-none-manylinux1_x86_64.whl (46.2 MB)
+2026-03-25 01:23:16.222 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 46.2/46.2 MB 23.3 MB/s eta 0:00:00
+2026-03-25 01:23:16.288 | Downloading playwright_stealth-2.0.2-py3-none-any.whl (33 kB)
+2026-03-25 01:23:16.373 | Downloading pre_commit-4.5.1-py2.py3-none-any.whl (226 kB)
+2026-03-25 01:23:16.401 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 226.4/226.4 kB 8.2 MB/s eta 0:00:00
+2026-03-25 01:23:16.469 | Downloading pyopenssl-26.0.0-py3-none-any.whl (57 kB)
+2026-03-25 01:23:16.485 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 58.0/58.0 kB 3.4 MB/s eta 0:00:00
+2026-03-25 01:23:16.552 | Downloading snowballstemmer-2.2.0-py2.py3-none-any.whl (93 kB)
+2026-03-25 01:23:16.571 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 93.0/93.0 kB 5.3 MB/s eta 0:00:00
+2026-03-25 01:23:16.637 | Downloading cfgv-3.5.0-py2.py3-none-any.whl (7.4 kB)
+2026-03-25 01:23:16.716 | Downloading click_log-0.4.0-py2.py3-none-any.whl (4.3 kB)
+2026-03-25 01:23:16.798 | Downloading fastuuid-0.14.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (279 kB)
+2026-03-25 01:23:16.821 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 279.7/279.7 kB 13.1 MB/s eta 0:00:00
+2026-03-25 01:23:16.889 | Downloading identify-2.6.18-py2.py3-none-any.whl (99 kB)
+2026-03-25 01:23:16.909 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 99.4/99.4 kB 5.3 MB/s eta 0:00:00
+2026-03-25 01:23:16.976 | Downloading nodeenv-1.10.0-py2.py3-none-any.whl (23 kB)
+2026-03-25 01:23:17.057 | Downloading rtree-1.4.1-py3-none-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (507 kB)
+2026-03-25 01:23:17.093 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 507.6/507.6 kB 15.3 MB/s eta 0:00:00
+2026-03-25 01:23:17.162 | Downloading trimesh-4.11.4-py3-none-any.whl (740 kB)
+2026-03-25 01:23:17.208 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 740.8/740.8 kB 16.6 MB/s eta 0:00:00
+2026-03-25 01:23:17.275 | Downloading virtualenv-21.2.0-py3-none-any.whl (5.8 MB)
+2026-03-25 01:23:17.570 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.8/5.8 MB 19.8 MB/s eta 0:00:00
+2026-03-25 01:23:17.638 | Downloading distlib-0.4.0-py2.py3-none-any.whl (469 kB)
+2026-03-25 01:23:17.668 |    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 469.0/469.0 kB 16.2 MB/s eta 0:00:00
+2026-03-25 01:23:17.735 | Downloading filelock-3.25.2-py3-none-any.whl (26 kB)
+2026-03-25 01:23:17.814 | Downloading python_discovery-1.2.0-py3-none-any.whl (31 kB)
+2026-03-25 01:23:18.985 | Installing collected packages: snowballstemmer, distlib, trimesh, rtree, nodeenv, lxml, lark, identify, humanize, graphviz, filelock, fastuuid, cssselect, click-log, cfgv, asyncio, aiosqlite, python-discovery, patchright, alphashape, virtualenv, pyOpenSSL, playwright-stealth, pre-commit, diagrams, unclecode-litellm, crawl4ai
+2026-03-25 01:23:19.336 |   Attempting uninstall: lxml
+2026-03-25 01:23:19.347 |     Found existing installation: lxml 6.0.2
+2026-03-25 01:23:19.357 |     Uninstalling lxml-6.0.2:
+2026-03-25 01:23:19.393 |       Successfully uninstalled lxml-6.0.2
+2026-03-25 01:23:19.642 |   Attempting uninstall: filelock
+2026-03-25 01:23:19.673 |     Found existing installation: filelock 3.20.0
+2026-03-25 01:23:19.674 |     Uninstalling filelock-3.20.0:
+2026-03-25 01:23:19.680 |       Successfully uninstalled filelock-3.20.0
+2026-03-25 01:23:23.625 | Successfully installed aiosqlite-0.22.1 alphashape-1.3.1 asyncio-4.0.0 cfgv-3.5.0 click-log-0.4.0 crawl4ai-0.8.6 cssselect-1.4.0 diagrams-0.25.1 distlib-0.4.0 fastuuid-0.14.0 filelock-3.25.2 graphviz-0.20.3 humanize-4.15.0 identify-2.6.18 lark-1.3.1 lxml-5.4.0 nodeenv-1.10.0 patchright-1.58.2 playwright-stealth-2.0.2 pre-commit-4.5.1 pyOpenSSL-26.0.0 python-discovery-1.2.0 rtree-1.4.1 snowballstemmer-2.2.0 trimesh-4.11.4 unclecode-litellm-1.81.13 virtualenv-21.2.0
+2026-03-25 01:23:23.625 | WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+2026-03-25 01:23:23.947 | 
+2026-03-25 01:23:23.947 | [notice] A new release of pip is available: 24.0 -> 26.0.1
+2026-03-25 01:23:23.947 | [notice] To update, run: pip install --upgrade pip
+2026-03-25 01:23:24.349 | /usr/local/lib/python3.11/site-packages/jwt/api_jwt.py:371: InsecureKeyLengthWarning: The HMAC key is 16 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+2026-03-25 01:23:24.349 |   decoded = self.decode_complete(
+2026-03-25 01:23:24.369 | 2026-03-24 22:23:24.369 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/version HTTP/1.1" 200
+2026-03-25 01:23:29.259 | 2026-03-24 22:23:29.258 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /manifest.json HTTP/1.1" 200
+2026-03-25 01:23:29.806 | 2026-03-24 22:23:29.805 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/config HTTP/1.1" 200
+2026-03-25 01:23:29.823 | 2026-03-24 22:23:29.822 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/v1/auths/ HTTP/1.1" 401
+2026-03-25 01:23:29.837 | 2026-03-24 22:23:29.836 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/version HTTP/1.1" 200
+2026-03-25 01:23:30.813 | 2026-03-24 22:23:30.813 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/version HTTP/1.1" 200
+2026-03-25 01:23:31.769 | 2026-03-24 22:23:31.769 | INFO     | open_webui.models.auths:authenticate_user:127 - authenticate_user: salmajnouni@gmail.com
+2026-03-25 01:23:31.950 | /usr/local/lib/python3.11/site-packages/jwt/api_jwt.py:153: InsecureKeyLengthWarning: The HMAC key is 16 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+2026-03-25 01:23:31.950 |   return self._jws.encode(
+2026-03-25 01:23:31.955 | 2026-03-24 22:23:31.954 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "POST /api/v1/auths/signin HTTP/1.1" 200
+2026-03-25 01:23:31.979 | 2026-03-24 22:23:31.979 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33096 - "GET /api/config HTTP/1.1" 200
+2026-03-25 01:23:31.982 | 2026-03-24 22:23:31.982 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/v1/users/user/settings HTTP/1.1" 200
+2026-03-25 01:23:32.049 | 2026-03-24 22:23:32.049 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/v1/folders/ HTTP/1.1" 200
+2026-03-25 01:23:32.168 | 2026-03-24 22:23:32.168 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33144 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:23:32.172 | 2026-03-24 22:23:32.171 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33128 - "GET /api/v1/chats/all/tags HTTP/1.1" 200
+2026-03-25 01:23:32.173 | 2026-03-24 22:23:32.173 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33146 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:23:32.174 | 2026-03-24 22:23:32.173 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33150 - "GET /api/v1/users/user/settings HTTP/1.1" 200
+2026-03-25 01:23:32.174 | 2026-03-24 22:23:32.174 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33096 - "POST /api/v1/auths/update/timezone HTTP/1.1" 200
+2026-03-25 01:23:32.200 | 2026-03-24 22:23:32.200 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:23:32.200 | 2026-03-24 22:23:32.200 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:23:32.219 | 2026-03-24 22:23:32.219 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33150 - "GET /api/v1/terminals/ HTTP/1.1" 200
+2026-03-25 01:23:32.220 | 2026-03-24 22:23:32.220 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/v1/users/e6240ede-d596-497e-b464-a3b3e49f52c5/profile/image HTTP/1.1" 200
+2026-03-25 01:23:32.221 | 2026-03-24 22:23:32.221 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33128 - "GET /api/v1/chats/pinned HTTP/1.1" 200
+2026-03-25 01:23:32.230 | 2026-03-24 22:23:32.230 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:23:32.251 | 2026-03-24 22:23:32.251 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33146 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:23:32.253 | 2026-03-24 22:23:32.253 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33128 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:23:32.338 | 2026-03-24 22:23:32.337 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:23:32.417 | 2026-03-24 22:23:32.416 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33146 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:23:32.417 | 2026-03-24 22:23:32.416 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33150 - "GET /api/v1/functions/ HTTP/1.1" 200
+2026-03-25 01:23:32.426 | 2026-03-24 22:23:32.426 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33150 - "GET /api/v1/functions/ HTTP/1.1" 200
+2026-03-25 01:23:32.444 | 2026-03-24 22:23:32.444 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56972 - "POST /api/v1/tasks/active/chats HTTP/1.1" 200
+2026-03-25 01:23:32.681 | 2026-03-24 22:23:32.680 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33128 - "GET /api/version/updates HTTP/1.1" 200
+2026-03-25 01:23:44.367 | 2026-03-24 22:23:44.366 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60124 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:23:44.368 | 2026-03-24 22:23:44.368 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60136 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:23:52.017 | 2026-03-24 22:23:52.017 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:23:53.598 | 2026-03-24 22:23:53.597 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/usage HTTP/1.1" 200
+2026-03-25 01:23:55.218 | 2026-03-24 22:23:55.217 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/v1/users/?page=1&order_by=created_at&direction=asc HTTP/1.1" 200
+2026-03-25 01:23:55.244 | 2026-03-24 22:23:55.244 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/v1/users/e6240ede-d596-497e-b464-a3b3e49f52c5/info HTTP/1.1" 200
+2026-03-25 01:23:55.511 | 2026-03-24 22:23:55.510 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/v1/users/?page=1&order_by=created_at&direction=asc HTTP/1.1" 200
+2026-03-25 01:23:56.825 | 2026-03-24 22:23:56.825 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53526 - "GET /api/webhook HTTP/1.1" 200
+2026-03-25 01:23:56.826 | 2026-03-24 22:23:56.826 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53530 - "GET /api/v1/auths/admin/config HTTP/1.1" 200
+2026-03-25 01:23:56.828 | 2026-03-24 22:23:56.828 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53540 - "GET /api/v1/auths/admin/config/ldap/server HTTP/1.1" 200
+2026-03-25 01:23:56.861 | 2026-03-24 22:23:56.861 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:23:56.869 | 2026-03-24 22:23:56.869 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53562 - "GET /api/webhook HTTP/1.1" 200
+2026-03-25 01:23:56.870 | 2026-03-24 22:23:56.869 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53526 - "GET /api/v1/auths/admin/config HTTP/1.1" 200
+2026-03-25 01:23:56.870 | 2026-03-24 22:23:56.870 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53530 - "GET /api/v1/auths/admin/config/ldap/server HTTP/1.1" 200
+2026-03-25 01:23:56.880 | 2026-03-24 22:23:56.880 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /api/v1/auths/admin/config/ldap HTTP/1.1" 200
+2026-03-25 01:23:56.881 | 2026-03-24 22:23:56.880 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53540 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:23:56.916 | 2026-03-24 22:23:56.916 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53540 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:23:56.916 | 2026-03-24 22:23:56.916 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /api/v1/auths/admin/config/ldap HTTP/1.1" 200
+2026-03-25 01:23:56.922 | 2026-03-24 22:23:56.922 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:23:56.951 | 2026-03-24 22:23:56.951 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/version/updates HTTP/1.1" 200
+2026-03-25 01:23:57.069 | 2026-03-24 22:23:57.068 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /api/version/updates HTTP/1.1" 200
+2026-03-25 01:23:58.349 | 2026-03-24 22:23:58.349 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /openai/config HTTP/1.1" 200
+2026-03-25 01:23:58.349 | 2026-03-24 22:23:58.349 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:59586 - "GET /ollama/config HTTP/1.1" 200
+2026-03-25 01:23:58.350 | 2026-03-24 22:23:58.349 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53540 - "GET /api/v1/configs/connections HTTP/1.1" 200
+2026-03-25 01:23:58.369 | 2026-03-24 22:23:58.366 | ERROR    | open_webui.routers.openai:get_models:642 - Unexpected error: HTTP Error: 500
+2026-03-25 01:23:58.369 | Traceback (most recent call last):
+2026-03-25 01:23:58.369 | 
+2026-03-25 01:23:58.369 |   File "<frozen runpy>", line 198, in _run_module_as_main
+2026-03-25 01:23:58.369 |   File "<frozen runpy>", line 88, in _run_code
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/uvicorn/__main__.py", line 4, in <module>
+2026-03-25 01:23:58.369 |     uvicorn.main()
+2026-03-25 01:23:58.369 |     │       └ <Command main>
+2026-03-25 01:23:58.369 |     └ <module 'uvicorn' from '/usr/local/lib/python3.11/site-packages/uvicorn/__init__.py'>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/click/core.py", line 1485, in __call__
+2026-03-25 01:23:58.369 |     return self.main(*args, **kwargs)
+2026-03-25 01:23:58.369 |            │    │     │       └ {}
+2026-03-25 01:23:58.369 |            │    │     └ ()
+2026-03-25 01:23:58.369 |            │    └ <function Command.main at 0x7b7befdc7100>
+2026-03-25 01:23:58.369 |            └ <Command main>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/click/core.py", line 1406, in main
+2026-03-25 01:23:58.369 |     rv = self.invoke(ctx)
+2026-03-25 01:23:58.369 |          │    │      └ <click.core.Context object at 0x7b7bf0b00890>
+2026-03-25 01:23:58.369 |          │    └ <function Command.invoke at 0x7b7befdc6de0>
+2026-03-25 01:23:58.369 |          └ <Command main>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/click/core.py", line 1269, in invoke
+2026-03-25 01:23:58.369 |     return ctx.invoke(self.callback, **ctx.params)
+2026-03-25 01:23:58.369 |            │   │      │    │           │   └ {'host': '0.0.0.0', 'port': 8080, 'forwarded_allow_ips': '*', 'workers': 1, 'app': 'open_webui.main:app', 'uds': None, 'fd': ...
+2026-03-25 01:23:58.369 |            │   │      │    │           └ <click.core.Context object at 0x7b7bf0b00890>
+2026-03-25 01:23:58.369 |            │   │      │    └ <function main at 0x7b7befbcc040>
+2026-03-25 01:23:58.369 |            │   │      └ <Command main>
+2026-03-25 01:23:58.369 |            │   └ <function Context.invoke at 0x7b7befdc6020>
+2026-03-25 01:23:58.369 |            └ <click.core.Context object at 0x7b7bf0b00890>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/click/core.py", line 824, in invoke
+2026-03-25 01:23:58.369 |     return callback(*args, **kwargs)
+2026-03-25 01:23:58.369 |            │         │       └ {'host': '0.0.0.0', 'port': 8080, 'forwarded_allow_ips': '*', 'workers': 1, 'app': 'open_webui.main:app', 'uds': None, 'fd': ...
+2026-03-25 01:23:58.369 |            │         └ ()
+2026-03-25 01:23:58.369 |            └ <function main at 0x7b7befbcc040>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/uvicorn/main.py", line 433, in main
+2026-03-25 01:23:58.369 |     run(
+2026-03-25 01:23:58.369 |     └ <function run at 0x7b7befc7dd00>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/uvicorn/main.py", line 606, in run
+2026-03-25 01:23:58.369 |     server.run()
+2026-03-25 01:23:58.369 |     │      └ <function Server.run at 0x7b7befc7d580>
+2026-03-25 01:23:58.369 |     └ <uvicorn.server.Server object at 0x7b7befd11750>
+2026-03-25 01:23:58.369 |   File "/usr/local/lib/python3.11/site-packages/uvicorn/server.py", line 75, in run
+2026-03-25 01:23:58.369 |     return asyncio_run(self.serve(sockets=sockets), loop_factory=self.config.get_loop_factory())
+2026-03-25 01:23:58.369 |            │           │    │             │                      │    │      └ <function Config.get_loop_factory at 0x7b7befd94360>
+2026-03-25 01:23:58.369 |            │           │    │             │                      │    └ <uvicorn.config.Config object at 0x7b7bf0c97110>
+2026-03-25 01:23:58.369 |            │           │    │             │                      └ <uvicorn.server.Server object at 0x7b7befd11750>
+2026-03-25 01:23:58.369 |            │           │    │             └ None
+2026-03-25 01:23:58.370 |            │           │    └ <function Server.serve at 0x7b7befc7d620>
+2026-03-25 01:23:58.370 |            │           └ <uvicorn.server.Server object at 0x7b7befd11750>
+2026-03-25 01:23:58.370 |            └ <function asyncio_run at 0x7b7befdce020>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/uvicorn/_compat.py", line 30, in asyncio_run
+2026-03-25 01:23:58.370 |     return runner.run(main)
+2026-03-25 01:23:58.370 |            │      │   └ <coroutine object Server.serve at 0x7b7befb334c0>
+2026-03-25 01:23:58.370 |            │      └ <function Runner.run at 0x7b7bf0018fe0>
+2026-03-25 01:23:58.370 |            └ <asyncio.runners.Runner object at 0x7b7befd88250>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
+2026-03-25 01:23:58.370 |     return self._loop.run_until_complete(task)
+2026-03-25 01:23:58.370 |            │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /usr/local/lib/python3.11/site-packages/uvicorn/server.py:79> wai...
+2026-03-25 01:23:58.370 |            │    │     └ <cyfunction Loop.run_until_complete at 0x7b7befbe6800>
+2026-03-25 01:23:58.370 |            │    └ <uvloop.Loop running=True closed=False debug=False>
+2026-03-25 01:23:58.370 |            └ <asyncio.runners.Runner object at 0x7b7befd88250>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/base.py", line 144, in coro
+2026-03-25 01:23:58.370 |     await self.app(scope, receive_or_disconnect, send_no_error)
+2026-03-25 01:23:58.370 |           │    │   │      │                      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7b7a71d211c0>
+2026-03-25 01:23:58.370 |           │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │    └ <starlette_compress.CompressMiddleware object at 0x7b7a73ab92b0>
+2026-03-25 01:23:58.370 |           └ <open_webui.main.RedirectMiddleware object at 0x7b7a739fd250>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette_compress/__init__.py", line 104, in __call__
+2026-03-25 01:23:58.370 |     return await self._zstd(scope, receive, send)
+2026-03-25 01:23:58.370 |                  │    │     │      │        └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.send_no_error at 0x7b7a71d211c0>
+2026-03-25 01:23:58.370 |                  │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |                  │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |                  │    └ <member '_zstd' of 'CompressMiddleware' objects>
+2026-03-25 01:23:58.370 |                  └ <starlette_compress.CompressMiddleware object at 0x7b7a73ab92b0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette_compress/_zstd_legacy.py", line 107, in __call__
+2026-03-25 01:23:58.370 |     await self.app(scope, receive, wrapper)
+2026-03-25 01:23:58.370 |           │    │   │      │        └ <function ZstdResponder.__call__.<locals>.wrapper at 0x7b7a71d23e20>
+2026-03-25 01:23:58.370 |           │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │    └ <member 'app' of 'ZstdResponder' objects>
+2026-03-25 01:23:58.370 |           └ <starlette_compress._zstd_legacy.ZstdResponder object at 0x7b7a73cd1f80>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+2026-03-25 01:23:58.370 |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+2026-03-25 01:23:58.370 |           │                            │    │    │     │      │        └ <function ZstdResponder.__call__.<locals>.wrapper at 0x7b7a71d23e20>
+2026-03-25 01:23:58.370 |           │                            │    │    │     │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │                            │    │    └ <starlette.requests.Request object at 0x7b7a71cc7950>
+2026-03-25 01:23:58.370 |           │                            │    └ <fastapi.middleware.asyncexitstack.AsyncExitStackMiddleware object at 0x7b7a7227a8d0>
+2026-03-25 01:23:58.370 |           │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7b7a7227a890>
+2026-03-25 01:23:58.370 |           └ <function wrap_app_handling_exceptions at 0x7b7becf98cc0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+2026-03-25 01:23:58.370 |     await app(scope, receive, sender)
+2026-03-25 01:23:58.370 |           │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           └ <fastapi.middleware.asyncexitstack.AsyncExitStackMiddleware object at 0x7b7a7227a8d0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+2026-03-25 01:23:58.370 |     await self.app(scope, receive, send)
+2026-03-25 01:23:58.370 |           │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │    └ <fastapi.routing.APIRouter object at 0x7b7a73cfc250>
+2026-03-25 01:23:58.370 |           └ <fastapi.middleware.asyncexitstack.AsyncExitStackMiddleware object at 0x7b7a7227a8d0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 716, in __call__
+2026-03-25 01:23:58.370 |     await self.middleware_stack(scope, receive, send)
+2026-03-25 01:23:58.370 |           │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │    │                │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7b7a73cfc250>>
+2026-03-25 01:23:58.370 |           └ <fastapi.routing.APIRouter object at 0x7b7a73cfc250>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 736, in app
+2026-03-25 01:23:58.370 |     await route.handle(scope, receive, send)
+2026-03-25 01:23:58.370 |           │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │     │      │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │     └ <function Route.handle at 0x7b7becf9a340>
+2026-03-25 01:23:58.370 |           └ APIRoute(path='/openai/models/{url_idx}', name='get_models', methods=['GET'])
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/routing.py", line 290, in handle
+2026-03-25 01:23:58.370 |     await self.app(scope, receive, send)
+2026-03-25 01:23:58.370 |           │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │    │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │    └ <function request_response.<locals>.app at 0x7b7a739b8c20>
+2026-03-25 01:23:58.370 |           └ APIRoute(path='/openai/models/{url_idx}', name='get_models', methods=['GET'])
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 130, in app
+2026-03-25 01:23:58.370 |     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+2026-03-25 01:23:58.370 |           │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d225c0>
+2026-03-25 01:23:58.370 |           │                            │    │        │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           │                            │    └ <starlette.requests.Request object at 0x7b7a71cc4a50>
+2026-03-25 01:23:58.370 |           │                            └ <function request_response.<locals>.app.<locals>.app at 0x7b7a71d220c0>
+2026-03-25 01:23:58.370 |           └ <function wrap_app_handling_exceptions at 0x7b7becf98cc0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+2026-03-25 01:23:58.370 |     await app(scope, receive, sender)
+2026-03-25 01:23:58.370 |           │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7b7a71d23380>
+2026-03-25 01:23:58.370 |           │   │      └ <function BaseHTTPMiddleware.__call__.<locals>.call_next.<locals>.receive_or_disconnect at 0x7b7a71d20540>
+2026-03-25 01:23:58.370 |           │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('172.20.0.3', 8080), 'c...
+2026-03-25 01:23:58.370 |           └ <function request_response.<locals>.app.<locals>.app at 0x7b7a71d220c0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 116, in app
+2026-03-25 01:23:58.370 |     response = await f(request)
+2026-03-25 01:23:58.370 |                      │ └ <starlette.requests.Request object at 0x7b7a71cc4a50>
+2026-03-25 01:23:58.370 |                      └ <function get_request_handler.<locals>.app at 0x7b7a739b8900>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 670, in app
+2026-03-25 01:23:58.370 |     raw_response = await run_endpoint_function(
+2026-03-25 01:23:58.370 |                          └ <function run_endpoint_function at 0x7b7bed0147c0>
+2026-03-25 01:23:58.370 |   File "/usr/local/lib/python3.11/site-packages/fastapi/routing.py", line 324, in run_endpoint_function
+2026-03-25 01:23:58.370 |     return await dependant.call(**values)
+2026-03-25 01:23:58.370 |                  │         │      └ {'user': UserModel(id='e6240ede-d596-497e-b464-a3b3e49f52c5', email='salmajnouni@gmail.com', username=None, role='admin', nam...
+2026-03-25 01:23:58.370 |                  │         └ <function get_models at 0x7b7af9ea3380>
+2026-03-25 01:23:58.370 |                  └ Dependant(path_params=[ModelField(field_info=Path(PydanticUndefined), name='url_idx', mode='validation', config=None)], query...
+2026-03-25 01:23:58.370 | 
+2026-03-25 01:23:58.370 | > File "/app/backend/open_webui/routers/openai.py", line 613, in get_models
+2026-03-25 01:23:58.370 |     raise Exception(error_detail)
+2026-03-25 01:23:58.370 |                     └ 'HTTP Error: 500'
+2026-03-25 01:23:58.370 | 
+2026-03-25 01:23:58.370 | Exception: HTTP Error: 500
+2026-03-25 01:23:58.371 | 2026-03-24 22:23:58.371 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "GET /openai/models/0 HTTP/1.1" 500
+2026-03-25 01:24:02.963 | 2026-03-24 22:24:02.963 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53546 - "POST /openai/verify HTTP/1.1" 500
+2026-03-25 01:24:30.397 | 2026-03-24 22:24:30.397 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39976 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:24:36.104 | 2026-03-24 22:24:36.103 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39980 - "POST /openai/verify HTTP/1.1" 500
+2026-03-25 01:24:47.189 | 2026-03-24 22:24:47.189 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:34934 - "POST /openai/verify HTTP/1.1" 500
+2026-03-25 01:25:30.382 | 2026-03-24 22:25:30.381 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40252 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:25:44.352 | 2026-03-24 22:25:44.352 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40756 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:26:31.355 | 2026-03-24 22:26:31.355 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40240 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:26:44.360 | 2026-03-24 22:26:44.360 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:48860 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:27:14.648 | 2026-03-24 22:27:14.647 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:27:14.792 | 2026-03-24 22:27:14.791 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57826 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:27:14.794 | 2026-03-24 22:27:14.794 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /static/favicon.png HTTP/1.1" 200
+2026-03-25 01:27:17.135 | 2026-03-24 22:27:17.134 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:27:17.618 | 2026-03-24 22:27:17.617 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:27:17.618 | 2026-03-24 22:27:17.617 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:27:17.628 | 2026-03-24 22:27:17.627 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:27:17.720 | 2026-03-24 22:27:17.719 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:27:18.830 | 2026-03-24 22:27:18.829 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /ollama/api/version HTTP/1.1" 200
+2026-03-25 01:27:18.915 | 2026-03-24 22:27:18.914 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57826 - "GET /api/v1/models/model/profile/image?id=llama3.1:70b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.916 | 2026-03-24 22:27:18.916 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /api/v1/models/model/profile/image?id=qwen2.5:72b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.921 | 2026-03-24 22:27:18.920 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52840 - "GET /api/v1/models/model/profile/image?id=qwen2.5:32b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.928 | 2026-03-24 22:27:18.928 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52838 - "GET /api/v1/models/model/profile/image?id=nomic-embed-text:latest&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.933 | 2026-03-24 22:27:18.933 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52836 - "GET /api/v1/models/model/profile/image?id=qwen2.5:14b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.941 | 2026-03-24 22:27:18.941 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52832 - "GET /api/v1/models/model/profile/image?id=deepseek-r1:32b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.969 | 2026-03-24 22:27:18.969 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57816 - "GET /api/v1/models/model/profile/image?id=qwen2.5:7b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.977 | 2026-03-24 22:27:18.976 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57826 - "GET /api/v1/models/model/profile/image?id=arena-model&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.981 | 2026-03-24 22:27:18.981 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52840 - "GET /api/v1/models/model/profile/image?id=saleh_agent&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.988 | 2026-03-24 22:27:18.988 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52838 - "GET /api/v1/models/model/profile/image?id=evo1&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:18.995 | 2026-03-24 22:27:18.994 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52836 - "GET /api/v1/models/model/profile/image?id=dev_architect&lang=en-US HTTP/1.1" 200
+2026-03-25 01:27:32.351 | 2026-03-24 22:27:32.350 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39826 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:27:44.401 | 2026-03-24 22:27:44.401 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35028 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:27:54.920 | 2026-03-24 22:27:54.920 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "POST /api/v1/chats/new HTTP/1.1" 200
+2026-03-25 01:27:55.103 | 2026-03-24 22:27:55.102 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46350 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:27:55.106 | 2026-03-24 22:27:55.106 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46354 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:27:55.122 | 2026-03-24 22:27:55.122 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:27:55.221 | 2026-03-24 22:27:55.220 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "POST /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:27:55.242 | 2026-03-24 22:27:55.241 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:27:55.458 | 2026-03-24 22:27:55.458 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_arxiv_search_tool
+2026-03-25 01:27:55.550 | 2026-03-24 22:27:55.550 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_brained_search_langsearch_or
+2026-03-25 01:27:55.593 | 2026-03-24 22:27:55.592 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_pexels_stock_image_and_video
+2026-03-25 01:27:55.648 | 2026-03-24 22:27:55.648 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_ltx_generate_video
+2026-03-25 01:27:55.688 | 2026-03-24 22:27:55.687 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_image_gen
+2026-03-25 01:27:55.722 | 2026-03-24 22:27:55.722 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_kubernetes_monitoring
+2026-03-25 01:27:55.722 | 2026-03-24 22:27:55.722 | INFO     | tool_kubernetes_monitoring:__init__:28 - Kubernetes Monitoring initialized (simulation mode)
+2026-03-25 01:27:55.968 | 2026-03-24 22:27:55.968 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_web_search_and_crawl
+2026-03-25 01:27:55.968 | 2026-03-24 22:27:55.968 | INFO     | tool_web_search_and_crawl:__init__:405 - Web Search and Crawl tool initialized
+2026-03-25 01:27:56.033 | 2026-03-24 22:27:56.033 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_batch_install_plugins_from_github
+2026-03-25 01:27:56.140 | 2026-03-24 22:27:56.139 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_computer_use_tools
+2026-03-25 01:27:56.140 | Connecting to Docker via SSH: ssh://docker-user@dockerai
+2026-03-25 01:27:56.140 | Failed to connect to Docker: Install paramiko package to enable ssh:// support
+2026-03-25 01:27:56.189 | 2026-03-24 22:27:56.188 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_reddit_explorer
+2026-03-25 01:27:56.222 | 2026-03-24 22:27:56.222 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_pyodide_code_execution
+2026-03-25 01:27:56.276 | 2026-03-24 22:27:56.275 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_skyzi_sub_agent
+2026-03-25 01:27:56.321 | 2026-03-24 22:27:56.321 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_parallel_tools
+2026-03-25 01:27:56.383 | 2026-03-24 22:27:56.383 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_visuals_v4
+2026-03-25 01:27:56.429 | 2026-03-24 22:27:56.428 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_yt_transcript
+2026-03-25 01:27:56.473 | 2026-03-24 22:27:56.473 | INFO     | open_webui.utils.plugin:load_tool_module_by_id:244 - Loaded module: tool_diagrams
+2026-03-25 01:27:56.499 | 2026-03-24 22:27:56.498 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "POST /api/chat/completions HTTP/1.1" 200
+2026-03-25 01:27:56.503 | /usr/local/lib/python3.11/site-packages/jwt/api_jwt.py:371: InsecureKeyLengthWarning: The HMAC key is 16 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+2026-03-25 01:27:56.503 |   decoded = self.decode_complete(
+2026-03-25 01:27:56.540 | 2026-03-24 22:27:56.539 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46334 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:28:16.419 | 2026-03-24 22:28:16.419 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:28:16.571 | 2026-03-24 22:28:16.570 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:28:19.172 | 2026-03-24 22:28:19.171 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466 HTTP/1.1" 200
+2026-03-25 01:28:19.236 | 2026-03-24 22:28:19.235 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466/tags HTTP/1.1" 200
+2026-03-25 01:28:19.262 | 2026-03-24 22:28:19.261 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/tasks/chat/72873c47-26fd-4311-9b0b-6410b692f466 HTTP/1.1" 200
+2026-03-25 01:28:19.845 | 2026-03-24 22:28:19.844 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57944 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:28:33.367 | 2026-03-24 22:28:33.366 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52144 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:28:44.485 | 2026-03-24 22:28:44.484 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:53928 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:29:05.688 | 2026-03-24 22:29:05.687 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:32946 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:29:05.731 | 2026-03-24 22:29:05.730 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:32946 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:29:05.762 | 2026-03-24 22:29:05.761 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:32960 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3/tags HTTP/1.1" 200
+2026-03-25 01:29:05.787 | 2026-03-24 22:29:05.787 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:32960 - "GET /api/tasks/chat/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:29:06.266 | 2026-03-24 22:29:06.265 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:32960 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:29:34.363 | 2026-03-24 22:29:34.362 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:44524 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:29:45.365 | 2026-03-24 22:29:45.364 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57108 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:29:50.702 | 2026-03-24 22:29:50.701 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:29:50.745 | 2026-03-24 22:29:50.745 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:29:50.745 | 2026-03-24 22:29:50.745 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:29:50.747 | 2026-03-24 22:29:50.747 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:29:50.821 | 2026-03-24 22:29:50.820 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /api/v1/models/list?page=1 HTTP/1.1" 200
+2026-03-25 01:29:50.832 | 2026-03-24 22:29:50.832 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:29:50.866 | 2026-03-24 22:29:50.865 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /api/v1/models/tags HTTP/1.1" 200
+2026-03-25 01:29:50.892 | 2026-03-24 22:29:50.891 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:29:52.186 | 2026-03-24 22:29:52.185 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /_app/immutable/nodes/37.Dhyi3Hw1.js HTTP/1.1" 200
+2026-03-25 01:29:52.253 | 2026-03-24 22:29:52.252 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /api/v1/models/model?id=dev_architect HTTP/1.1" 200
+2026-03-25 01:29:52.641 | 2026-03-24 22:29:52.640 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:29:52.682 | 2026-03-24 22:29:52.681 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /api/v1/functions/ HTTP/1.1" 200
+2026-03-25 01:29:52.909 | 2026-03-24 22:29:52.908 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40228 - "GET /api/v1/skills/list HTTP/1.1" 200
+2026-03-25 01:29:52.912 | 2026-03-24 22:29:52.911 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:29:52.917 | 2026-03-24 22:29:52.916 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40234 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:29:52.919 | 2026-03-24 22:29:52.918 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40232 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:29:53.096 | 2026-03-24 22:29:53.095 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40234 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:29:53.099 | 2026-03-24 22:29:53.098 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40212 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:29:53.099 | 2026-03-24 22:29:53.099 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40232 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:30:03.802 | 2026-03-24 22:30:03.801 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60954 - "POST /api/v1/models/model/update HTTP/1.1" 200
+2026-03-25 01:30:03.866 | 2026-03-24 22:30:03.865 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:30:03.867 | 2026-03-24 22:30:03.866 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:30:03.892 | 2026-03-24 22:30:03.892 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:30:03.931 | 2026-03-24 22:30:03.930 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60954 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:30:04.034 | 2026-03-24 22:30:04.033 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60954 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:30:04.035 | 2026-03-24 22:30:04.035 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60968 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:30:04.098 | 2026-03-24 22:30:04.097 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60968 - "GET /api/v1/models/list?page=1 HTTP/1.1" 200
+2026-03-25 01:30:04.139 | 2026-03-24 22:30:04.138 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60968 - "GET /api/v1/models/tags HTTP/1.1" 200
+2026-03-25 01:30:08.336 | 2026-03-24 22:30:08.335 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60968 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:30:08.653 | 2026-03-24 22:30:08.652 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:60968 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:19.860 | 2026-03-24 22:30:19.860 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "POST /api/v1/chats/new HTTP/1.1" 200
+2026-03-25 01:30:20.286 | 2026-03-24 22:30:20.285 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42660 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:20.342 | 2026-03-24 22:30:20.341 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:30:20.444 | 2026-03-24 22:30:20.443 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "POST /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:30:20.516 | 2026-03-24 22:30:20.515 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:30:21.233 | 2026-03-24 22:30:21.232 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "POST /api/chat/completions HTTP/1.1" 200
+2026-03-25 01:30:21.334 | 2026-03-24 22:30:21.333 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:30:22.234 | 2026-03-24 22:30:22.233 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:30:22.545 | 2026-03-24 22:30:22.544 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:23.629 | 2026-03-24 22:30:23.628 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:30:23.709 | 2026-03-24 22:30:23.708 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3/tags HTTP/1.1" 200
+2026-03-25 01:30:23.735 | 2026-03-24 22:30:23.734 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/tasks/chat/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:30:24.220 | 2026-03-24 22:30:24.219 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:42646 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:40.198 | 2026-03-24 22:30:40.197 | WARNING  | open_webui.utils.middleware:response_handler:4807 - Task was cancelled!
+2026-03-25 01:30:40.358 | 2026-03-24 22:30:40.357 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37688 - "POST /api/tasks/stop/84923e47-0d9a-4961-a0f9-017fe2dc6c6b HTTP/1.1" 200
+2026-03-25 01:30:41.986 | 2026-03-24 22:30:41.985 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37688 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:30:42.022 | 2026-03-24 22:30:42.021 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37688 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:30:42.060 | 2026-03-24 22:30:42.059 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:30:42.086 | 2026-03-24 22:30:42.086 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:30:42.479 | 2026-03-24 22:30:42.478 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:44.425 | 2026-03-24 22:30:44.424 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:30:45.366 | 2026-03-24 22:30:45.365 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:30:49.087 | 2026-03-24 22:30:49.086 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:30:49.087 | 2026-03-24 22:30:49.086 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:30:49.091 | 2026-03-24 22:30:49.091 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:30:49.187 | 2026-03-24 22:30:49.187 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:30:49.189 | 2026-03-24 22:30:49.189 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/models/list?page=1 HTTP/1.1" 200
+2026-03-25 01:30:49.222 | 2026-03-24 22:30:49.222 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/models/tags HTTP/1.1" 200
+2026-03-25 01:30:49.257 | 2026-03-24 22:30:49.257 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49554 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:30:50.691 | 2026-03-24 22:30:50.691 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49554 - "GET /api/v1/models/model?id=dev_architect HTTP/1.1" 200
+2026-03-25 01:30:51.030 | 2026-03-24 22:30:51.029 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49554 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:30:51.104 | 2026-03-24 22:30:51.103 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49554 - "GET /api/v1/functions/ HTTP/1.1" 200
+2026-03-25 01:30:51.225 | 2026-03-24 22:30:51.224 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49554 - "GET /api/v1/skills/list HTTP/1.1" 200
+2026-03-25 01:30:51.245 | 2026-03-24 22:30:51.244 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:30:51.245 | 2026-03-24 22:30:51.245 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49556 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:30:51.250 | 2026-03-24 22:30:51.250 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49566 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:30:51.513 | 2026-03-24 22:30:51.512 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49556 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:30:51.514 | 2026-03-24 22:30:51.514 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:37692 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:30:51.521 | 2026-03-24 22:30:51.521 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:49566 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:31:21.245 | 2026-03-24 22:31:21.244 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35020 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:31:21.552 | 2026-03-24 22:31:21.551 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:31:23.821 | 2026-03-24 22:31:23.820 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:31:23.893 | 2026-03-24 22:31:23.893 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:31:23.917 | 2026-03-24 22:31:23.916 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:31:24.328 | 2026-03-24 22:31:24.327 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:31:26.936 | 2026-03-24 22:31:26.935 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:31:27.015 | 2026-03-24 22:31:27.015 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3/tags HTTP/1.1" 200
+2026-03-25 01:31:27.042 | 2026-03-24 22:31:27.041 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/tasks/chat/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:31:27.690 | 2026-03-24 22:31:27.689 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35024 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:31:45.377 | 2026-03-24 22:31:45.376 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56142 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:32:03.920 | 2026-03-24 22:32:03.920 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:56492 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:32:21.312 | 2026-03-24 22:32:21.311 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "POST /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:32:21.402 | 2026-03-24 22:32:21.401 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:32:22.089 | 2026-03-24 22:32:22.088 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "POST /api/chat/completions HTTP/1.1" 200
+2026-03-25 01:32:22.152 | 2026-03-24 22:32:22.152 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:32:22.297 | 2026-03-24 22:32:22.297 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:32:25.193 | 2026-03-24 22:32:25.192 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:32:25.269 | 2026-03-24 22:32:25.268 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:32:25.291 | 2026-03-24 22:32:25.291 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:32:25.709 | 2026-03-24 22:32:25.708 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40664 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:32:44.418 | 2026-03-24 22:32:44.418 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46496 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:32:45.382 | 2026-03-24 22:32:45.381 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:46496 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:32:57.663 | 2026-03-24 22:32:57.662 | WARNING  | open_webui.utils.middleware:response_handler:4807 - Task was cancelled!
+2026-03-25 01:32:57.781 | 2026-03-24 22:32:57.780 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "POST /api/tasks/stop/fe98d634-f4c3-40f0-ade4-d8976446694b HTTP/1.1" 200
+2026-03-25 01:32:57.908 | 2026-03-24 22:32:57.907 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "POST /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:32:57.977 | 2026-03-24 22:32:57.976 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:32:59.570 | 2026-03-24 22:32:59.569 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "POST /api/chat/completions HTTP/1.1" 200
+2026-03-25 01:32:59.673 | 2026-03-24 22:32:59.672 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:33:00.259 | 2026-03-24 22:33:00.257 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:33:00.283 | 2026-03-24 22:33:00.282 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:33:00.356 | 2026-03-24 22:33:00.355 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3/tags HTTP/1.1" 200
+2026-03-25 01:33:00.383 | 2026-03-24 22:33:00.382 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/tasks/chat/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:33:00.978 | 2026-03-24 22:33:00.977 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:04.121 | 2026-03-24 22:33:04.120 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466 HTTP/1.1" 200
+2026-03-25 01:33:04.193 | 2026-03-24 22:33:04.192 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466/tags HTTP/1.1" 200
+2026-03-25 01:33:04.215 | 2026-03-24 22:33:04.214 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/tasks/chat/72873c47-26fd-4311-9b0b-6410b692f466 HTTP/1.1" 200
+2026-03-25 01:33:04.710 | 2026-03-24 22:33:04.709 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:08.348 | 2026-03-24 22:33:08.348 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466/pinned HTTP/1.1" 200
+2026-03-25 01:33:13.767 | 2026-03-24 22:33:13.765 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "DELETE /api/v1/chats/72873c47-26fd-4311-9b0b-6410b692f466 HTTP/1.1" 200
+2026-03-25 01:33:13.787 | 2026-03-24 22:33:13.786 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/chats/12c95f42-af29-4b6f-a5f3-bbd5f38c99d2 HTTP/1.1" 200
+2026-03-25 01:33:13.830 | 2026-03-24 22:33:13.829 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/chats/all/tags HTTP/1.1" 200
+2026-03-25 01:33:13.872 | 2026-03-24 22:33:13.871 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/chats/12c95f42-af29-4b6f-a5f3-bbd5f38c99d2/tags HTTP/1.1" 200
+2026-03-25 01:33:13.904 | 2026-03-24 22:33:13.903 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40172 - "GET /api/v1/chats/all/tags HTTP/1.1" 200
+2026-03-25 01:33:13.905 | 2026-03-24 22:33:13.904 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57184 - "GET /api/v1/folders/ HTTP/1.1" 200
+2026-03-25 01:33:13.916 | 2026-03-24 22:33:13.915 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/tasks/chat/12c95f42-af29-4b6f-a5f3-bbd5f38c99d2 HTTP/1.1" 200
+2026-03-25 01:33:13.979 | 2026-03-24 22:33:13.978 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40172 - "GET /api/v1/chats/pinned HTTP/1.1" 200
+2026-03-25 01:33:14.345 | 2026-03-24 22:33:14.344 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40172 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:14.357 | 2026-03-24 22:33:14.356 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:33:17.527 | 2026-03-24 22:33:17.526 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/chats/12c95f42-af29-4b6f-a5f3-bbd5f38c99d2/pinned HTTP/1.1" 200
+2026-03-25 01:33:23.145 | 2026-03-24 22:33:23.145 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "DELETE /api/v1/chats/12c95f42-af29-4b6f-a5f3-bbd5f38c99d2 HTTP/1.1" 200
+2026-03-25 01:33:23.174 | 2026-03-24 22:33:23.173 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/chats/all/tags HTTP/1.1" 200
+2026-03-25 01:33:23.310 | 2026-03-24 22:33:23.310 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:33:23.592 | 2026-03-24 22:33:23.591 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:40160 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:23.615 | 2026-03-24 22:33:23.614 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41070 - "GET /api/v1/folders/ HTTP/1.1" 200
+2026-03-25 01:33:23.618 | 2026-03-24 22:33:23.617 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/all/tags HTTP/1.1" 200
+2026-03-25 01:33:23.680 | 2026-03-24 22:33:23.680 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/pinned HTTP/1.1" 200
+2026-03-25 01:33:23.743 | 2026-03-24 22:33:23.742 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:33:26.550 | 2026-03-24 22:33:26.549 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:33:26.634 | 2026-03-24 22:33:26.634 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:33:26.657 | 2026-03-24 22:33:26.657 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:33:27.074 | 2026-03-24 22:33:27.073 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:29.966 | 2026-03-24 22:33:29.965 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:33:30.041 | 2026-03-24 22:33:30.040 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/chats/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3/tags HTTP/1.1" 200
+2026-03-25 01:33:30.068 | 2026-03-24 22:33:30.067 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/tasks/chat/bf2397ea-d1d5-4aa7-8f2a-782a2cc817f3 HTTP/1.1" 200
+2026-03-25 01:33:30.713 | 2026-03-24 22:33:30.712 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:41076 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:33:45.399 | 2026-03-24 22:33:45.398 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51968 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:33:58.770 | 2026-03-24 22:33:58.769 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:54884 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:33:58.851 | 2026-03-24 22:33:58.850 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:54884 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:33:58.875 | 2026-03-24 22:33:58.875 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:54884 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:33:59.300 | 2026-03-24 22:33:59.299 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:54884 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:34:29.205 | [GITLAB] MCP_TOKENS_API_KEY not configured, skipping token fetch
+2026-03-25 01:34:29.205 | [SSH-CHECK] Failed to establish connection in get_or_create_container()
+2026-03-25 01:34:44.423 | 2026-03-24 22:34:44.422 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45418 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:34:46.360 | 2026-03-24 22:34:46.359 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45418 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:34:52.148 | 2026-03-24 22:34:52.147 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33336 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:34:52.581 | 2026-03-24 22:34:52.580 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33352 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:34:52.586 | 2026-03-24 22:34:52.585 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33336 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:34:53.849 | 2026-03-24 22:34:53.848 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33352 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:34:53.926 | 2026-03-24 22:34:53.925 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33352 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:34:53.951 | 2026-03-24 22:34:53.950 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33352 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:34:54.393 | 2026-03-24 22:34:54.392 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33336 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:34:54.399 | 2026-03-24 22:34:54.398 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:33352 - "GET /api/v1/models/model/profile/image?id=dev_architect&lang=en-US HTTP/1.1" 200
+2026-03-25 01:35:05.216 | 2026-03-24 22:35:05.215 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:35:05.217 | 2026-03-24 22:35:05.216 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:35:05.245 | 2026-03-24 22:35:05.244 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:35:05.304 | 2026-03-24 22:35:05.303 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39920 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:35:06.732 | 2026-03-24 22:35:06.731 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39920 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:35:07.160 | 2026-03-24 22:35:07.160 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51628 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:35:09.910 | 2026-03-24 22:35:09.910 | INFO     | open_webui.routers.openai:get_all_models:487 - get_all_models()
+2026-03-25 01:35:09.911 | 2026-03-24 22:35:09.910 | INFO     | open_webui.routers.ollama:get_all_models:322 - get_all_models()
+2026-03-25 01:35:09.916 | 2026-03-24 22:35:09.915 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51628 - "GET /api/v1/groups/ HTTP/1.1" 200
+2026-03-25 01:35:10.008 | 2026-03-24 22:35:10.007 | ERROR    | open_webui.routers.openai:send_get_request:91 - Connection error: 500, message='Attempt to decode JSON with unexpected mimetype: text/plain; charset=utf-8', url='http://host.docker.internal:9099/models'
+2026-03-25 01:35:10.010 | 2026-03-24 22:35:10.010 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51628 - "GET /api/v1/models/list?page=1 HTTP/1.1" 200
+2026-03-25 01:35:10.134 | 2026-03-24 22:35:10.133 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51628 - "GET /api/v1/models/tags HTTP/1.1" 200
+2026-03-25 01:35:10.183 | 2026-03-24 22:35:10.182 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39920 - "GET /api/models HTTP/1.1" 200
+2026-03-25 01:35:10.191 | 2026-03-24 22:35:10.190 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51654 - "GET /api/v1/models/model/profile/image?id=saleh_agent&lang=en-US HTTP/1.1" 200
+2026-03-25 01:35:10.192 | 2026-03-24 22:35:10.192 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51642 - "GET /api/v1/models/model/profile/image?id=evo1&lang=en-US HTTP/1.1" 200
+2026-03-25 01:35:10.194 | 2026-03-24 22:35:10.193 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51662 - "GET /api/v1/models/model/profile/image?id=qwen2.5:14b&lang=en-US HTTP/1.1" 200
+2026-03-25 01:35:11.462 | 2026-03-24 22:35:11.462 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51654 - "GET /api/v1/models/model?id=dev_architect HTTP/1.1" 200
+2026-03-25 01:35:11.892 | 2026-03-24 22:35:11.891 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51654 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:35:11.931 | 2026-03-24 22:35:11.930 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51654 - "GET /api/v1/functions/ HTTP/1.1" 200
+2026-03-25 01:35:12.070 | 2026-03-24 22:35:12.069 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51654 - "GET /api/v1/skills/list HTTP/1.1" 200
+2026-03-25 01:35:12.074 | 2026-03-24 22:35:12.074 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51662 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:35:12.077 | 2026-03-24 22:35:12.077 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51642 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:35:12.080 | 2026-03-24 22:35:12.079 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39920 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:35:12.344 | 2026-03-24 22:35:12.343 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:39920 - "GET /api/v1/notes/search?query= HTTP/1.1" 200
+2026-03-25 01:35:12.346 | 2026-03-24 22:35:12.345 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51642 - "GET /api/v1/knowledge/search/files?page=1 HTTP/1.1" 200
+2026-03-25 01:35:12.347 | 2026-03-24 22:35:12.346 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:51662 - "GET /api/v1/knowledge/search HTTP/1.1" 200
+2026-03-25 01:35:28.106 | 2026-03-24 22:35:28.105 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45016 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:35:28.446 | 2026-03-24 22:35:28.445 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45016 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:35:36.120 | 2026-03-24 22:35:36.119 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45032 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:35:36.193 | 2026-03-24 22:35:36.192 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45032 - "GET /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3/tags HTTP/1.1" 200
+2026-03-25 01:35:36.219 | 2026-03-24 22:35:36.218 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45032 - "GET /api/tasks/chat/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:35:36.643 | 2026-03-24 22:35:36.641 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45032 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:35:44.363 | 2026-03-24 22:35:44.362 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:36472 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:36:23.756 | 2026-03-24 22:36:23.755 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52680 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:36:23.760 | 2026-03-24 22:36:23.760 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52668 - "POST /api/chat/completed HTTP/1.1" 200
+2026-03-25 01:36:23.841 | 2026-03-24 22:36:23.840 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52668 - "POST /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:36:23.864 | 2026-03-24 22:36:23.863 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:52668 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:36:44.355 | 2026-03-24 22:36:44.355 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:36040 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:36:44.355 | 2026-03-24 22:36:44.355 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:36052 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:37:33.555 | 2026-03-24 22:37:33.555 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:57552 - "GET /static/apple-touch-icon.png HTTP/1.1" 200
+2026-03-25 01:37:44.374 | 2026-03-24 22:37:44.373 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45550 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:37:44.374 | 2026-03-24 22:37:44.373 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:45564 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:38:11.565 | 2026-03-24 22:38:11.565 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:38480 - "POST /api/v1/chats/557553ac-e0eb-4e6f-a344-b6fff42712b3 HTTP/1.1" 200
+2026-03-25 01:38:11.606 | 2026-03-24 22:38:11.605 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:38480 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:38:11.816 | 2026-03-24 22:38:11.816 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:38480 - "POST /api/chat/completions HTTP/1.1" 200
+2026-03-25 01:38:11.841 | 2026-03-24 22:38:11.841 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:38480 - "GET /api/v1/chats/?page=1 HTTP/1.1" 200
+2026-03-25 01:38:44.383 | 2026-03-24 22:38:44.382 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35602 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:38:44.389 | 2026-03-24 22:38:44.388 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35614 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:38:45.631 | 2026-03-24 22:38:45.630 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35602 - "GET /api/v1/configs/banners HTTP/1.1" 200
+2026-03-25 01:38:45.641 | 2026-03-24 22:38:45.640 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35618 - "GET /api/v1/tools/ HTTP/1.1" 200
+2026-03-25 01:38:45.650 | 2026-03-24 22:38:45.649 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:35634 - "GET /static/favicon.png HTTP/1.1" 304
+2026-03-25 01:39:44.391 | 2026-03-24 22:39:44.390 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:58102 - "GET /_app/version.json HTTP/1.1" 200
+2026-03-25 01:39:44.395 | 2026-03-24 22:39:44.394 | INFO     | uvicorn.protocols.http.httptools_impl:send:483 - 172.20.0.1:58106 - "GET /_app/version.json HTTP/1.1" 200

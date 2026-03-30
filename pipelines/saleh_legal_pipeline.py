@@ -18,6 +18,7 @@ import re
 class Pipeline:
     class Valves(BaseModel):
         # إعدادات قابلة للتعديل من واجهة Open WebUI
+        pipelines: List[str] = ["*"]
         ENABLE_LEGAL_CONTEXT: bool = True
         ENABLE_CONFLICT_DETECTION: bool = True
         ENABLE_REPORT_MODE: bool = True

@@ -1,12 +1,21 @@
 # OpenWebUI — الدليل الشامل
 
+> تنبيه حاكم: هذا الملف شرح معرفي عام لـ OpenWebUI داخل المشروع، وليس مرجعًا حاكمًا للتشغيل الحالي. إعدادات التشغيل الفعلية تُحسم من `docker-compose.yml` ثم `ARCHITECTURE.md`.
+
+## تصحيح تشغيلي إلزامي
+
+- صورة Open WebUI الفعلية في التشغيل الحالي هي `ghcr.io/open-webui/open-webui:v0.8.12`.
+- التكامل عبر `mcpo` ملغى حاليًا في المشروع، لذلك لا يجوز افتراض توفره أثناء اتخاذ القرار.
+- أي مواد تاريخية مرتبطة بـ `mcpo` لا تُعامل كمرجع تشغيلي حي.
+- المسار المرجعي الصحيح للبحث القانوني الحي يعتمد `saleh_knowledge` وواجهات Chroma `v1` في المسارات النشطة.
+
 ## ما هو OpenWebUI؟
 
 **OpenWebUI** واجهة مستخدم مفتوحة المصدر لنماذج اللغة الكبيرة (LLMs)، تعمل محلياً بالكامل وتدعم Ollama وأي API متوافق مع OpenAI. في مشروع SaleHSaaS تعمل على المنفذ **3000** (http://localhost:3000).
 
 - **المستودع:** https://github.com/open-webui/open-webui
 - **الوثائق:** https://docs.openwebui.com
-- **الإصدار في المشروع:** `ghcr.io/open-webui/open-webui:main`
+- **الإصدار في المشروع:** `ghcr.io/open-webui/open-webui:v0.8.12`
 
 ---
 

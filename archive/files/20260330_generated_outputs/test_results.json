@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-03-28T23:44:04.522063",
+  "duration": "0:00:05.132793",
+  "tests": {
+    "service_health": {
+      "chromadb": {
+        "status": "online",
+        "code": 404
+      },
+      "n8n": {
+        "status": "online",
+        "code": 200
+      },
+      "open_webui": {
+        "status": "online",
+        "code": 200
+      },
+      "pipelines": {
+        "status": "online",
+        "code": 404
+      },
+      "data_pipeline": {
+        "status": "online",
+        "code": 200
+      }
+    },
+    "docker_services": {
+      "status": "ok",
+      "containers": 0,
+      "all_running": true
+    },
+    "n8n_workflows": {
+      "status": "ok",
+      "active_count": 5
+    }
+  }
+}

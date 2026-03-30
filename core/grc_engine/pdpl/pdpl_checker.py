@@ -20,49 +20,42 @@ class PDPLComplianceChecker:
             "Article-20": "Data Security",
         }
         self.findings = []
-        # Regex for Saudi National ID or phone numbers
-        self.pii_pattern = re.compile(r"\b(1\d{9})\b|\b(05\d{8})\b")
+        # Patterns for Saudi National ID, Saudi Phone Numbers, Saudi IBAN, and CR
+        self.patterns = {
+            "National ID": re.compile(r"\b(1\d{9})\b"),
+            "Phone Number": re.compile(r"\b(05\d{8})\b"),
+            "Saudi IBAN": re.compile(r"\bSA\d{2}[A-Z0-9]{20}\b"),
+            "Commercial Registration (CR)": re.compile(r"\b(1010\d{6})\b|\b(4030\d{6})\b")
+        }
 
-    def scan_for_unencrypted_pii(self, db_connection_string):
-        """
-        Simulates scanning a database for unencrypted Personally Identifiable Information (PII).
-
-        Args:
-            db_connection_string (str): The connection string to the database.
-
-        Returns:
-            dict or None: A finding if unencrypted PII is detected.
-        """
-        # This is a mock scan. In a real implementation, we would connect to the DB,
-        # query tables, and scan for patterns in the data.
-        print(f"Simulating PII scan on: {db_connection_string}")
-        mock_data_sample = "User John Doe, National ID 1234567890, phone 0501234567."
-
-        if self.pii_pattern.search(mock_data_sample):
-            return {
-                "control_id": "Article-20",
-                "description": "Potential unencrypted PII (National ID or Phone Number) found in database.",
-                "severity": "Critical"
-            }
-        return None
+    def scan_text(self, text, source_name="Unknown Source"):
+        """Scans text content for PDPL sensitive data."""
+        local_findings = []
+        for label, pattern in self.patterns.items():
+            matches = pattern.findall(text)
+            if matches:
+                local_findings.append({
+                    "control_id": "Article-20",
+                    "description": f"Potential unencrypted {label} found in {source_name}.",
+                    "matches_count": len(matches),
+                    "severity": "Critical" if label in ["National ID", "Saudi IBAN"] else "High"
+                })
+        return local_findings
 
     def run_checks(self, database_connections):
         """
         Runs all PDPL checks against a list of database connections.
-
-        Args:
-            database_connections (list): A list of database connection strings.
-
-        Returns:
-            dict: A dictionary of findings.
+        Currently simulated for text scanning.
         """
         self.findings = []
         print(f"Running PDPL checks on {len(database_connections)} database(s)...")
 
+        # Mock database scanning for now, but using the new scan_text logic
         for db_conn in database_connections:
-            finding = self.scan_for_unencrypted_pii(db_conn)
-            if finding:
-                self.findings.append(finding)
+            # In a real scenario, we would fetch data from the database here
+            mock_data = "User data from DB contains ID 1234567890"
+            res = self.scan_text(mock_data, source_name=db_conn)
+            self.findings.extend(res)
 
         return {
             "framework": "Personal Data Protection Law (PDPL)",

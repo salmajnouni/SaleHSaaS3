@@ -2,92 +2,77 @@
 # -*- coding: utf-8 -*-
 
 """
-SaleHSaaS 3.0 - Cybersecurity Agent (وكيل الأمن السيبراني)
-
-Monitors system security, checks NCA compliance, scans for vulnerabilities,
-and generates security reports - all locally with zero external exposure.
+SaleHSaaS 4.0 - Cybersecurity Agent (وكيل الأمن السيبراني)
+المسؤول عن تحليل تقارير الامتثال والرد على استفسارات المستخدم الأمنية.
 """
 
 import os
 import json
-import hashlib
-import subprocess
+import requests
 from datetime import datetime
-from typing import Optional
-
+from pathlib import Path
 
 class CybersecurityAgent:
     """
-    AI-powered cybersecurity agent aligned with NCA Basic Controls.
+    وكيل ذكاء اصطناعي متخصص في الأمن السيبراني والامتثال لأنظمة NCA و PDPL.
     """
 
-    AGENT_NAME = "وكيل الأمن السيبراني"
-    AGENT_VERSION = "3.0"
-
-    # NCA Basic Cybersecurity Controls (ECC-1:2018)
-    NCA_CONTROLS = {
-        "1-1": "حوكمة الأمن السيبراني",
-        "1-2": "مخاطر الأمن السيبراني",
-        "2-1": "أمن الأصول",
-        "2-2": "إدارة الهويات والصلاحيات",
-        "2-3": "أمن العمليات",
-        "2-4": "أمن الاتصالات والشبكات",
-        "2-5": "أمن الأجهزة",
-        "2-6": "أمن التطبيقات",
-        "2-7": "أمن البيانات",
-        "2-8": "الاستمرارية التشغيلية",
-        "2-9": "أمن الموارد البشرية",
-        "2-10": "أمن الطرف الثالث",
-        "3-1": "الأمن السيبراني في الحوادث",
-        "3-2": "التدريب والتوعية"
-    }
-
-    def __init__(self, ollama_url: str = "http://ollama:11434", model: str = "llama3"):
+    def __init__(self, ollama_url: str = "http://host.docker.internal:11434", model: str = "llama3"):
         self.ollama_url = ollama_url
         self.model = model
-        print(f"✅ {self.AGENT_NAME} v{self.AGENT_VERSION} initialized.")
+        self.reports_dir = Path("/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/core/grc_engine/reports")
 
-    def scan_configuration(self, config: dict) -> dict:
-        """
-        Scans a system configuration for security weaknesses.
+    def get_latest_grc_report(self):
+        """قراءة أحدث تقرير امتثال مولد"""
+        if not self.reports_dir.exists():
+            return None
+        reports = sorted(self.reports_dir.glob("GRC_Report_*.json"), key=lambda x: x.stat().st_mtime, reverse=True)
+        if not reports:
+            return None
+        with open(reports[0], 'r', encoding='utf-8') as f:
+            return json.load(f)
 
-        Args:
-            config (dict): System configuration to scan.
+    def analyze_security_status(self, user_query: str):
+        """تحليل حالة الأمن والرد على المستخدم باستخدام LLM"""
+        report_data = self.get_latest_grc_report()
+        
+        context = ""
+        if report_data:
+            context = f"نتائج فحص الامتثال الأخير:\n{json.dumps(report_data, ensure_ascii=False, indent=2)}"
+        else:
+            context = "لا توجد تقارير امتثال سابقة. يجب تشغيل فحص الامتثال أولاً."
 
-        Returns:
-            dict: Security scan results with findings and NCA control mapping.
-        """
-        print(f"🔍 فحص الإعدادات الأمنية...")
-        findings = []
-        nca_gaps = []
+        prompt = f"""أنت 'وكيل الأمن السيبراني' في منصة SaleH SaaS 4.0.
+مهمتك هي مساعدة المستخدم في فهم حالة الأمن والامتثال بناءً على التقارير.
 
-        # Check 1: Default/weak passwords
-        config_str = json.dumps(config).lower()
-        weak_passwords = ['password', '123456', 'admin', 'root', 'default', 'changeme']
-        for weak_pw in weak_passwords:
-            if weak_pw in config_str:
-                findings.append({
-                    "severity": "حرج",
-                    "finding": f"كلمة مرور ضعيفة أو افتراضية: '{weak_pw}'",
-                    "nca_control": "2-2",
-                    "recommendation": "استخدم كلمات مرور قوية لا تقل عن 12 حرفاً"
-                })
-                if "2-2" not in nca_gaps:
-                    nca_gaps.append("2-2")
+السياق الحالي:
+{context}
 
-        # Check 2: Encryption settings
-        if not config.get('encryption_enabled', False):
-            findings.append({
-                "severity": "عالٍ",
-                "finding": "التشفير غير مفعّل",
-                "nca_control": "2-7",
-                "recommendation": "فعّل تشفير AES-256 لجميع البيانات الحساسة"
-            })
-            nca_gaps.append("2-7")
+سؤال المستخدم: {user_query}
 
-        # Check 3: Logging
-        if not config.get('logging_enabled', False):
-            findings.append({
+أجب باللغة العربية الفصحى، بأسلوب مهني وتقني دقيق. إذا وجدت مخاطر حرجة، نبه المستخدم إليها فوراً وقدم توصيات بناءً على ضوابط الهيئة الوطنية للأمن السيبراني (NCA) ونظام حماية البيانات الشخصية (PDPL).
+"""
+
+        try:
+            response = requests.post(
+                f"{self.ollama_url}/api/generate",
+                json={
+                    "model": self.model,
+                    "prompt": prompt,
+                    "stream": False
+                },
+                timeout=120
+            )
+            return response.json().get("response", "عذراً، حدث خطأ في توليد الإجابة.")
+        except Exception as e:
+            return f"خطأ في الاتصال بمحرك الذكاء الاصطناعي: {str(e)}"
+
+if __name__ == '__main__':
+    agent = CybersecurityAgent()
+    # تجربة تحليل
+    print("--- فحص حالة الأمن ---")
+    print(agent.analyze_security_status("ما هي حالة الامتثال الحالية وما هي أهم المخاطر؟"))
+ findings.append({
                 "severity": "متوسط",
                 "finding": "التسجيل والمراقبة غير مفعّل",
                 "nca_control": "2-3",

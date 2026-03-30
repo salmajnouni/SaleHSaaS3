@@ -2,6 +2,11 @@
 # SaleHSaaS 3.0 - Smart Installer (PowerShell)
 # =============================================================================
 
+# WARNING:
+# This installer reflects an older stack profile and is not an authoritative
+# source for the current runtime topology. Validate active services against
+# docker-compose.yml before using this script in production environments.
+
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
@@ -221,7 +226,7 @@ N8N_USER=admin
 N8N_PASSWORD=$N8N_PASS
 N8N_ENCRYPTION_KEY=$N8N_ENC
 
-# Qdrant Vector DB
+# Qdrant Vector DB (Legacy/Optional)
 QDRANT_PORT=6333
 QDRANT_API_KEY=
 
@@ -229,21 +234,21 @@ QDRANT_API_KEY=
 SEARXNG_PORT=8080
 SEARXNG_SECRET=$SEARXNG_SEC
 
-# Dashboard
+# Dashboard (Legacy/Optional)
 DASHBOARD_PORT=8000
 DASHBOARD_SECRET_KEY=$DASH_KEY
 FLASK_DEBUG=false
 
-# Code Server
+# Code Server (Legacy/Optional)
 CODE_SERVER_PORT=8443
 CODE_SERVER_PASSWORD=$CODE_PASS
 
-# Grafana
+# Grafana (Legacy/Optional)
 GRAFANA_PORT=3001
 GRAFANA_USER=admin
 GRAFANA_PASSWORD=$GRAFANA_PASS
 
-# AnythingLLM
+# AnythingLLM (Legacy/Optional)
 ANYTHINGLLM_PORT=3002
 ANYTHINGLLM_JWT_SECRET=$ALLM_JWT
 "@
@@ -319,12 +324,24 @@ if ($LASTEXITCODE -eq 0) {
     Write-Yellow "  [WARN] llama3 download failed - you can retry from MANAGE_SALEHSAAS.bat"
 }
 
-Write-White "  Downloading nomic-embed-text model (for RAG)..."
-docker exec salehsaas_ollama ollama pull nomic-embed-text
+Write-White "  Downloading nomic-embed-text:latest model (active RAG path)..."
+docker exec salehsaas_ollama ollama pull nomic-embed-text:latest
 if ($LASTEXITCODE -eq 0) {
-    Write-Green "  [OK] nomic-embed-text downloaded"
+    Write-Green "  [OK] nomic-embed-text:latest downloaded"
 } else {
-    Write-Yellow "  [WARN] nomic-embed-text download failed - retry later"
+    Write-Yellow "  [WARN] nomic-embed-text:latest download failed - retry later"
+}
+
+if ($env:ALLOW_LEGACY_QWEN3 -eq "true") {
+    Write-White "  Legacy opt-in: Downloading qwen3-embedding:0.6b..."
+    docker exec salehsaas_ollama ollama pull qwen3-embedding:0.6b
+    if ($LASTEXITCODE -eq 0) {
+        Write-Green "  [OK] qwen3-embedding:0.6b downloaded (legacy optional)"
+    } else {
+        Write-Yellow "  [WARN] qwen3-embedding:0.6b download failed - retry later"
+    }
+} else {
+    Write-Yellow "  Skipping legacy qwen3-embedding download (set ALLOW_LEGACY_QWEN3=true to enable)."
 }
 
 # =============================================================================
@@ -338,13 +355,16 @@ Write-Cyan  "================================================================"
 Write-Host ""
 Write-White "  SERVICES:"
 Write-Host ""
-Write-Green "   Main Dashboard    : http://localhost:8000"
 Write-Green "   Open WebUI (AI)   : http://localhost:3000"
-Write-Green "   AnythingLLM       : http://localhost:3002"
+Write-Green "   Open Terminal     : http://localhost:8000"
 Write-Green "   n8n Automation    : http://localhost:5678"
+Write-Green "   Data Pipeline API : http://localhost:8001"
+Write-Green "   ChromaDB          : http://localhost:8010"
 Write-Green "   SearXNG Search    : http://localhost:8080"
-Write-Green "   Code Server       : http://localhost:8443"
-Write-Green "   Grafana Monitor   : http://localhost:3001"
+Write-Green "   Browserless       : http://localhost:3001"
+Write-Host ""
+Write-Yellow "  Legacy optional services (not enabled by default): AnythingLLM, Code Server, Grafana."
+Write-Yellow "  Enable only through a separate rehabilitation/profile flow."
 Write-Host ""
 Write-Cyan  "================================================================"
 Write-Yellow "  Passwords saved in: $INSTALL_DIR\.env"

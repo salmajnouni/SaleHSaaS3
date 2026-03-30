@@ -1,6 +1,10 @@
 # SaleH SaaS 4.0 - Setup Script
 # Run as Administrator in PowerShell
 
+# WARNING:
+# This script has inherited messages from older layouts.
+# Runtime truth must always be validated against docker-compose.yml.
+
 $ErrorActionPreference = "Stop"
 
 Write-Host ""
@@ -70,11 +74,11 @@ Write-Host ""
 Write-Host "Services:" -ForegroundColor White
 Write-Host "  Open WebUI  (main interface) : http://localhost:3000" -ForegroundColor Cyan
 Write-Host "  n8n         (automation)     : http://localhost:5678" -ForegroundColor Cyan
-Write-Host "  Code Server (dev environment): http://localhost:8443" -ForegroundColor Cyan
+Write-Host "  Open Terminal(dev terminal)  : http://localhost:8000" -ForegroundColor Cyan
 Write-Host "  ChromaDB    (vector database): http://localhost:8010" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Notes:" -ForegroundColor Yellow
 Write-Host "  - First time: Create admin account in Open WebUI." -ForegroundColor Yellow
 Write-Host "  - Upload legal documents from the 'Documents' tab." -ForegroundColor Yellow
-Write-Host "  - Code Server password is in your .env file." -ForegroundColor Yellow
+Write-Host "  - Validate active services with docker compose ps." -ForegroundColor Yellow
 Write-Host ""

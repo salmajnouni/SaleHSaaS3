@@ -5,6 +5,5 @@ python-dotenv
 langchain-community
 langchain-text-splitters
 langchain-ollama
-langchain-chroma
-chromadb-client
-unstructured[all-docs]
+langchain-chroma==0.2.0
+chromadb==0.5.3

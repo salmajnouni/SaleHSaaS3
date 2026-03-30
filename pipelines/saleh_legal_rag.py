@@ -7,8 +7,8 @@ SaleH SaaS - Legal RAG Pipeline & MCP Tool
 2. كـ MCP Tool Server: لتوفير أداة بحث قانوني يمكن استدعاؤها.
 
 التغييرات:
-- تصحيح اسم الـ collection: saleh_legal_knowledge
-- ترقية ChromaDB API من v1 إلى v2
+- استخدام ChromaDB v1 API المتوافق مع النسخة الحالية
+- توحيد اسم الـ collection مع المسار الحي: saleh_knowledge
 - إضافة pipe() method كاملة للـ streaming
 """
 
@@ -23,22 +23,25 @@ from pydantic import BaseModel
 
 class Pipeline:
     class Valves(BaseModel):
+        pipelines: List[str] = ["*"]
         CHROMADB_URL: str = "http://chromadb:8000"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
         EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-        COLLECTION_NAME: str = "saleh_legal_knowledge"
+        COLLECTION_NAME: str = "saleh_knowledge"
         CHROMADB_TENANT: str = "default_tenant"
         CHROMADB_DATABASE: str = "default_database"
-        TOP_K: int = 5
-        MIN_RELEVANCE_SCORE: float = 0.2
+        TOP_K: int = 10
+        MIN_RELEVANCE_SCORE: float = 0.45
         ENABLE_RAG: bool = True
-        SYSTEM_PROMPT: str = """أنت مساعد قانوني متخصص في الأنظمة والتشريعات السعودية.
-عند الإجابة:
-1. استند دائماً إلى النصوص القانونية المقدمة في السياق
-2. اذكر رقم المادة والنظام المصدر لكل معلومة
-3. إذا لم يكن السؤال في نطاق الوثائق المتاحة، وضّح ذلك بصراحة
-4. استخدم لغة قانونية دقيقة وواضحة
-5. رتّب إجابتك بشكل منظم عند الحاجة"""
+        SYSTEM_PROMPT: str = """أنت 'صالح'، المساعد القانوني السيادي المتقدم للمملكة العربية السعودية.
+مهمتك هي تقديم استشارات قانونية دقيقة بناءً على الأنظمة واللوائح السعودية حصراً.
+
+قواعد الإجابة الصارمة:
+1. السيادة والبيانات: جميع إجاباتك يجب أن تعكس الأنظمة المعتمدة في المملكة العربية السعودية (مثل نظام المحاكم التجارية، نظام العمل، نظام الإجراءات الجزائية، إلخ).
+2. الاستشهاد الدقيق: عند ذكر أي معلومة قانونية، يجب أن تذكر (رقم المادة، اسم النظام، وتاريخه إن وجد) بناءً على السياق المزود لك.
+3. الأمانة العلمية: إذا لم تجد نصاً صريحاً في 'الوثائق القانونية ذات الصلة' المزودة لك، قل: 'بناءً على الوثائق المتاحة في النظام حالياً، لا يوجد نص مباشر يتناول هذا السؤال، ولكن وبشكل عام في الأنظمة السعودية...'
+4. الدقة اللغوية: استخدم المصطلحات القانونية السعودية المعتمدة (مثل: 'المنظم' بدلاً من 'المشرع').
+5. الهيكل: رتب إجابتك في نقاط واضحة مع تبويب المواد القانونية."""
 
     def __init__(self):
         self.name = "SaleH Legal RAG"
@@ -58,14 +61,9 @@ class Pipeline:
         return None
 
     def _get_collection_id(self) -> Optional[str]:
-        """الحصول على collection ID من ChromaDB v2"""
+        """الحصول على collection ID من ChromaDB v1"""
         try:
-            url = (
-                f"{self.valves.CHROMADB_URL}/api/v2/tenants/"
-                f"{self.valves.CHROMADB_TENANT}/databases/"
-                f"{self.valves.CHROMADB_DATABASE}/collections/"
-                f"{self.valves.COLLECTION_NAME}"
-            )
+            url = f"{self.valves.CHROMADB_URL}/api/v1/collections/{self.valves.COLLECTION_NAME}"
             resp = requests.get(url, timeout=10)
             if resp.status_code == 200:
                 return resp.json().get("id")
@@ -87,12 +85,7 @@ class Pipeline:
             return []
 
         try:
-            url = (
-                f"{self.valves.CHROMADB_URL}/api/v2/tenants/"
-                f"{self.valves.CHROMADB_TENANT}/databases/"
-                f"{self.valves.CHROMADB_DATABASE}/collections/"
-                f"{collection_id}/query"
-            )
+            url = f"{self.valves.CHROMADB_URL}/api/v1/collections/{collection_id}/query"
             resp = requests.post(
                 url,
                 json={
@@ -193,9 +186,41 @@ class Pipeline:
         return body
 
     def pipe(self, user_message: str, model_id: str, messages: List[dict], body: dict) -> Iterator[str]:
-        """تمرير الطلب مع السياق القانوني"""
-        # inlet يتولى حقن السياق تلقائياً
-        yield from []
+        """تمرير الطلب مع السياق القانوني إلى Ollama GPU"""
+        # inlet يتولى حقن السياق تلقائياً في messages
+        
+        # اختيار النموذج الافتراضي (يمكن تغييره من Valves)
+        model = body.get("model", "qwen2.5:14b")
+        
+        try:
+            resp = requests.post(
+                f"{self.valves.OLLAMA_URL}/api/chat",
+                json={
+                    "model": model,
+                    "messages": body.get("messages", messages),
+                    "stream": True,
+                    "options": {
+                        "temperature": 0.3,
+                        "num_ctx": 8192
+                    }
+                },
+                stream=True,
+                timeout=120
+            )
+            
+            if resp.status_code == 200:
+                for line in resp.iter_lines():
+                    if line:
+                        chunk = json.loads(line)
+                        if "message" in chunk and "content" in chunk["message"]:
+                            yield chunk["message"]["content"]
+                        if chunk.get("done"):
+                            break
+            else:
+                yield f"❌ خطأ في الاتصال بـ Ollama: {resp.status_code} - {resp.text[:200]}"
+                
+        except Exception as e:
+            yield f"❌ خطأ في معالجة الطلب: {str(e)}"
 
 
 # --- MCP Tool Server Implementation ---

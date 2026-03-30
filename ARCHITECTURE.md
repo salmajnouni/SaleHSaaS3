@@ -19,11 +19,11 @@
 │  │  Pipelines :9099     Apache Tika :9998   SearXNG :8080       │    │
 │  │  172.20.0.31         172.20.0.32         172.20.0.33         │    │
 │  │                                                               │    │
-│  │  n8n :5678           Code Server :8443   mcpo :8020          │    │
-│  │  172.20.0.40         172.20.0.50         172.20.0.60         │    │
+│  │  n8n :5678           Data Pipeline :8001 Open Terminal :8000 │    │
+│  │  172.20.0.40         172.20.0.62         172.20.0.80         │    │
 │  │                                                               │    │
-│  │  Knowledge Watcher                                            │    │
-│  │  172.20.0.61                                                  │    │
+│  │  Knowledge Watcher      Browserless :3001                     │    │
+│  │  172.20.0.61            172.20.0.70                           │    │
 │  └──────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -45,10 +45,10 @@ Knowledge Watcher (172.20.0.61)
       │         (timeout: 300s)
       │
       ├──► ChromaDB :8000     ──► تخزين chunks + embeddings
-      │         (API v2: /api/v2/tenants/default_tenant/databases/default_database/)
-      │         (Collection: saleh_legal_knowledge)
+      │         (API v1: /api/v1/...)
+      │         (Collection: saleh_knowledge)
       │
-      ├──► knowledge_archive/YYYY-MM-DD/  (نجاح)
+      ├──► knowledge_processed/           (نجاح)
       │
       └──► knowledge_failed/              (فشل + تقرير .txt)
 ```
@@ -77,22 +77,16 @@ Open WebUI
 
 ---
 
-## تدفق أدوات MCP
+## أدوات MCP المرجعية خارج التشغيل الحالي
 
 ```
-المستخدم يكتب في Open WebUI
-      │
-      ▼
-Open WebUI → mcpo :8020 (REST API)
-      │
-      ├──► ollama_model_builder.py  →  Ollama :11434
-      │         (تحميل/حذف/عرض النماذج)
-      │
-      ├──► legal_rag_mcp.py         →  ChromaDB :8000
-      │         (بحث دلالي في الوثائق القانونية)
-      │
-      └──► n8n_builder.py           →  n8n :5678
-                (إنشاء/تفعيل/تنفيذ workflows)
+ملفات MCP موجودة داخل المستودع كأدوات مرجعية وتكاملية،
+لكن لا توجد خدمة `mcpo` مفعلة ضمن `docker-compose.yml` الحالي.
+كما أن مسار `mcpo` ملغي حاليًا في هذا المشروع ولا يُعتمد للتشغيل.
+وأي مواد تاريخية مرتبطة به لا يجوز التعامل معها كجزء من التشغيل الحي.
+
+بالتالي لا يجوز لأي وكيل أن يفترض توفر endpoint حي على المنفذ 8020
+إلا بعد التحقق من تشغيل خدمة مستقلة لهذا الغرض.
 ```
 
 ---
@@ -108,23 +102,47 @@ Open WebUI → mcpo :8020 (REST API)
 | `pipelines` | `172.20.0.31` | `9099` | معالجة RAG القانونية المخصصة |
 | `searxng` | `172.20.0.33` | `8080` | بحث الإنترنت المحلي |
 | `n8n` | `172.20.0.40` | `5678` | أتمتة سير العمل |
-| `code_server` | `172.20.0.50` | `8443` | تطوير الكود من المتصفح |
-| `mcpo` | `172.20.0.60` | `8020` | تحويل MCP إلى REST API |
 | `knowledge_watcher` | `172.20.0.61` | داخلي | مراقبة inbox وإدخال الوثائق |
+| `data_pipeline` | `172.20.0.62` | `8001` | استقبال الملفات، التقطيع، والتخزين في ChromaDB |
+| `browserless` | `172.20.0.70` | `3001` | متصفح آلي لخدمات تحتاج تنفيذًا متصفحياً |
+| `open-terminal` | `172.20.0.80` | `8000` | بيئة طرفية داخلية مرتبطة بالمجلد المحلي `saleh/` |
 
 ---
 
-## ChromaDB v2 API — المسارات المستخدمة
+## حقائق تشغيلية معتمدة للوكلاء
+
+- ChromaDB العاملة حاليًا هي `chromadb/chroma:0.5.3` وتُستخدم عبر واجهات `v1` في المسارات الحية.
+- اسم مجموعة المعرفة الحية المعتمد في البحث القانوني والاستيعاب الحالي هو `saleh_knowledge`.
+- نموذج التضمين المعتمد حاليًا هو `nomic-embed-text:latest`، وأبعاده `768`.
+- خدمة `knowledge_watcher` تنقل الملفات الناجحة إلى `knowledge_processed/`، والفاشلة إلى `knowledge_failed/`.
+- خدمة `knowledge_watcher` الحية الحالية تُبنى من المجلد `file_watcher/`، والملف التنفيذي المعتمد هو `file_watcher/watcher.py`.
+- المجلد `knowledge_processing/` ليس جزءًا من مسار النجاح الحي الحالي، ويجب عدم اعتباره وجهة تشغيلية نهائية ما لم يتغير الكود و`docker-compose.yml`.
+- المجلد `knowledge_archive/` ليس وجهة النجاح الحي لـ watcher، لكنه ما زال مستخدمًا لأرشفة بعض المصادر المرجعية مثل مخرجات `scripts/uqn_scraper.py` تحت `knowledge_archive/uqn/`.
+- المجلد `saleh_dashboard/` موجود داخل المستودع كمشروع Dashboard قديم/مرجعي، لكنه ليس خدمة مفعلة ضمن `docker-compose.yml` الحالي ولا يجوز اعتباره الواجهة الحية للمستخدم.
+- خدمة `data_pipeline` هي المسار التنفيذي الفعلي لاستيعاب الملفات على المنفذ `8001`.
+- لا يجوز افتراض أن `mcpo` جزء من التشغيل الحالي؛ هذا المسار ملغي حاليًا.
+- لا يجوز افتراض أن `code_server` جزء من التشغيل الحالي ما لم تتم إضافته صراحة إلى `docker-compose.yml`.
+
+---
+
+## مسارات open-terminal المعتمدة
+
+- المسار `/home/user` داخل حاوية `open-terminal` هو مساحة المنزل الداخلية للحاوية ويُغذى من volume مستقل باسم `open-terminal-data`.
+- المجلد المحلي `saleh/` في جذر المشروع ليس هو `home` نفسه، لكنه مربوط داخل الحاوية على المسار `/home/user/projects`.
+- أي إشارة تشغيلية من الوكلاء إلى ملفات المشروع داخل بيئة `open-terminal` يجب أن تتعامل مع `/home/user/projects` على أنه المرآة الداخلية للمجلد المحلي `saleh/`.
+- لا يجوز نقل أو إعادة تسمية المجلد `saleh/` أو تغيير هذا الربط إلا مع تحديث `docker-compose.yml` والتحقق من خدمة `open-terminal` بعد التعديل.
+
+---
+
+## ChromaDB v1 API — المسارات المستخدمة
 
 ```
 Base URL: http://chromadb:8000
-API Path: /api/v2/tenants/default_tenant/databases/default_database/
+API Path: /api/v1/
 
 GET    /collections                    → قائمة المجموعات
-GET    /collections/{name}             → معلومات المجموعة (يُعيد UUID)
-POST   /collections/{uuid}/add         → إضافة chunks + embeddings
+GET    /collections/{name}             → معلومات المجموعة
 POST   /collections/{uuid}/query       → بحث دلالي
-GET    /heartbeat                      → فحص الصحة
 ```
 
 ---

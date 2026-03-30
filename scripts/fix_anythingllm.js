@@ -6,7 +6,7 @@ const settings = [
   ['OllamaLLMModelPref', 'llama3:latest'],
   ['EmbeddingEngine', 'ollama'],
   ['EmbeddingBasePath', 'http://ollama:11434'],
-  ['EmbeddingModelPref', 'nomic-embed-text:latest']
+  ['EmbeddingModelPref', 'qwen3-embedding:0.6b']
 ];
 async function fix() {
   for (const [label, value] of settings) {

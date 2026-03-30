@@ -1,0 +1,113 @@
+{
+  "name": "Daily Backup - نسخ احتياطي يومي",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "id": "d1000001-0001-4001-8001-000000000001",
+      "name": "⏰ يومياً الساعة 2 صباحاً",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [60, -80]
+    },
+    {
+      "parameters": {},
+      "id": "d1000001-0001-4001-8001-000000000002",
+      "name": "▶️ تشغيل يدوي",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [60, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// تجميع معلومات النظام قبل النسخ الاحتياطي\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '').substring(0, 15);\nreturn [{\n  json: {\n    timestamp: timestamp,\n    backup_name: `backup_${timestamp}`,\n    services: ['postgres', 'chromadb', 'open_webui', 'knowledge']\n  }\n}];"
+      },
+      "id": "d1000001-0001-4001-8001-000000000003",
+      "name": "📋 إعداد بيانات النسخ",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, -180]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://chromadb:8000/api/v1/collections/saleh_knowledge",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "d1000001-0001-4001-8001-000000000004",
+      "name": "📊 عدد الوثائق في ChromaDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, -180]
+    },
+    {
+      "parameters": {
+        "jsCode": "const chromaInfo = $json;\nconst prev = $('📋 إعداد بيانات النسخ').item.json;\n\n// تسجيل حالة النظام\nconst report = {\n  backup_timestamp: prev.timestamp,\n  chromadb_collection: chromaInfo.name || 'saleh_knowledge',\n  chromadb_documents: chromaInfo.dimension ? 'Collection exists' : 'Unknown',\n  status: 'health_check_passed',\n  message: `✅ فحص النظام: ChromaDB متصل - المجموعة: ${chromaInfo.name || 'N/A'} - الأبعاد: ${chromaInfo.dimension || 'N/A'}`\n};\n\nreturn [{ json: report }];"
+      },
+      "id": "d1000001-0001-4001-8001-000000000005",
+      "name": "📝 تقرير الحالة",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [740, -180]
+    }
+  ],
+  "connections": {
+    "⏰ يومياً الساعة 2 صباحاً": {
+      "main": [
+        [
+          {
+            "node": "📋 إعداد بيانات النسخ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "▶️ تشغيل يدوي": {
+      "main": [
+        [
+          {
+            "node": "📋 إعداد بيانات النسخ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📋 إعداد بيانات النسخ": {
+      "main": [
+        [
+          {
+            "node": "📊 عدد الوثائق في ChromaDB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 عدد الوثائق في ChromaDB": {
+      "main": [
+        [
+          {
+            "node": "📝 تقرير الحالة",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

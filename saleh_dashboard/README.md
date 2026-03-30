@@ -1,5 +1,9 @@
 # SaleH Dashboard Service
 
+> Warning: this directory is not part of the active runtime in the current `docker-compose.yml`.
+> The live user-facing interface is `Open WebUI` on port `3000`.
+> This dashboard project contains historical or experimental assumptions such as `AnythingLLM` and old pipeline hostnames, so it must not be treated as an authoritative description of current runtime.
+
 This is the main user-facing component of the SaleH SaaS ecosystem. It's a FastAPI application that serves a comprehensive SvelteKit single-page application (SPA) for monitoring, search, and chat.
 
 ## Features

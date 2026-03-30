@@ -1,0 +1,1204 @@
+{
+  "summary": {
+    "collection": "saleh_knowledge",
+    "collection_id": "8c394725-8a25-4c26-a0d3-4711f554aab8",
+    "collection_dimension": 768,
+    "embed_model": "nomic-embed-text:latest",
+    "summary_vector_count": 31,
+    "top_k": 10,
+    "total_questions": 20,
+    "passed_questions": 20,
+    "pass_rate": 100.0,
+    "domain_pass_rate": {
+      "fire": 100.0,
+      "hvac": 100.0,
+      "plumbing": 100.0
+    }
+  },
+  "results": [
+    {
+      "id": "HVAC-01",
+      "domain": "hvac",
+      "expected_source": "SBC-501",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5141400557736551,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-010.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "HVAC-02",
+      "domain": "hvac",
+      "expected_source": "SBC-501 + ASHRAE",
+      "expected_tokens": [
+        "ashrae",
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5395768290061598,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HVAC-03",
+      "domain": "hvac",
+      "expected_source": "SBC-501",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5046185438527552,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-006.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "HVAC-04",
+      "domain": "hvac",
+      "expected_source": "SBC-501",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.4973122342098787,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-002.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "HVAC-05",
+      "domain": "hvac",
+      "expected_source": "SBC-501 + ASHRAE 62.1",
+      "expected_tokens": [
+        "ashrae",
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5068440337490739,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-010.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HVAC-06",
+      "domain": "hvac",
+      "expected_source": "SBC-501",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5343812838761184,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "HVAC-07",
+      "domain": "hvac",
+      "expected_source": "SBC-501/engineering procedure",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.5212291836709301,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HVAC-08",
+      "domain": "hvac",
+      "expected_source": "SBC-501",
+      "expected_tokens": [
+        "sbc501"
+      ],
+      "pass": true,
+      "min_distance": 0.509015798913142,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": [
+            "sbc501"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PLB-01",
+      "domain": "plumbing",
+      "expected_source": "SBC-701",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.531817992918111,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-006.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "PLB-02",
+      "domain": "plumbing",
+      "expected_source": "SBC-701",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.5516674587543555,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-006.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PLB-03",
+      "domain": "plumbing",
+      "expected_source": "SBC-701",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.518636996890544,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PLB-04",
+      "domain": "plumbing",
+      "expected_source": "SBC-701",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.5472484248898828,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-006.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PLB-05",
+      "domain": "plumbing",
+      "expected_source": "SBC-701",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.49612581996577654,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PLB-06",
+      "domain": "plumbing",
+      "expected_source": "SBC-701/local authority guidance",
+      "expected_tokens": [
+        "sbc701"
+      ],
+      "pass": true,
+      "min_distance": 0.5375883433338032,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": [
+            "sbc701"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FIRE-01",
+      "domain": "fire",
+      "expected_source": "SBC-801 + NFPA 13",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5270120952090608,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "FIRE-02",
+      "domain": "fire",
+      "expected_source": "SBC-801 + NFPA 13",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5138320779963161,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "FIRE-03",
+      "domain": "fire",
+      "expected_source": "SBC-801 + NFPA",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5295033866586378,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "FIRE-04",
+      "domain": "fire",
+      "expected_source": "SBC-801 + NFPA 14",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5006653447745613,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "FIRE-05",
+      "domain": "fire",
+      "expected_source": "NFPA 13 / SBC-801",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5269362768833941,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-010.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-004.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-003.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        }
+      ]
+    },
+    {
+      "id": "FIRE-06",
+      "domain": "fire",
+      "expected_source": "SBC-801 + NFPA procedures",
+      "expected_tokens": [
+        "nfpa",
+        "sbc801"
+      ],
+      "pass": true,
+      "min_distance": 0.5253257078394937,
+      "top_hits": [
+        {
+          "source": "summary-card_card-sbc501-001.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc501-005.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-007.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc501-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-005.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-003.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc801-008.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc801-009.md",
+          "matched_tokens": [
+            "sbc801"
+          ]
+        },
+        {
+          "source": "summary-card_card-sbc701-009.md",
+          "matched_tokens": []
+        },
+        {
+          "source": "summary-card_card-sbc701-002.md",
+          "matched_tokens": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+﻿=== WITHOUT DOCUMENT CODE ===
+C:\saleh26\salehsaas\SaleHSaaS3\ARCHITECTURE.md
+C:\saleh26\salehsaas\SaleHSaaS3\CHANGELOG.md
+C:\saleh26\salehsaas\SaleHSaaS3\core\grc_engine\reports\GRC_Report_20260326_151533.md
+C:\saleh26\salehsaas\SaleHSaaS3\data_pipeline\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\01_json_structure.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\02_rest_api.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\03_common_nodes.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\04_expressions.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\05_error_handling_and_n8n_node.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\06_complete_workflow_examples.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\07_salehsaas_project.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\08_openwebui_guide.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\knowledge\09_github_and_communities.md
+C:\saleh26\salehsaas\SaleHSaaS3\dev_studio\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\ACCOUNT_AUTOMATION_ONBOARDING.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\ENGINEERING_OFFICES_SERVICES.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\knowledge_watcher.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\LINKEDIN_PAGE_SETUP_AND_PLAYBOOK.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\mep_summary_only_rag.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\sbc_rag_bootstrap.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\SOLO_MARKETING_AUTOMATION.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\guides\TECHNICAL_ROADMAP_ENGINEERING.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\sales\CLIENT_OFFER_STACK_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\sales\CLIENT_SCENARIOS_AND_PACKAGES_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\sales\DISCOVERY_MEETING_CHECKLIST_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\sales\HOTEL_QUOTATION_MODEL_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\services\SERVICE_CATALOG_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\services\SERVICE_DELIVERY_WORKFLOW_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\services\SERVICE_SCOPE_TEMPLATE_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\file_watcher\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\INSTALL_GUIDE.md
+C:\saleh26\salehsaas\SaleHSaaS3\IntegraAI\backend\ADVANCED_SERVICES_GUIDE.md
+C:\saleh26\salehsaas\SaleHSaaS3\IntegraAI\backend\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\MCP_SETUP_GUIDE.md
+C:\saleh26\salehsaas\SaleHSaaS3\n8n_workflows\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\saleh_brain\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\saleh_core_data\uploads\5f7039af-6737-4f54-a3bd-e05c50a28c68_System Prompt — وكيل المهندس المستشار الميكانيكي.md
+C:\saleh26\salehsaas\SaleHSaaS3\saleh_dashboard\README.md
+C:\saleh26\salehsaas\SaleHSaaS3\SERVICES.md
+C:\saleh26\salehsaas\SaleHSaaS3\USER_GUIDE_AR.md
+C:\saleh26\salehsaas\SaleHSaaS3\الأمانة.md
+C:\saleh26\salehsaas\SaleHSaaS3\دليل السياسات والإجراءات - نظام الوكلاء الذكيين.md
+
+=== WITH DOCUMENT CODE ===
+C:\saleh26\salehsaas\SaleHSaaS3\docs\services\الملحق الاستراتيجي الالزامي 001.md
+C:\saleh26\salehsaas\SaleHSaaS3\docs\services\خطة الجودة للتطبيق - QMS-APP-POL-RAG-001.md

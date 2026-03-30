@@ -1,0 +1,308 @@
+{
+  "name": "📰 أم القرى - مراقب الأنظمة الجديدة",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weekInterval": 1,
+              "triggerAtDay": [4],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000001",
+      "name": "⏰ جدولة أسبوعية (الخميس 6 صباحاً)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [60, -80]
+    },
+    {
+      "parameters": {},
+      "id": "c3000001-0001-4001-8001-000000000002",
+      "name": "▶️ تشغيل يدوي",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [60, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// تصنيفات أم القرى للسحب\n// ====================================================================\nconst UQN_BASE = 'https://www.uqn.gov.sa';\nconst PAGES_PER_CATEGORY = 3; // أول 3 صفحات (الأحدث)\n\nconst categories = [\n  {\n    key: 'rules',\n    name: 'لوائح وأنظمة',\n    listPath: '/decisions/rules-and-regulations',\n    type: 'regulation'\n  },\n  {\n    key: 'cabinet',\n    name: 'قرارات مجلس الوزراء',\n    listPath: '/decisions/council-of-ministers-decisions',\n    type: 'cabinet_decision'\n  },\n  {\n    key: 'royal_decrees',\n    name: 'مراسيم ملكية',\n    listPath: '/decisions/royal-decrees',\n    type: 'royal_decree'\n  },\n  {\n    key: 'royal_orders',\n    name: 'أوامر ملكية',\n    listPath: '/decisions/royal-orders',\n    type: 'royal_order'\n  },\n  {\n    key: 'ministerial',\n    name: 'قرارات وزارية',\n    listPath: '/decisions/ministerial-decisions',\n    type: 'ministerial_decision'\n  }\n];\n\n// Generate page URLs to scrape\nconst pageRequests = [];\nfor (const cat of categories) {\n  for (let page = 1; page <= PAGES_PER_CATEGORY; page++) {\n    pageRequests.push({\n      json: {\n        category_key: cat.key,\n        category_name: cat.name,\n        category_type: cat.type,\n        page_number: page,\n        list_url: `${UQN_BASE}${cat.listPath}?pgno=${page}`,\n        base_url: UQN_BASE\n      }\n    });\n  }\n}\n\nreturn pageRequests;"
+      },
+      "id": "c3000001-0001-4001-8001-000000000003",
+      "name": "📂 تصنيفات أم القرى",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, -180]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000004",
+      "name": "🔄 صفحة تلو الأخرى",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [520, -180]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.list_url }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000005",
+      "name": "📄 سحب صفحة القائمة",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// استخراج روابط الأنظمة من صفحة القائمة\n// ====================================================================\nconst batchItem = $('🔄 صفحة تلو الأخرى').item.json;\nconst categoryKey = batchItem.category_key;\nconst categoryType = batchItem.category_type;\nconst categoryName = batchItem.category_name;\n\nlet html = '';\nif (typeof $json === 'string') html = $json;\nelse if ($json.data && typeof $json.data === 'string') html = $json.data;\nelse html = JSON.stringify($json);\n\n// Extract regulation links with title attribute\n// Format: <a href=\".../decisions-and-regulations/[subpath/]DIGITS\" title=\"TITLE\">\nconst titlePattern = /<a[^>]*href=\"(?:https?:\\/\\/www\\.uqn\\.gov\\.sa)?(\\/decisions-and-regulations\\/(?:[^\\/\"]+\\/)?([0-9]+))\"[^>]*title=\"([^\"]+)\"/gi;\n\nconst items = [];\nconst seen = new Set();\nlet match;\n\nwhile ((match = titlePattern.exec(html)) !== null) {\n  const fullPath = match[1];\n  const uqnId = match[2];\n  let title = match[3].replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\\s+/g, ' ').trim();\n  \n  if (!seen.has(uqnId) && title.length > 3) {\n    seen.add(uqnId);\n    items.push({\n      json: {\n        uqn_id: uqnId,\n        title: title,\n        detail_url: `https://www.uqn.gov.sa${fullPath}`,\n        category_key: categoryKey,\n        category_type: categoryType,\n        category_name: categoryName,\n        source: 'uqn.gov.sa'\n      }\n    });\n  }\n}\n\nif (items.length === 0) {\n  return [{ json: { skip: true, reason: `لا توجد عناصر في ${categoryName} صفحة ${batchItem.page_number}` } }];\n}\n\nreturn items;"
+      },
+      "id": "c3000001-0001-4001-8001-000000000006",
+      "name": "🔗 استخراج الروابط",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// فحص ChromaDB - أي أنظمة أم القرى موجودة بالفعل؟\n// ====================================================================\nconst CHROMADB = 'http://chromadb:8000/api/v1';\nconst COLLECTION_NAME = 'saleh_knowledge';\n\n// Get collection\nconst cols = await fetch(`${CHROMADB}/collections`).then(r => r.json());\nconst col = cols.find(c => c.name === COLLECTION_NAME);\nif (!col) throw new Error('Collection saleh_knowledge not found!');\n\n// Get all metadatas\nconst total = await fetch(`${CHROMADB}/collections/${col.id}/count`).then(r => r.json());\nconst data = await fetch(`${CHROMADB}/collections/${col.id}/get`, {\n  method: 'POST',\n  headers: {'Content-Type': 'application/json'},\n  body: JSON.stringify({ include: ['metadatas'], limit: total })\n}).then(r => r.json());\n\n// Build set of existing UQN IDs\nconst existingUqnIds = new Set();\nfor (const meta of (data.metadatas || [])) {\n  if (meta.source === 'uqn.gov.sa' && meta.uqn_id) {\n    existingUqnIds.add(String(meta.uqn_id));\n  }\n}\n\n// Filter input items\nconst inputItems = $input.all();\nconst newItems = inputItems.filter(item => {\n  if (item.json.skip) return false;\n  return !existingUqnIds.has(String(item.json.uqn_id));\n});\n\nif (newItems.length === 0) {\n  return [{ json: { status: 'up_to_date', message: '✅ لا يوجد جديد في أم القرى', total_in_db: total, checked: inputItems.length, existing_uqn: existingUqnIds.size } }];\n}\n\nconsole.log(`🆕 Found ${newItems.length} new items from UQN out of ${inputItems.length}`);\nreturn newItems;"
+      },
+      "id": "c3000001-0001-4001-8001-000000000007",
+      "name": "🔍 فحص الموجود في ChromaDB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1180, -180]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond_uqn_1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "up_to_date",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000008",
+      "name": "🔀 هل يوجد جديد؟",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1400, -180]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000009",
+      "name": "🔄 معالجة نظام تلو الآخر",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1620, -280]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.detail_url }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000010",
+      "name": "🌐 سحب صفحة النظام",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1840, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// استخراج نص النظام وتقسيمه\n// ====================================================================\nconst chunkSize = 1000;\nconst overlap = 150;\nconst results = [];\n\nconst batchNode = $('🔄 معالجة نظام تلو الآخر');\nconst meta = batchNode.item.json;\nconst title = meta.title || 'unknown';\nconst uqnId = meta.uqn_id || 'unknown';\nconst categoryType = meta.category_type || 'regulation';\nconst categoryName = meta.category_name || '';\n\nlet html = '';\nif (typeof $json === 'string') html = $json;\nelse if ($json.data && typeof $json.data === 'string') html = $json.data;\nelse html = JSON.stringify($json);\n\n// === تنظيف HTML ===\nlet text = html.replace(/<script[^>]*>[\\s\\S]*?<\\/script>/gi, '');\ntext = text.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\ntext = text.replace(/<br\\s*\\/?>/gi, '\\n');\ntext = text.replace(/<\\/p>/gi, '\\n\\n');\ntext = text.replace(/<[^>]+>/g, ' ');\ntext = text.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"');\ntext = text.replace(/[ \\t]+/g, ' ');\n\n// === البحث عن بداية النص ===\nconst markers = ['المادة الأولى', 'المادة الاولى', 'مادة أولى', title];\nfor (const m of markers) {\n  const idx = text.indexOf(m);\n  if (idx > -1 && idx < text.length * 0.5) {\n    text = text.substring(idx);\n    break;\n  }\n}\n\n// === إزالة الذيل (Footer) ===\nconst footerMarkers = ['الأكثر قراءة', 'جميع الحقوق محفوظة', 'تابعنا على', 'اتصل بنا', 'خريطة الموقع'];\nfor (const m of footerMarkers) {\n  const idx = text.indexOf(m);\n  if (idx > 200) {\n    text = text.substring(0, idx);\n    break;\n  }\n}\n\n// تنظيف السطور\ntext = text.split('\\n').map(l => l.trim()).filter(l => l.length > 0).join('\\n');\ntext = text.replace(/\\n{3,}/g, '\\n\\n').trim();\n\nif (text.length < 100) {\n  return [{ json: { error: `النص قصير جداً: ${title}`, length: text.length, uqn_id: uqnId } }];\n}\n\n// === التقسيم (مع مراعاة حدود المواد) ===\nconst articlePattern = /(?=المادة\\s+(?:الأولى|الثانية|الثالثة|الرابعة|الخامسة|السادسة|السابعة|الثامنة|التاسعة|العاشرة|الحادية|[\\d\\u0660-\\u0669]+))/;\nconst articleSplits = text.split(articlePattern);\n\nlet chunks = [];\nif (articleSplits.length > 3) {\n  // Article-based chunking\n  let currentChunk = '';\n  for (const part of articleSplits) {\n    const trimmed = part.trim();\n    if (!trimmed) continue;\n    if (currentChunk.length + trimmed.length < chunkSize) {\n      currentChunk += (currentChunk ? '\\n\\n' : '') + trimmed;\n    } else {\n      if (currentChunk) chunks.push(currentChunk.trim());\n      currentChunk = trimmed;\n    }\n  }\n  if (currentChunk) chunks.push(currentChunk.trim());\n} else {\n  // Size-based chunking\n  let start = 0, idx = 0;\n  while (start < text.length) {\n    const end = Math.min(start + chunkSize, text.length);\n    const chunk = text.substring(start, end).trim();\n    if (chunk.length > 50) chunks.push(chunk);\n    if (end >= text.length) break;\n    start += chunkSize - overlap;\n  }\n}\n\n// === إنشاء النتائج ===\nfor (let i = 0; i < chunks.length; i++) {\n  results.push({\n    json: {\n      chunk_id: `uqn_${uqnId}_c${i}`,\n      chunk_text: chunks[i],\n      title: title,\n      uqn_id: uqnId,\n      source: 'uqn.gov.sa',\n      source_url: meta.detail_url || '',\n      category: categoryType,\n      category_name: categoryName,\n      chunk_index: i,\n      total_chunks: chunks.length,\n      total_text_length: text.length\n    }\n  });\n}\n\nif (results.length === 0) {\n  return [{ json: { error: `فشل التقسيم: ${title}`, uqn_id: uqnId } }];\n}\n\nreturn results;"
+      },
+      "id": "c3000001-0001-4001-8001-000000000011",
+      "name": "✂️ استخراج وتقسيم النص",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2060, -280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/embeddings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'nomic-embed-text:latest', prompt: $json.chunk_text }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000012",
+      "name": "🧠 Ollama Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2280, -280]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const embedding = $json.embedding;\nconst prev = $('✂️ استخراج وتقسيم النص').item.json;\n\nreturn {\n  ids: [prev.chunk_id],\n  embeddings: [embedding],\n  documents: [prev.chunk_text],\n  metadatas: [{\n    law_name: prev.title,\n    uqn_id: prev.uqn_id,\n    source: 'uqn.gov.sa',\n    source_url: prev.source_url || '',\n    category: prev.category,\n    chunk_index: prev.chunk_index,\n    total_chunks: prev.total_chunks,\n    ingested_at: new Date().toISOString(),\n    auto_updated: 'true'\n  }],\n  chunk_id: prev.chunk_id,\n  title: prev.title\n};"
+      },
+      "id": "c3000001-0001-4001-8001-000000000013",
+      "name": "🔗 تحضير بيانات ChromaDB",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2500, -280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/upsert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ids: $json.ids, embeddings: $json.embeddings, documents: $json.documents, metadatas: $json.metadatas }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "c3000001-0001-4001-8001-000000000014",
+      "name": "💾 حفظ في ChromaDB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2720, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====================================================================\n// تقرير نهائي\n// ====================================================================\nconst items = $input.all();\nconst successCount = items.filter(i => !i.json.error).length;\nconst errorCount = items.filter(i => i.json.error).length;\nconst timestamp = new Date().toISOString();\n\nlet finalCount = 'N/A';\ntry {\n  const resp = await fetch('http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/count');\n  finalCount = await resp.json();\n} catch(e) {}\n\nreturn [{\n  json: {\n    status: 'completed',\n    source: 'uqn.gov.sa - أم القرى',\n    total_chunks_saved: successCount,\n    errors: errorCount,\n    chromadb_total: finalCount,\n    message: `📰 أم القرى: تم حفظ ${successCount} قطعة جديدة | أخطاء: ${errorCount} | الإجمالي: ${finalCount}`,\n    timestamp: timestamp\n  }\n}];"
+      },
+      "id": "c3000001-0001-4001-8001-000000000015",
+      "name": "📊 تقرير نهائي",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2940, -280]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $json }];"
+      },
+      "id": "c3000001-0001-4001-8001-000000000016",
+      "name": "✅ لا يوجد جديد",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1620, -80]
+    }
+  ],
+  "connections": {
+    "⏰ جدولة أسبوعية (الخميس 6 صباحاً)": {
+      "main": [[{"node": "📂 تصنيفات أم القرى", "type": "main", "index": 0}]]
+    },
+    "▶️ تشغيل يدوي": {
+      "main": [[{"node": "📂 تصنيفات أم القرى", "type": "main", "index": 0}]]
+    },
+    "📂 تصنيفات أم القرى": {
+      "main": [[{"node": "🔄 صفحة تلو الأخرى", "type": "main", "index": 0}]]
+    },
+    "🔄 صفحة تلو الأخرى": {
+      "main": [
+        [{"node": "📄 سحب صفحة القائمة", "type": "main", "index": 0}],
+        [{"node": "🔍 فحص الموجود في ChromaDB", "type": "main", "index": 0}]
+      ]
+    },
+    "📄 سحب صفحة القائمة": {
+      "main": [[{"node": "🔗 استخراج الروابط", "type": "main", "index": 0}]]
+    },
+    "🔗 استخراج الروابط": {
+      "main": [[{"node": "🔄 صفحة تلو الأخرى", "type": "main", "index": 0}]]
+    },
+    "🔍 فحص الموجود في ChromaDB": {
+      "main": [[{"node": "🔀 هل يوجد جديد؟", "type": "main", "index": 0}]]
+    },
+    "🔀 هل يوجد جديد؟": {
+      "main": [
+        [{"node": "🔄 معالجة نظام تلو الآخر", "type": "main", "index": 0}],
+        [{"node": "✅ لا يوجد جديد", "type": "main", "index": 0}]
+      ]
+    },
+    "🔄 معالجة نظام تلو الآخر": {
+      "main": [
+        [{"node": "🌐 سحب صفحة النظام", "type": "main", "index": 0}],
+        [{"node": "📊 تقرير نهائي", "type": "main", "index": 0}]
+      ]
+    },
+    "🌐 سحب صفحة النظام": {
+      "main": [[{"node": "✂️ استخراج وتقسيم النص", "type": "main", "index": 0}]]
+    },
+    "✂️ استخراج وتقسيم النص": {
+      "main": [[{"node": "🧠 Ollama Embedding", "type": "main", "index": 0}]]
+    },
+    "🧠 Ollama Embedding": {
+      "main": [[{"node": "🔗 تحضير بيانات ChromaDB", "type": "main", "index": 0}]]
+    },
+    "🔗 تحضير بيانات ChromaDB": {
+      "main": [[{"node": "💾 حفظ في ChromaDB", "type": "main", "index": 0}]]
+    },
+    "💾 حفظ في ChromaDB": {
+      "main": [[{"node": "🔄 معالجة نظام تلو الآخر", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {"name": "auto-update"},
+    {"name": "uqn"},
+    {"name": "gazette"}
+  ]
+}

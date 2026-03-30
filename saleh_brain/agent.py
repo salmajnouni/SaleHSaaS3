@@ -2,6 +2,10 @@
 """
 SaleH Brain Agent - العقل الذكي لمنصة SaleHSaaS 3.0
 يراقب الأداء، يُحلّل عبر Ollama، ويتخذ قرارات تلقائية
+
+ملاحظة تشغيلية:
+هذا الوكيل يعكس تكوينًا تاريخيًا أقدم (يتضمن خدمات مثل AnythingLLM/Redis)
+ولا يُستخدم كمرجع حاكم لخدمات التشغيل الحالية.
 """
 
 import os
@@ -39,12 +43,12 @@ MEMORY_HIGH_THRESHOLD = float(os.getenv("MEMORY_HIGH_THRESHOLD", "85"))  # %
 MEMORY_LOW_THRESHOLD  = float(os.getenv("MEMORY_LOW_THRESHOLD",  "30"))  # %
 
 # الخدمات الأساسية التي يجب مراقبتها
+# يمكن تخصيصها عبر متغير البيئة CRITICAL_SERVICES بصيغة CSV.
 CRITICAL_SERVICES = [
-    "salehsaas_ollama",
-    "salehsaas_postgres",
-    "salehsaas_anythingllm",
-    "salehsaas_n8n",
-    "salehsaas_redis",
+    svc.strip() for svc in os.getenv(
+        "CRITICAL_SERVICES",
+        "salehsaas_postgres,salehsaas_chromadb,salehsaas_n8n,salehsaas_data_pipeline,salehsaas_open-terminal",
+    ).split(",") if svc.strip()
 ]
 
 # المهام القابلة للتأجيل في n8n (أسماء workflows)

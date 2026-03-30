@@ -1,0 +1,87 @@
+[
+  {
+    "law_id": "16b97fcb-4833-4f66-8531-a9a700f161b6",
+    "law_name": "النظام الأساسي للحكم",
+    "category": "constitutional"
+  },
+  {
+    "law_id": "b5cf540a-e6ac-426a-b348-a9a700f163de",
+    "law_name": "نظام مجلس الشورى",
+    "category": "constitutional"
+  },
+  {
+    "law_id": "93e87aa7-f344-4711-b97c-a9a700f1662b",
+    "law_name": "نظام مجلس الوزراء",
+    "category": "constitutional"
+  },
+  {
+    "law_id": "93f81644-fbbc-49ca-b33c-a9a700f16701",
+    "law_name": "نظام المناطق",
+    "category": "regions"
+  },
+  {
+    "law_id": "08381293-6388-48e2-8ad2-a9a700f2aa94",
+    "law_name": "نظام العمل",
+    "category": "labor_law"
+  },
+  {
+    "law_id": "98ee4b51-d398-4323-ae69-b2b8009f3156",
+    "law_name": "نظام السجل التجاري",
+    "category": "commercial_registry"
+  },
+  {
+    "law_id": "23576008-1ce4-4685-ac3e-a9a700f2cb02",
+    "law_name": "نظام ضريبة الدخل",
+    "category": "tax"
+  },
+  {
+    "law_id": "c2c05ee1-201a-48de-91e7-a9a700f2d14f",
+    "law_name": "نظام المنافسات والمشتريات الحكومية",
+    "category": "procurement"
+  },
+  {
+    "law_id": "ae610645-e094-48ef-814e-aeb4009d244f",
+    "law_name": "نظام الاتصالات وتقنية المعلومات",
+    "category": "telecom"
+  },
+  {
+    "law_id": "25df73d6-0f49-4dc5-b010-a9a700f2ec1d",
+    "law_name": "نظام مكافحة جرائم المعلوماتية",
+    "category": "cyber_crimes"
+  },
+  {
+    "law_id": "6f509360-2c39-4358-ae2a-a9a700f2ed16",
+    "law_name": "نظام التعاملات الإلكترونية",
+    "category": "ecommerce"
+  },
+  {
+    "law_id": "a1bdadb5-c518-48bb-a1d0-b33000e66fd1",
+    "law_name": "نظام تملك غير السعوديين للعقار",
+    "category": "real_estate"
+  },
+  {
+    "law_id": "85364e57-c01e-41ba-8def-a9a700f183e9",
+    "law_name": "نظام المرور",
+    "category": "traffic"
+  },
+  {
+    "law_id": "eda86cc3-3a00-4b90-900d-b1d000c8a863",
+    "law_name": "نظام الاستثمار",
+    "category": "investment"
+  },
+  {
+    "law_id": "48da5c0f-b5a6-4e93-b76c-b33200be0330",
+    "law_name": "نظام المواد البترولية والبتروكيماوية",
+    "category": "petroleum"
+  },
+  {
+    "law_id": "b4edc050-18f3-4b23-aabc-b35b00ddaab7",
+    "law_name": "نظام الإحصاء",
+    "category": "statistics"
+  },
+  {
+    "law_id": "366a4221-3214-4338-b3f2-b35c009f36cd",
+    "law_name": "نظام الحرف والصناعات اليدوية",
+    "category": "crafts"
+  }
+]

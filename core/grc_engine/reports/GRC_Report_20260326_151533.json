@@ -1,0 +1,36 @@
+{
+    "nca": {
+        "framework": "NCA Essential Cybersecurity Controls",
+        "status": "Incomplete",
+        "findings": [
+            {
+                "control_id": "ECC-2.1.3",
+                "description": "Access logging markers not found. Logging might be misconfigured.",
+                "severity": "Medium"
+            }
+        ]
+    },
+    "pdpl": {
+        "framework": "Personal Data Protection Law (PDPL)",
+        "status": "Incomplete",
+        "findings": [
+            {
+                "control_id": "Article-20",
+                "description": "Potential unencrypted National ID found in postgresql://salehsaas:salehsaas_pass@postgres:5432/salehsaas.",
+                "matches_count": 1,
+                "severity": "Critical"
+            }
+        ]
+    },
+    "citc": {
+        "framework": "CITC Cloud Computing Regulatory Framework",
+        "status": "Incomplete",
+        "findings": [
+            {
+                "control_id": "CSP-Policy-3.1",
+                "description": "Data transfer to an international IP address detected, potentially violating data localization requirements.",
+                "severity": "High"
+            }
+        ]
+    }
+}

@@ -2,6 +2,10 @@
 chcp 65001 >nul
 cls
 
+REM WARNING:
+REM This installer reflects an older stack layout and is not a runtime authority.
+REM Validate current active services against docker-compose.yml.
+
 echo.
 echo ╭──────────────────────────────────────────────────────────────────╮
 echo │          SaleHSaaS 3.0 - مثبَّت المنصة السيادية                 │
@@ -121,9 +125,12 @@ echo ║  لوحة التحكم الرئيسية:  http://localhost:8000        
 echo ║  واجهة الذكاء الاصطناعي: http://localhost:3000                  ║
 echo ║  أتمتة سير العمل (n8n): http://localhost:5678                   ║
 echo ║  محرك البحث المحلي:     http://localhost:8080                   ║
-echo ║  استوديو التطوير:       http://localhost:8443                   ║
-echo ║  مراقبة الأداء:         http://localhost:3001                   ║
+echo ║  الطرفية التفاعلية:     http://localhost:8000                   ║
+echo ║  Browserless:           http://localhost:3001                   ║
 echo ╚══════════════════════════════════════════════════════════════════╝
+echo.
+echo [NOTE] الخدمات الاختيارية Legacy ^(AnythingLLM, Code Server, Grafana^) غير مفعلة افتراضياً.
+echo [NOTE] المرجع الأعلى للتشغيل الحالي هو docker-compose.yml
 echo.
 echo جميع البيانات تُعالج محلياً - لا يوجد إرسال خارجي
 echo All data processed locally - Zero external transmission

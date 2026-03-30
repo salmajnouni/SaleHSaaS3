@@ -2,12 +2,29 @@
 :: SaleHSaaS 3.0 - Install Continue.dev in Code Server
 :: Run this after docker compose is up
 
+REM WARNING:
+REM Legacy helper for old Code Server flow. Not part of current runtime by default.
+REM Keep for historical/dev recovery usage only.
+
 echo.
 echo ================================================================
 echo   Installing Continue.dev in Code Server
 echo   Connecting to local llama3 via Ollama
 echo ================================================================
 echo.
+
+if /I not "%ALLOW_LEGACY_CODE_SERVER%"=="true" (
+    echo [SKIP] Legacy Code Server flow is disabled by default.
+    echo [INFO] Set ALLOW_LEGACY_CODE_SERVER=true then rerun if needed.
+    goto :end
+)
+
+docker ps --format "{{.Names}}" | findstr /I "salehsaas_code_server" >nul
+if %errorLevel% neq 0 (
+    echo [SKIP] Container salehsaas_code_server is not running.
+    echo [INFO] Start legacy dev studio first if you intentionally need this flow.
+    goto :end
+)
 
 :: Step 1 - Install Continue extension inside code-server container
 echo [1/3] Installing Continue.dev extension...
@@ -35,4 +52,5 @@ echo   Done! Open http://localhost:8443
 echo   Look for the Continue icon in the left sidebar
 echo ================================================================
 echo.
+:end
 pause
