@@ -176,6 +176,9 @@ services:
       - N8N_METRICS=true
       - N8N_LOG_LEVEL=info
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_RUNNERS_MODE=external
+      - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
+      - N8N_RUNNERS_AUTH_TOKEN=salehsaas-runners-secret-2026
     volumes:
       - n8n_data:/home/node/.n8n
       - ./core:/app/core
@@ -187,6 +190,19 @@ services:
         ipv4_address: 172.20.0.40
     ports:
       - "5678:5678"
+
+  task_runners:
+    image: n8nio/runners:2.14.2
+    container_name: salehsaas_task_runners
+    restart: unless-stopped
+    depends_on:
+      - n8n
+    environment:
+      - N8N_RUNNERS_AUTH_TOKEN=salehsaas-runners-secret-2026
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.41
 
   knowledge_watcher:
     build:

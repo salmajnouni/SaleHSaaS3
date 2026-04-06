@@ -39,8 +39,8 @@ $entries = @()
 # When a deviation is closed with a code change, add its action here to suppress the old warn entry.
 $filterOutActions = @(
     "synthetic_deviation",           # test signal only
-    "missing_env_vars_compose_warning",  # closed: added defaults in docker-compose.yml (commit 72e157b)
-    "python_task_runner_internal"        # closed: Dockerfile.n8n adds python3 (commit 72e157b)
+    "missing_env_vars_compose_warning"   # closed: added defaults in docker-compose.yml (commit 72e157b)
+    # python_task_runner_internal — CLOSED FOR REAL: external n8nio/runners:2.14.2 sidecar (task_runners service)
 )
 
 foreach ($line in $lines) {
