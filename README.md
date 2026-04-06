@@ -33,11 +33,12 @@
 | 4 | **Apache Tika** | `apache/tika:latest` | داخلي | استخراج النصوص من PDF وWord وExcel |
 | 5 | **Ollama** | Windows Host | `11434` | نماذج اللغة والتضمين المحلية |
 | 6 | **Knowledge Watcher** | مبني محلياً | داخلي | خط أنابيب استيعاب الوثائق التلقائي v3.0 |
-| 7 | **n8n** | `n8nio/n8n:latest` | `5678` | أتمتة سير العمل |
-| 8 | **SearXNG** | `searxng/searxng:latest` | داخلي | بحث محلي على الإنترنت |
-| 9 | **Data Pipeline** | مبني محلياً | `8001` | استقبال الملفات، التقطيع، وتخزينها في ChromaDB |
-| 10 | **Browserless** | `browserless/chrome:latest` | `3001` | متصفح آلي للخدمات التي تحتاج تنفيذًا متصفحياً |
-| 11 | **Open Terminal** | `ghcr.io/open-webui/open-terminal` | `8000` | طرفية داخلية مرتبطة بالمجلد المحلي `saleh/` |
+| 7 | **n8n** | `n8nio/n8n:2.14.2` | `5678` | أتمتة سير العمل + Task Broker |
+| 8 | **Task Runners** | `n8nio/runners:2.14.2` | داخلي | تشغيل Python/JavaScript لـ n8n (external runners mode) |
+| 9 | **SearXNG** | `searxng/searxng:latest` | داخلي | بحث محلي على الإنترنت |
+| 10 | **Data Pipeline** | مبني محلياً | `8001` | استقبال الملفات، التقطيع، وتخزينها في ChromaDB |
+| 11 | **Browserless** | `browserless/chrome:latest` | `3001` | متصفح آلي للخدمات التي تحتاج تنفيذًا متصفحياً |
+| 12 | **Open Terminal** | `ghcr.io/open-webui/open-terminal` | `8000` | طرفية داخلية مرتبطة بالمجلد المحلي `saleh/` |
 
 ---
 
@@ -106,6 +107,21 @@ knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
 4. يولّد التضمينات عبر Ollama (`qwen3-embedding:0.6b`)
 5. يخزّن في ChromaDB عبر واجهة `v1` (المجموعة المعتمدة: `saleh_knowledge_qwen3`)
 6. ينقل الملف الناجح إلى `knowledge_processed/`
+
+---
+
+## التحقق التشغيلي الأخير (2026-04-06)
+
+تم تنفيذ اختبار RAG شامل end-to-end على المسار الحي (Embedding -> ChromaDB -> Context Injection -> LLM) وكانت النتيجة ناجحة.
+
+- الاستعلام المختبَر: `ما هي شروط الفسخ في العقود القانونية السعودية؟`
+- نموذج التضمين: `qwen3-embedding:0.6b` (أبعاد 1024)
+- المجموعة: `saleh_knowledge_qwen3`
+- الاسترجاع: `15` مقطع (Top similarity=`0.606`)
+- حقن السياق: system context بطول `11253` حرف
+- الناتج: إجابة عربية قانونية متدفقة من Ollama عبر `pipe()`
+
+مرجع الأثر التشغيلي: `logs/ops_journal.jsonl` (action: `rag_e2e_verified`)
 
 ---
 

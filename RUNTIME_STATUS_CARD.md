@@ -12,6 +12,7 @@ Scope: current operational truth for this repository.
 - `data_pipeline` (`salehsaas_data_pipeline`) -> `http://localhost:8001`
 - `knowledge_watcher` (`salehsaas_watcher`)
 - `n8n` (`salehsaas_n8n`) -> `http://localhost:5678`
+- `task_runners` (`salehsaas_task_runners`) -> internal (n8n external runners)
 - `tika` (`salehsaas_tika`)
 - `searxng` (`salehsaas_searxng`)
 
@@ -40,9 +41,18 @@ Scope: current operational truth for this repository.
 
 ## Operational Defaults
 
-- Chroma collection: `saleh_knowledge`
-- Embedding model: `nomic-embed-text:latest`
+- Chroma collection: `saleh_knowledge_qwen3`
+- Embedding model: `qwen3-embedding:0.6b` (1024 dims)
 - Chroma API mode in active paths: `v1`
+
+## RAG Verification (2026-04-06)
+
+- End-to-end RAG was verified on the live path (`pipelines/saleh_legal_rag.py`)
+- Query: `ما هي شروط الفسخ في العقود القانونية السعودية؟`
+- Retrieval: `15` chunks (top similarity `0.606`) from `saleh_knowledge_qwen3`
+- Context injection: `11253` chars via `inlet()`
+- LLM response streamed successfully via `pipe()`
+- Journal record: `logs/ops_journal.jsonl` action `rag_e2e_verified`
 
 ## Backup Status (Verified 2026-04-06)
 
