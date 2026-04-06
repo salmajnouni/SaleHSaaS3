@@ -1,4 +1,5 @@
 {
+  "id": "CwCounclMain001",
   "name": "المجلس الاستشاري — Advisory Council",
   "nodes": [
 
@@ -310,6 +311,6 @@
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "tags": ["advisory-council", "agents", "telegram", "governance"],
+  "tags": [],
   "meta": { "instanceId": "salehsaas" }
 }

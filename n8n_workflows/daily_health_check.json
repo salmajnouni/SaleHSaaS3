@@ -13,7 +13,7 @@
         }
       },
       "id": "d1000001-0001-4001-8001-000000000001",
-      "name": "⏰ يومياً الساعة 2 صباحاً",
+      "name": "يومياً الساعة 2 صباحاً",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [60, -80]
@@ -21,90 +21,41 @@
     {
       "parameters": {},
       "id": "d1000001-0001-4001-8001-000000000002",
-      "name": "▶️ تشغيل يدوي",
+      "name": "تشغيل يدوي",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [60, -280]
     },
     {
       "parameters": {
-        "jsCode": "// تجميع معلومات النظام قبل النسخ الاحتياطي\nconst timestamp = new Date().toISOString().replace(/[:.]/g, '').substring(0, 15);\nreturn [{\n  json: {\n    timestamp: timestamp,\n    backup_name: `backup_${timestamp}`,\n    services: ['postgres', 'chromadb', 'open_webui', 'knowledge']\n  }\n}];"
+        "command": "powershell.exe -NonInteractive -ExecutionPolicy Bypass -File \"C:\\saleh26\\salehsaas\\SaleHSaaS3\\backup.ps1\""
       },
-      "id": "d1000001-0001-4001-8001-000000000003",
-      "name": "📋 إعداد بيانات النسخ",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
+      "id": "d1000001-0001-4001-8001-000000000010",
+      "name": "تنفيذ backup.ps1",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
       "position": [300, -180]
     },
     {
       "parameters": {
-        "method": "GET",
-        "url": "http://chromadb:8000/api/v1/collections/saleh_knowledge",
-        "options": {
-          "timeout": 10000
-        }
+        "jsCode": "const stdout = $json.stdout || '';\nconst stderr = $json.stderr || '';\n\nconst failCount = (stdout.match(/\\[FAIL\\]/g) || []).length;\nconst warnCount = (stdout.match(/\\[WARN\\]/g) || []).length;\nconst okCount   = (stdout.match(/\\[OK\\]/g)   || []).length;\n\nconst zipMatch = stdout.match(/Archive: (.+\\.zip)/);\nconst zipFile  = zipMatch ? zipMatch[1].trim() : 'لم يُنشأ ملف مضغوط';\n\nconst success = (failCount === 0) && (okCount > 0);\n\nreturn [{ json: {\n  success: success,\n  verdict: success\n    ? ('نجح: ' + okCount + ' مكون' + (warnCount > 0 ? ' (' + warnCount + ' تحذير)' : '') + ' | الملف: ' + zipFile)\n    : ('فشل: ' + failCount + ' مكون فشل | ' + zipFile),\n  ok_count:   okCount,\n  warn_count: warnCount,\n  fail_count: failCount,\n  zip_file:   zipFile,\n  raw_output: stdout.substring(0, 1000)\n}}];"
       },
-      "id": "d1000001-0001-4001-8001-000000000004",
-      "name": "📊 عدد الوثائق في ChromaDB",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [520, -180]
-    },
-    {
-      "parameters": {
-        "jsCode": "const chromaInfo = $json;\nconst prev = $('📋 إعداد بيانات النسخ').item.json;\n\n// تسجيل حالة النظام\nconst report = {\n  backup_timestamp: prev.timestamp,\n  chromadb_collection: chromaInfo.name || 'saleh_knowledge',\n  chromadb_documents: chromaInfo.dimension ? 'Collection exists' : 'Unknown',\n  status: 'health_check_passed',\n  message: `✅ فحص النظام: ChromaDB متصل - المجموعة: ${chromaInfo.name || 'N/A'} - الأبعاد: ${chromaInfo.dimension || 'N/A'}`\n};\n\nreturn [{ json: report }];"
-      },
-      "id": "d1000001-0001-4001-8001-000000000005",
-      "name": "📝 تقرير الحالة",
+      "id": "d1000001-0001-4001-8001-000000000011",
+      "name": "التحقق من النتيجة",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [740, -180]
+      "position": [520, -180]
     }
   ],
   "connections": {
-    "⏰ يومياً الساعة 2 صباحاً": {
-      "main": [
-        [
-          {
-            "node": "📋 إعداد بيانات النسخ",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "يومياً الساعة 2 صباحاً": {
+      "main": [[{"node": "تنفيذ backup.ps1", "type": "main", "index": 0}]]
     },
-    "▶️ تشغيل يدوي": {
-      "main": [
-        [
-          {
-            "node": "📋 إعداد بيانات النسخ",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "تشغيل يدوي": {
+      "main": [[{"node": "تنفيذ backup.ps1", "type": "main", "index": 0}]]
     },
-    "📋 إعداد بيانات النسخ": {
-      "main": [
-        [
-          {
-            "node": "📊 عدد الوثائق في ChromaDB",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "📊 عدد الوثائق في ChromaDB": {
-      "main": [
-        [
-          {
-            "node": "📝 تقرير الحالة",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "تنفيذ backup.ps1": {
+      "main": [[{"node": "التحقق من النتيجة", "type": "main", "index": 0}]]
     }
   },
   "settings": {

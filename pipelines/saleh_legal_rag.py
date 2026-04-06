@@ -24,14 +24,14 @@ from pydantic import BaseModel
 class Pipeline:
     class Valves(BaseModel):
         pipelines: List[str] = ["*"]
-        CHROMADB_URL: str = "http://chromadb:8000"
+        CHROMADB_URL: str = "http://host.docker.internal:8010"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
         EMBEDDING_MODEL: str = "nomic-embed-text:latest"
         COLLECTION_NAME: str = "saleh_knowledge"
         CHROMADB_TENANT: str = "default_tenant"
         CHROMADB_DATABASE: str = "default_database"
-        TOP_K: int = 10
-        MIN_RELEVANCE_SCORE: float = 0.45
+        TOP_K: int = 15
+        MIN_RELEVANCE_SCORE: float = 0.35
         ENABLE_RAG: bool = True
         SYSTEM_PROMPT: str = """أنت 'صالح'، المساعد القانوني السيادي المتقدم للمملكة العربية السعودية.
 مهمتك هي تقديم استشارات قانونية دقيقة بناءً على الأنظمة واللوائح السعودية حصراً.

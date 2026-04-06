@@ -54,6 +54,7 @@ services:
       - open_webui
     volumes:
       - ./pipelines:/app/pipelines
+      - ./saleh_core_data/glossary:/app/backend/data/glossary:ro
     environment:
       - PIPELINES_API_KEY=0p_salehsaas-pipelines-key-2026
       - N8N_BASE_URL=http://n8n:5678
@@ -74,7 +75,6 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-      - browserless
       - tika
       - chromadb
     environment:
@@ -94,6 +94,12 @@ services:
       - ENABLE_RAG_WEB_SEARCH=True
       - RAG_WEB_SEARCH_ENGINE=searxng
       - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>&format=json
+      - SEARXNG_LANGUAGE=ar
+      - WEB_SEARCH_CONCURRENT_REQUESTS=1
+      - DDGS_BACKEND=api
+      - OPEN_WEBUI_MAIN_MODEL=llava:7b
+      - WHISPER_MODEL=base
+      - IMAGE_GENERATION_ENGINE=openai
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -108,6 +114,10 @@ services:
     image: browserless/chrome:latest
     container_name: salehsaas_browser
     restart: unless-stopped
+    profiles:
+      - browserless
+    # No active usage found in any pipeline/workflow as of 2026-04-06
+    # Activate when a real scraping/screenshot use case is wired: docker compose --profile browserless up
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.70
@@ -161,10 +171,17 @@ services:
       - N8N_VARIABLES_WEBUI_API_KEY=sk-773169e4bcce483fb5e8268e9bf393dc
       - N8N_VARIABLES_COUNCIL_MODEL=qwen2.5:7b
       - N8N_VARIABLES_SALEH_TELEGRAM_CHAT_ID=161458544
+      - N8N_VARIABLES_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - N8N_BLOCK_SVC_REGISTRATION_EMAIL=true
+      - N8N_METRICS=true
+      - N8N_LOG_LEVEL=info
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
     volumes:
       - n8n_data:/home/node/.n8n
       - ./core:/app/core
       - ./logs:/app/logs
+      - //./pipe/dockerDesktopLinuxEngine://./pipe/docker-engine
+      - c:/saleh26:/app/host_saleh26:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
@@ -229,3 +246,35 @@ services:
         ipv4_address: 172.20.0.80
     ports:
       - "8000:8000"
+
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: salehsaas_crawl4ai
+    restart: unless-stopped
+    profiles:
+      - crawl4ai
+    # Zero usage in entire codebase as of 2026-04-06 — disabled until a real use case exists
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.90
+    ports:
+      - "11235:11235"
+    environment:
+      - CRAWL4AI_API_TOKEN=salehsaas_crawl_secret_2026
+
+  python_agent:
+    build:
+      context: ./python_agent
+    container_name: salehsaas_python_agent
+    restart: unless-stopped
+    profiles:
+      - python-agent
+    # SECURITY: docker.sock removed — was granting full Docker control with no real purpose
+    # Activate only when a real use case is defined: docker compose --profile python-agent up
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.95

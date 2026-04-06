@@ -1,0 +1,21 @@
+saleh_legal_ingest | SaleH Legal Ingest
+saleh_legal_pipeline | SaleH Legal Pipeline - المعالج القانوني
+saleh_legal_rag | SaleH Legal RAG
+qwen3-embedding:0.6b | qwen3-embedding:0.6b
+qwen3:32b | qwen3:32b
+qwen3:14b | qwen3:14b
+qwen3-coder:30b | qwen3-coder:30b
+qwen2.5:7b | qwen2.5:7b
+qwen2.5:72b | qwen2.5:72b
+qwen2.5:32b | qwen2.5:32b
+qwen2.5:14b | qwen2.5:14b
+nomic-embed-text:latest | nomic-embed-text:latest
+llama3.3:70b | llama3.3:70b
+llama3.1:70b | llama3.1:70b
+deepseek-r1:32b | deepseek-r1:32b
+deepseek-coder-v2:16b | deepseek-coder-v2:16b
+arena-model | Arena Model
+saleh_agent | Sovereign Assistant
+dev_architect | Dev Architect
+evo | الرئيس
+evo1 | مبرمج

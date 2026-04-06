@@ -1,4 +1,5 @@
 {
+  "id": "CwCounclWbhk001",
   "name": "Advisory Council Webhook - استقبال طلبات المجلس",
   "nodes": [
     {
@@ -12,7 +13,10 @@
       "name": "🌐 Webhook Intake",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [80, 260],
+      "position": [
+        80,
+        260
+      ],
       "webhookId": "advisory-council-intake"
     },
     {
@@ -21,7 +25,10 @@
       "name": "▶️ تشغيل يدوي",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [80, 80]
+      "position": [
+        80,
+        80
+      ]
     },
     {
       "parameters": {
@@ -38,7 +45,10 @@
       "name": "⏰ جلسة أسبوعية",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [80, 440]
+      "position": [
+        80,
+        440
+      ]
     },
     {
       "parameters": {
@@ -48,7 +58,10 @@
       "name": "🎯 تهيئة الطلب",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [320, 260]
+      "position": [
+        320,
+        260
+      ]
     },
     {
       "parameters": {
@@ -59,7 +72,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
             },
             {
               "name": "Content-Type",
@@ -69,16 +82,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أنت وكيل الامتثال القانوني في مجلس استشاري. مهمتك: تحليل الموضوع من المنظور القانوني والتنظيمي فقط. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: ⚖️ *وكيل القانون والامتثال:*' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أجب باللغة العربية فقط. أنت وكيل الامتثال القانوني في مجلس استشاري. مهمتك: تحليل الموضوع من المنظور القانوني والتنظيمي فقط. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: ⚖️ وكيل القانون والامتثال:' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
         "options": {
           "timeout": 120000
-        }
+        },
+        "specifyHeaders": "keypair"
       },
       "id": "cw-0005",
       "name": "⚖️ رأي القانون والامتثال",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [620, 20]
+      "position": [
+        620,
+        20
+      ]
     },
     {
       "parameters": {
@@ -89,7 +106,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
             },
             {
               "name": "Content-Type",
@@ -99,16 +116,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أنت وكيل المال والأعمال في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية الجدوى، القيمة، الأولوية، والعائد. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: 💰 *وكيل المال والأعمال:*' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أجب باللغة العربية فقط. أنت وكيل المال والأعمال في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية الجدوى، القيمة، الأولوية، والعائد. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: 💰 وكيل المال والأعمال:' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
         "options": {
           "timeout": 120000
-        }
+        },
+        "specifyHeaders": "keypair"
       },
       "id": "cw-0006",
       "name": "💰 رأي المال والأعمال",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [620, 180]
+      "position": [
+        620,
+        180
+      ]
     },
     {
       "parameters": {
@@ -119,7 +140,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
             },
             {
               "name": "Content-Type",
@@ -129,16 +150,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أنت وكيل الأمن السيبراني في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية المخاطر الأمنية، ضوابط NCA وPDPL وسلامة التنفيذ. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: 🛡️ *وكيل الأمن السيبراني:*' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أجب باللغة العربية فقط. أنت وكيل الأمن السيبراني في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية المخاطر الأمنية، ضوابط NCA وPDPL وسلامة التنفيذ. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: 🛡️ وكيل الأمن السيبراني:' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
         "options": {
           "timeout": 120000
-        }
+        },
+        "specifyHeaders": "keypair"
       },
       "id": "cw-0007",
       "name": "🛡️ رأي الأمن السيبراني",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [620, 340]
+      "position": [
+        620,
+        340
+      ]
     },
     {
       "parameters": {
@@ -149,7 +174,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
             },
             {
               "name": "Content-Type",
@@ -159,16 +184,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أنت وكيل التطوير التقني في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية الجاهزية التقنية، التعقيد، التبعيات، وقابلية التنفيذ. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: ⚙️ *وكيل التطوير التقني:*' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أجب باللغة العربية فقط. أنت وكيل التطوير التقني في مجلس استشاري. مهمتك: تحليل الموضوع من زاوية الجاهزية التقنية، التعقيد، التبعيات، وقابلية التنفيذ. أعط 3 نقاط قصيرة وعملية. ابدأ بـ: ⚙️ وكيل التطوير التقني:' }, { role: 'user', content: 'الموضوع: ' + $('🎯 تهيئة الطلب').item.json.topic + '\\nنوع الدراسة: ' + $('🎯 تهيئة الطلب').item.json.studyType }], stream: false, max_tokens: 400 }) }}",
         "options": {
           "timeout": 120000
-        }
+        },
+        "specifyHeaders": "keypair"
       },
       "id": "cw-0008",
       "name": "⚙️ رأي التطوير التقني",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [620, 500]
+      "position": [
+        620,
+        500
+      ]
     },
     {
       "parameters": {
@@ -178,7 +207,10 @@
       "name": "🔀 جمع الآراء",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
-      "position": [920, 260]
+      "position": [
+        920,
+        260
+      ]
     },
     {
       "parameters": {
@@ -188,7 +220,10 @@
       "name": "📊 بناء جلسة المجلس",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1160, 260]
+      "position": [
+        1160,
+        260
+      ]
     },
     {
       "parameters": {
@@ -199,7 +234,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
             },
             {
               "name": "Content-Type",
@@ -209,16 +244,20 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أنت رئيس المجلس الاستشاري. بعد قراءة آراء الأعضاء الأربعة، أخرج قرارًا موحدًا موجزًا بهذا الهيكل: عنوان قرار المجلس، الرأي الموحد، أبرز نقاط الاتفاق، أبرز نقاط الحذر، التوصية التنفيذية، ومستوى الثقة. كن حاسمًا ومختصرًا.' }, { role: 'user', content: 'الموضوع: ' + $json.topic + '\n\nآراء الأعضاء:\n' + $json.councilSession }], stream: false, max_tokens: 600 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: $vars.COUNCIL_MODEL || 'llama3.1:latest', messages: [{ role: 'system', content: 'أجب باللغة العربية فقط. أنت رئيس المجلس الاستشاري. بعد قراءة آراء الأعضاء الأربعة، أخرج قرارًا موحدًا موجزًا بهذا الهيكل: عنوان قرار المجلس، الرأي الموحد، أبرز نقاط الاتفاق، أبرز نقاط الحذر، التوصية التنفيذية، ومستوى الثقة. كن حاسمًا ومختصرًا.' }, { role: 'user', content: 'الموضوع: ' + $json.topic + '\\n\\nآراء الأعضاء:\\n' + $json.councilSession }], stream: false, max_tokens: 600 }) }}",
         "options": {
           "timeout": 120000
-        }
+        },
+        "specifyHeaders": "keypair"
       },
       "id": "cw-0011",
       "name": "🏛️ القرار الموحد",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1400, 260]
+      "position": [
+        1400,
+        260
+      ]
     },
     {
       "parameters": {
@@ -228,57 +267,53 @@
       "name": "📝 تجهيز المحضر",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1640, 260]
+      "position": [
+        1640,
+        260
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const fs = require('fs');\nconst record = $json;\nconst logPath = '/app/logs/advisory_council_sessions.jsonl';\n\ntry {\n  fs.appendFileSync(logPath, JSON.stringify(record, null, 0) + '\\n', 'utf8');\n  return [{ json: { status: 'success', message: 'تم حفظ محضر الجلسة', session: record } }];\n} catch (error) {\n  return [{ json: { status: 'error', message: 'تعذر حفظ محضر الجلسة', error: error.message, session: record } }];\n}"
+        "jsCode": "const record = $json;\nreturn [{ json: { status: 'success', message: 'تم تجهيز محضر الجلسة', session: record } }];"
       },
       "id": "cw-0013",
       "name": "💾 حفظ المحضر في logs",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1880, 260]
+      "position": [
+        1880,
+        260
+      ]
     },
     {
       "parameters": {
-        "resource": "message",
-        "operation": "sendMessage",
-        "chatId": "={{ $vars.SALEH_TELEGRAM_CHAT_ID }}",
-        "text": "={{ '🏛️ *قرار المجلس الاستشاري*\\n\\n📋 الموضوع: ' + $json.session.topic + '\\n🔖 الجلسة: ' + $json.session.sessionId + '\\n\\n' + $json.session.chairDecision + '\\n\\nهل تعتمد هذه التوصية؟' }}",
-        "additionalFields": {
-          "parse_mode": "Markdown",
-          "reply_markup": {
-            "inline_keyboard": [
-              [
-                {
-                  "text": "✅ اعتماد",
-                  "callback_data": "={{ 'COUNCIL_APPROVE::' + $json.session.sessionId }}"
-                },
-                {
-                  "text": "❌ رفض",
-                  "callback_data": "={{ 'COUNCIL_REJECT::' + $json.session.sessionId }}"
-                },
-                {
-                  "text": "🔄 إعادة دراسة",
-                  "callback_data": "={{ 'COUNCIL_RESTUDY::' + $json.session.sessionId }}"
-                }
-              ]
-            ]
-          }
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $vars.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $vars.SALEH_TELEGRAM_CHAT_ID || '161458544', text: '🏛️ قرار المجلس الاستشاري\\n\\n📋 الموضوع: ' + ($json.session.topic || '') + '\\n🔖 الجلسة: ' + ($json.session.sessionId || '') + '\\n\\n' + (($json.session.chairDecision || '').substring(0, 2000)) + '\\n\\nهل تعتمد هذه التوصية؟', reply_markup: { inline_keyboard: [[ { text: '✅ اعتماد', callback_data: 'COUNCIL_APPROVE::' + ($json.session.sessionId || '') }, { text: '❌ رفض', callback_data: 'COUNCIL_REJECT::' + ($json.session.sessionId || '') }, { text: '🔄 إعادة دراسة', callback_data: 'COUNCIL_RESTUDY::' + ($json.session.sessionId || '') } ]] } }) }}",
+        "options": {
+          "timeout": 30000
         }
       },
       "id": "cw-0014",
       "name": "📤 إرسال القرار لتيليجرام",
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [2120, 200],
-      "credentials": {
-        "telegramApi": {
-          "id": "telegram_bot_cred",
-          "name": "SaleH Telegram Bot"
-        }
-      }
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2120,
+        200
+      ]
     },
     {
       "parameters": {
@@ -288,7 +323,10 @@
       "name": "↩️ استجابة webhook",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2360, 200]
+      "position": [
+        2360,
+        200
+      ]
     }
   ],
   "connections": {
@@ -467,12 +505,7 @@
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "tags": [
-    "advisory-council",
-    "webhook",
-    "dashboard",
-    "governance"
-  ],
+  "tags": [],
   "meta": {
     "instanceId": "salehsaas"
   }

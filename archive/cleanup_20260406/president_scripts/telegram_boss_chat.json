@@ -1,0 +1,322 @@
+{
+  "id": "TgBossChat001",
+  "name": "Telegram Boss Chat - محادثة الرئيس",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "telegram-boss",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "tb-0001",
+      "name": "📩 Telegram Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [120, 300],
+      "webhookId": "telegram-boss"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json || {};\n\n// Determine update type\nif (body.callback_query) {\n  // callback_query from inline buttons\n  const cb = body.callback_query;\n  const callbackData = cb.data || '';\n  const callbackQueryId = cb.id || '';\n  const chatId = String(cb?.message?.chat?.id || '');\n  const allowedChatId = String($vars.SALEH_TELEGRAM_CHAT_ID || '');\n\n  if (!allowedChatId || chatId !== allowedChatId) {\n    return [{ json: { type: 'callback', chatId, callbackQueryId, message: '\\u26D4 \\u063A\\u064A\\u0631 \\u0645\\u0635\\u0631\\u062D' } }];\n  }\n\n  if (!callbackData.startsWith('COUNCIL_')) {\n    return [{ json: { type: 'skip' } }];\n  }\n\n  const [rawDecision, sessionId] = callbackData.split('::');\n  const map = {\n    COUNCIL_APPROVE: { status: 'approved', label: '\\u2705 \\u062A\\u0645 \\u0627\\u0639\\u062A\\u0645\\u0627\\u062F \\u0627\\u0644\\u062A\\u0648\\u0635\\u064A\\u0629' },\n    COUNCIL_REJECT: { status: 'rejected', label: '\\u274C \\u062A\\u0645 \\u0631\\u0641\\u0636 \\u0627\\u0644\\u062A\\u0648\\u0635\\u064A\\u0629' },\n    COUNCIL_RESTUDY: { status: 'restudy', label: '\\uD83D\\uDD04 \\u0625\\u0639\\u0627\\u062F\\u0629 \\u062F\\u0631\\u0627\\u0633\\u0629' }\n  };\n  const decisionInfo = map[rawDecision] || { status: 'unknown', label: '\\u0642\\u0631\\u0627\\u0631 \\u063A\\u064A\\u0631 \\u0645\\u0639\\u0631\\u0648\\u0641' };\n\n  return [{ json: {\n    type: 'callback',\n    chatId,\n    callbackQueryId,\n    message: decisionInfo.label + '\\n\\n\\uD83D\\uDD16 \\u0627\\u0644\\u062C\\u0644\\u0633\\u0629: ' + (sessionId || '') + '\\n\\uD83D\\uDD52 ' + new Date().toISOString()\n  }}];\n} else if (body.message && body.message.text) {\n  // Regular text message\n  const msg = body.message;\n  const chatId = String(msg.chat.id);\n  const allowedChatId = String($vars.SALEH_TELEGRAM_CHAT_ID || '');\n\n  if (!allowedChatId || chatId !== allowedChatId) {\n    return [{ json: { type: 'unauthorized', chatId } }];\n  }\n\n  const text = msg.text;\n  const firstName = msg.from?.first_name || '';\n\n  return [{ json: {\n    type: 'message',\n    chatId,\n    userText: text,\n    firstName\n  }}];\n} else {\n  return [{ json: { type: 'skip' } }];\n}\n"
+      },
+      "id": "tb-0002",
+      "name": "🧠 Route Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [360, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "message",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": "Message"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "callback",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": "Callback"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "tb-0003",
+      "name": "🔀 Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'evo', messages: [ { role: 'system', content: '\\u0623\\u0646\\u062a \\u0627\\u0644\\u0631\\u0626\\u064a\\u0633\\u060c \\u0627\\u0644\\u0645\\u0633\\u062a\\u0634\\u0627\\u0631 \\u0627\\u0644\\u0634\\u062e\\u0635\\u064a \\u0644\\u0635\\u0627\\u0644\\u062d. \\u0623\\u062c\\u0628 \\u062f\\u0627\\u0626\\u0645\\u0627\\u064b \\u0628\\u0627\\u0644\\u0644\\u063a\\u0629 \\u0627\\u0644\\u0639\\u0631\\u0628\\u064a\\u0629 \\u0641\\u0642\\u0637. \\u0623\\u0646\\u062a \\u0630\\u0643\\u064a \\u0648\\u062d\\u0643\\u064a\\u0645 \\u0648\\u062a\\u0633\\u0627\\u0639\\u062f \\u0635\\u0627\\u0644\\u062d \\u0641\\u064a \\u0643\\u0644 \\u0645\\u0627 \\u064a\\u062d\\u062a\\u0627\\u062c\\u0647 \\u0645\\u0646 \\u0627\\u0633\\u062a\\u0634\\u0627\\u0631\\u0627\\u062a \\u0648\\u0646\\u0635\\u0627\\u0626\\u062d \\u0648\\u0625\\u062f\\u0627\\u0631\\u0629 \\u0623\\u0639\\u0645\\u0627\\u0644\\u0647.' }, { role: 'user', content: $json.userText } ], stream: false }) }}",
+        "options": {
+          "timeout": 180000,
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "tb-0004",
+      "name": "🤖 Ask الرئيس",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 160]
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatId = $('🧠 Route Update').first().json.chatId;\nconst response = $json;\n\nlet answer = '';\nif (response.choices && response.choices.length > 0) {\n  answer = response.choices[0].message?.content || '';\n} else if (response.message?.content) {\n  answer = response.message.content;\n} else {\n  answer = '\\u26A0\\uFE0F \\u0644\\u0645 \\u0623\\u062A\\u0645\\u0643\\u0646 \\u0645\\u0646 \\u0627\\u0644\\u062D\\u0635\\u0648\\u0644 \\u0639\\u0644\\u0649 \\u0631\\u062F';\n}\n\n// Trim if too long for Telegram (4096 char limit)\nif (answer.length > 4000) {\n  answer = answer.substring(0, 4000) + '\\n\\n... (\\u062A\\u0645 \\u0627\\u0642\\u062A\\u0637\\u0627\\u0639 \\u0627\\u0644\\u0631\\u062F)';\n}\n\nreturn [{ json: { chatId, answer } }];\n"
+      },
+      "id": "tb-0005",
+      "name": "📝 Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $vars.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chatId, text: $json.answer }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "tb-0006",
+      "name": "📤 Send Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1360, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $vars.TELEGRAM_BOT_TOKEN + '/answerCallbackQuery' }}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ callback_query_id: $json.callbackQueryId, text: $json.message }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "tb-0007",
+      "name": "📩 Answer Callback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 440]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $vars.TELEGRAM_BOT_TOKEN + '/sendMessage' }}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chatId, text: $json.message }) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "tb-0008",
+      "name": "📤 Send Callback Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{}",
+        "options": {}
+      },
+      "id": "tb-0009",
+      "name": "✅ Respond OK (msg)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1600, 160]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{}",
+        "options": {}
+      },
+      "id": "tb-0010",
+      "name": "✅ Respond OK (cb)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1360, 440]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{}",
+        "options": {}
+      },
+      "id": "tb-0011",
+      "name": "✅ Respond OK (skip)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [880, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ 'https://api.telegram.org/bot' + $vars.TELEGRAM_BOT_TOKEN + '/sendChatAction' }}",
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ chat_id: $json.chatId, action: 'typing' }) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "tb-0012",
+      "name": "⏳ Typing...",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 20]
+    }
+  ],
+  "connections": {
+    "📩 Telegram Webhook": {
+      "main": [
+        [{ "node": "🧠 Route Update", "type": "main", "index": 0 }]
+      ]
+    },
+    "🧠 Route Update": {
+      "main": [
+        [{ "node": "🔀 Switch", "type": "main", "index": 0 }]
+      ]
+    },
+    "🔀 Switch": {
+      "main": [
+        [{ "node": "⏳ Typing...", "type": "main", "index": 0 }],
+        [{ "node": "📩 Answer Callback", "type": "main", "index": 0 }],
+        [{ "node": "✅ Respond OK (skip)", "type": "main", "index": 0 }]
+      ]
+    },
+    "⏳ Typing...": {
+      "main": [
+        [{ "node": "🤖 Ask الرئيس", "type": "main", "index": 0 }]
+      ]
+    },
+    "🤖 Ask الرئيس": {
+      "main": [
+        [{ "node": "📝 Format Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "📝 Format Response": {
+      "main": [
+        [{ "node": "📤 Send Reply", "type": "main", "index": 0 }]
+      ]
+    },
+    "📤 Send Reply": {
+      "main": [
+        [{ "node": "✅ Respond OK (msg)", "type": "main", "index": 0 }]
+      ]
+    },
+    "📩 Answer Callback": {
+      "main": [
+        [{ "node": "📤 Send Callback Result", "type": "main", "index": 0 }]
+      ]
+    },
+    "📤 Send Callback Result": {
+      "main": [
+        [{ "node": "✅ Respond OK (cb)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "versionId": "tgboss-v1",
+  "meta": {
+    "instanceId": "salehsaas"
+  },
+  "tags": []
+}

@@ -43,14 +43,21 @@ class Pipeline:
             if os.path.exists(self.valves.GLOSSARY_PATH):
                 with open(self.valves.GLOSSARY_PATH, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                    # بناء فهرس سريع بالمصطلحات العربية والإنجليزية
-                    for term_id, term_data in data.items():
-                        arabic = term_data.get("arabic", "").strip()
-                        english = term_data.get("english", "").strip().lower()
-                        if arabic:
-                            self.lexicon[arabic] = term_data
-                        if english:
-                            self.lexicon[english] = term_data
+                # البنية: {_metadata:{}, terms:{اسم_المصطلح: {بيانات}}}
+                # أو: {term_id: {arabic:..., english:...}} (بنية قديمة)
+                raw_terms = data.get("terms", data) if isinstance(data, dict) else data
+                if not isinstance(raw_terms, dict):
+                    raw_terms = {}
+                for term_key, term_data in raw_terms.items():
+                    if not isinstance(term_data, dict):
+                        continue
+                    # المفتاح هو اسم المصطلح العربي، أو قد يكون في حقل arabic
+                    arabic = term_data.get("arabic", term_key).strip()
+                    english = term_data.get("english", "").strip().lower()
+                    if arabic:
+                        self.lexicon[arabic] = term_data
+                    if english:
+                        self.lexicon[english] = term_data
                 print(f"✅ تم تحميل {len(self.lexicon)} مصطلح قانوني")
             else:
                 print(f"⚠️ ملف المعجم غير موجود: {self.valves.GLOSSARY_PATH}")

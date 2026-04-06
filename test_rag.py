@@ -7,10 +7,23 @@ COLLECTION_ID = "86fce70f-0753-4989-9e4c-54d1ded405cd"
 EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "nomic-embed-text:latest")
 
 def search(query, n=3):
-    emb = requests.post(f"{OLLAMA}/api/embeddings", json={"model": EMBED_MODEL, "prompt": query}).json()["embedding"]
-    r = requests.post(f"{CHROMADB}/api/v1/collections/{COLLECTION_ID}/query", json={
-        "query_embeddings": [emb], "n_results": n, "include": ["documents","metadatas","distances"]
-    }).json()
+    res = requests.post(f"{OLLAMA}/api/embeddings", json={"model": EMBED_MODEL, "prompt": query})
+    emb = res.json().get("embedding")
+    
+    url = f"{CHROMADB}/api/v1/collections/{COLLECTION_ID}/query"
+    payload = {
+        "query_embeddings": [emb], 
+        "n_results": n, 
+        "include": ["documents", "metadatas", "distances"]
+    }
+    
+    r = requests.post(url, json=payload).json()
+    # Debug print if ids are missing
+    if "ids" not in r:
+        print(f"DEBUG Response Type: {type(r)}")
+        print(f"DEBUG Keys: {r.keys()}")
+        if "error" in r:
+            print(f"DEBUG Error: {r['error']}")
     return r
 
 queries = [

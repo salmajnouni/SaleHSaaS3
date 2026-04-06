@@ -27,7 +27,7 @@ server:
   secret_key: "${SEARXNG_SECRET}"
   limiter: false
   image_proxy: true
-  http_protocol_version: "1.0"
+  http_protocol_version: "1.1"
 
 ui:
   static_use_hash: true
@@ -39,9 +39,31 @@ ui:
   theme_args:
     simple_style: dark
 
+engines:
+  - name: google
+    engine: google
+    shortcut: g
+    timeout: 10.0
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    timeout: 10.0
+  - name: bing
+    engine: bing
+    shortcut: b
+    timeout: 10.0
+  - name: brave
+    engine: brave
+    shortcut: br
+    timeout: 10.0
+  - name: wikipedia
+    engine: wikidata
+    shortcut: w
+    timeout: 10.0
+
 outgoing:
-  request_timeout: 3.0
-  max_request_timeout: 10.0
-  useragent_suffix: ""
+  request_timeout: 10.0
+  max_request_timeout: 15.0
+  useragent_suffix: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
   pool_connections: 100
   pool_maxsize: 20
