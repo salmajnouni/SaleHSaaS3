@@ -29,9 +29,38 @@ $ErrorActionPreference = "Continue"
 # === Configuration ===
 $PROJECT_DIR = "C:\saleh26\salehsaas\SaleHSaaS3"
 $BACKUP_ROOT = "C:\saleh26\salehsaas\SaleHSaaS3\backups"
+$OPS_LOG_FILE = "C:\saleh26\salehsaas\SaleHSaaS3\logs\ops_journal.jsonl"
 $TIMESTAMP = Get-Date -Format "yyyyMMdd_HHmmss"
 $BACKUP_DIR = Join-Path $BACKUP_ROOT $TIMESTAMP
 $MAX_BACKUPS = 7  # Keep last 7 backups
+
+function Write-OpsJournal {
+    param(
+        [string]$Status,
+        [string]$Summary,
+        [string]$ArchivePath,
+        [array]$ResultRows
+    )
+
+    $logDir = Split-Path -Parent $OPS_LOG_FILE
+    if (-not (Test-Path $logDir)) {
+        New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+    }
+
+    $entry = [ordered]@{
+        ts_utc = (Get-Date).ToUniversalTime().ToString("o")
+        category = "backup"
+        action = "backup.ps1"
+        status = $Status
+        quick_mode = [bool]$Quick
+        archive_path = $ArchivePath
+        summary = $Summary
+        results = $ResultRows
+        host = $env:COMPUTERNAME
+    }
+
+    $entry | ConvertTo-Json -Depth 8 -Compress | Add-Content -Path $OPS_LOG_FILE -Encoding UTF8
+}
 
 # === Setup ===
 Write-Host "========================================" -ForegroundColor Cyan
@@ -179,3 +208,13 @@ if (Test-Path $zipFile) {
     Write-Host "`n  Archive: $zipFile" -ForegroundColor White
 }
 Write-Host "========================================`n" -ForegroundColor Cyan
+
+# === Continuous Improvement Log Entry ===
+$hasFail = $results | Where-Object { $_.Status -eq "FAIL" }
+$hasWarn = $results | Where-Object { $_.Status -eq "WARN" }
+$overallStatus = if ($hasFail) { "fail" } elseif ($hasWarn) { "warn" } else { "ok" }
+$summary = "Backup completed: status=$overallStatus, quick=$Quick"
+$archiveForLog = if (Test-Path $zipFile) { $zipFile } elseif (Test-Path $BACKUP_DIR) { $BACKUP_DIR } else { "" }
+
+Write-OpsJournal -Status $overallStatus -Summary $summary -ArchivePath $archiveForLog -ResultRows $results
+Write-Host "Journal: $OPS_LOG_FILE" -ForegroundColor DarkGray

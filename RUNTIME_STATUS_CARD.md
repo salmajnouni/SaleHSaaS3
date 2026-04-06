@@ -47,9 +47,18 @@ Scope: current operational truth for this repository.
 ## Backup Status (Verified 2026-04-06)
 
 - Backup script: `backup.ps1` (creates zip in `backups/`)
+- Backup script now appends structured records to: `logs/ops_journal.jsonl`
 - Last verified backup files: `backups/20260330_005300.zip`, `backups/auto_backups/` (last: 2026-04-03)
 - **WARNING**: n8n workflow "Daily Backup" was NOT calling `backup.ps1` before 2026-04-06. It only performed a ChromaDB HTTP health check. Fixed in `n8n_workflows/daily_health_check.json` — requires manual re-import into n8n.
 - n8n "execution success" ≠ actual backup file created. Verification requires parsing `[OK]`/`[FAIL]` from `backup.ps1` stdout.
+
+## Continuous Improvement Log
+
+- Canonical log file: `logs/ops_journal.jsonl` (JSONL, one event per line)
+- Manual logging tool: `ops_log.ps1`
+- Example manual entry:
+	- `./ops_log.ps1 -Category rag -Action webui_test -Status ok -Summary "RAG verified from UI" -Metric "top_score=0.508"`
+- Use this log for: incident follow-up, root-cause notes, experiment outcomes, and next-step tracking.
 
 ## AI Agent Limitations (Hard Limits)
 
