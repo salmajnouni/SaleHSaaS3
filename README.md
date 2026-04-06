@@ -19,6 +19,8 @@
 
 > تنبيه تشغيلي: هذا الملف يصف التشغيل الحالي المعتمد في `docker-compose.yml`. عند أي تعارض بين هذه الصفحة وبين أي وثيقة أخرى، يكون المرجع الأعلى هو `docker-compose.yml` ثم `ARCHITECTURE.md`.
 
+> مسار الحقيقة التشغيلي: `الحقيقة.md` + `RUNTIME_STATUS_CARD.md` + `الحقائق التشغيلية الحاكمة - v0.1.md` + `logs/ops_journal.jsonl`.
+
 ---
 
 ## المكونات الرئيسية
@@ -101,8 +103,8 @@ knowledge_failed/         ← فشل المعالجة + تقرير الخطأ
 1. يكتشف الملف في `knowledge_inbox` خلال 10 ثوانٍ
 2. يستخرج النص عبر Apache Tika (مع دعم كامل للخطوط العربية والغربية)
 3. يقسّم النص إلى أجزاء عبر `data_pipeline`
-4. يولّد التضمينات عبر Ollama (`nomic-embed-text:latest`)
-5. يخزّن في ChromaDB عبر واجهة `v1` (مجموعة: `saleh_knowledge`)
+4. يولّد التضمينات عبر Ollama (`qwen3-embedding:0.6b`)
+5. يخزّن في ChromaDB عبر واجهة `v1` (المجموعة المعتمدة: `saleh_knowledge_qwen3`)
 6. ينقل الملف الناجح إلى `knowledge_processed/`
 
 ---
@@ -204,7 +206,7 @@ docker-compose up -d --build
 |---|---|
 | Knowledge Watcher لا يعالج الملفات | `docker logs salehsaas_watcher --tail 30` |
 | ChromaDB لا يستجيب | `docker-compose restart chromadb` |
-| Ollama لا يولّد تضمينات | تأكد من تشغيل Ollama على Windows وتحميل `nomic-embed-text` |
+| Ollama لا يولّد تضمينات | تأكد من تشغيل Ollama على Windows وتحميل `qwen3-embedding:0.6b` |
 | تحذيرات خطوط Tika | تم الحل في v4.0 — أعد بناء Tika: `docker-compose build --no-cache tika` |
 | Open Terminal لا يعمل | تحقق من `OPEN_TERMINAL_API_KEY` ومن ربط المجلد `saleh/` في `docker-compose.yml` |
 | n8n API لا يستجيب | تحقق من الوصول إلى `http://localhost:5678/api/v1/workflows` باستخدام Header `X-N8N-API-KEY` |
