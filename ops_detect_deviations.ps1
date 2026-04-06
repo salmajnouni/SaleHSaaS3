@@ -35,8 +35,13 @@ $fromUtc = (Get-Date).ToUniversalTime().AddHours(-1 * $SinceHours)
 $lines = Get-Content -Path $JournalPath -ErrorAction Stop
 $entries = @()
 
-# Filter out non-reportable deviations (test signals, known-benign warnings)
-$filterOutActions = @("synthetic_deviation")
+# Filter out non-reportable deviations (test signals, closed/resolved actions)
+# When a deviation is closed with a code change, add its action here to suppress the old warn entry.
+$filterOutActions = @(
+    "synthetic_deviation",           # test signal only
+    "missing_env_vars_compose_warning",  # closed: added defaults in docker-compose.yml (commit 72e157b)
+    "python_task_runner_internal"        # closed: Dockerfile.n8n adds python3 (commit 72e157b)
+)
 
 foreach ($line in $lines) {
     $trimmed = $line.Trim()
