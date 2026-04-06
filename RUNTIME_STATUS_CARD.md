@@ -56,9 +56,16 @@ Scope: current operational truth for this repository.
 
 - Canonical log file: `logs/ops_journal.jsonl` (JSONL, one event per line)
 - Manual logging tool: `ops_log.ps1`
+- Deviation detector: `ops_detect_deviations.ps1`
 - Example manual entry:
 	- `./ops_log.ps1 -Category rag -Action webui_test -Status ok -Summary "RAG verified from UI" -Metric "top_score=0.508"`
 - Use this log for: incident follow-up, root-cause notes, experiment outcomes, and next-step tracking.
+
+### Deviation Scan (from logs)
+
+- Run: `./ops_detect_deviations.ps1 -SinceHours 168`
+- Output report: `logs/deviation_report_latest.json`
+- Optional journal append: `./ops_detect_deviations.ps1 -SinceHours 168 -AppendScanEvent`
 
 ## AI Agent Limitations (Hard Limits)
 
