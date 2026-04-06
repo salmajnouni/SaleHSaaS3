@@ -35,6 +35,9 @@ $fromUtc = (Get-Date).ToUniversalTime().AddHours(-1 * $SinceHours)
 $lines = Get-Content -Path $JournalPath -ErrorAction Stop
 $entries = @()
 
+# Filter out non-reportable deviations (test signals, known-benign warnings)
+$filterOutActions = @("synthetic_deviation")
+
 foreach ($line in $lines) {
     $trimmed = $line.Trim()
     if ([string]::IsNullOrWhiteSpace($trimmed)) { continue }
@@ -42,6 +45,10 @@ foreach ($line in $lines) {
         $obj = $trimmed | ConvertFrom-Json -ErrorAction Stop
         $ts = $null
         try { $ts = [datetime]::Parse($obj.ts_utc).ToUniversalTime() } catch { continue }
+        
+        # Skip test/filtered-out actions
+        if ($obj.action -in $filterOutActions) { continue }
+        
         if ($ts -ge $fromUtc) {
             $entries += [PSCustomObject]@{
                 ts_utc    = $ts.ToString("o")

@@ -58,7 +58,7 @@ services:
     environment:
       - PIPELINES_API_KEY=0p_salehsaas-pipelines-key-2026
       - N8N_BASE_URL=http://n8n:5678
-      - N8N_API_KEY=${N8N_API_KEY}
+      - N8N_API_KEY=${N8N_API_KEY:-0p_salehsaas-n8n-api-key-dev-2026}
       - N8N_BASIC_AUTH_USER=admin
       - N8N_BASIC_AUTH_PASSWORD=salehsaas_pass
       - N8N_LOGIN_EMAIL=salmajnouni@gmail.com
@@ -146,7 +146,9 @@ services:
         ipv4_address: 172.20.0.33
 
   n8n:
-    image: n8nio/n8n:2.14.2
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.n8n
     container_name: salehsaas_n8n
     restart: unless-stopped
     depends_on:
@@ -171,7 +173,7 @@ services:
       - N8N_VARIABLES_WEBUI_API_KEY=sk-773169e4bcce483fb5e8268e9bf393dc
       - N8N_VARIABLES_COUNCIL_MODEL=qwen2.5:7b
       - N8N_VARIABLES_SALEH_TELEGRAM_CHAT_ID=161458544
-      - N8N_VARIABLES_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - N8N_VARIABLES_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-OPTIONAL_CONFIGURE_FOR_TELEGRAM_INTEGRATION}
       - N8N_BLOCK_SVC_REGISTRATION_EMAIL=true
       - N8N_METRICS=true
       - N8N_LOG_LEVEL=info
