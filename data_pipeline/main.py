@@ -17,7 +17,7 @@ load_dotenv()
 CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT = int(os.getenv("CHROMA_PORT", 8000))
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "nomic-embed-text:latest")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "qwen3-embedding:0.6b")
 TIKA_URL = os.getenv("TIKA_URL", "http://tika:9998/tika")
 LORA_QUEUE_DIR = os.getenv("LORA_QUEUE_DIR", "./lora_queue")
 INCOMING_DIR = os.getenv("INCOMING_DIR", "./incoming")
@@ -48,7 +48,7 @@ text_splitter = RecursiveCharacterTextSplitter(
 
 
 @app.post("/process-file/", summary="Process an uploaded file, chunk it, store in ChromaDB and LoRA queue")
-async def process_file(file: UploadFile = File(...), collection_name: str = "saleh_knowledge"):
+async def process_file(file: UploadFile = File(...), collection_name: str = os.getenv("COLLECTION_NAME", "saleh_knowledge_qwen3")):
     """
     Accepts any file (PDF, Word, Excel, TXT, etc.),
     extracts text via Apache Tika, splits into chunks,

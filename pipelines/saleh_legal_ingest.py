@@ -24,9 +24,9 @@ class Pipeline:
         pipelines: List[str] = ["*"]
         CHROMADB_URL: str = "http://chromadb:8000"
         TIKA_URL: str = "http://tika:9998"
-        COLLECTION_NAME: str = "saleh_knowledge"
+        COLLECTION_NAME: str = "saleh_knowledge_qwen3"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
-        EMBEDDING_MODEL: str = "nomic-embed-text:latest"
+        EMBEDDING_MODEL: str = "qwen3-embedding:0.6b"
         CHUNK_SIZE: int = 1000
         CHUNK_OVERLAP: int = 100
         MIN_CHUNK_LENGTH: int = 50

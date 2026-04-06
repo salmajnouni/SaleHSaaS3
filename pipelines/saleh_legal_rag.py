@@ -26,8 +26,8 @@ class Pipeline:
         pipelines: List[str] = ["*"]
         CHROMADB_URL: str = "http://host.docker.internal:8010"
         OLLAMA_URL: str = "http://host.docker.internal:11434"
-        EMBEDDING_MODEL: str = "nomic-embed-text:latest"
-        COLLECTION_NAME: str = "saleh_knowledge"
+        EMBEDDING_MODEL: str = "qwen3-embedding:0.6b"
+        COLLECTION_NAME: str = "saleh_knowledge_qwen3"
         CHROMADB_TENANT: str = "default_tenant"
         CHROMADB_DATABASE: str = "default_database"
         TOP_K: int = 15

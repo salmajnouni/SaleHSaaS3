@@ -35,9 +35,9 @@ class Pipeline:
         chromadb_url: str = "http://chromadb:8000"
         chromadb_tenant: str = "default_tenant"
         chromadb_database: str = "default_database"
-        chromadb_collection: str = "saleh_knowledge"
+        chromadb_collection: str = "saleh_knowledge_qwen3"
         ollama_url: str = "http://host.docker.internal:11434"
-        embedding_model: str = "nomic-embed-text:latest"
+        embedding_model: str = "qwen3-embedding:0.6b"
         rag_top_k: int = 10
         rag_min_score: float = 0.40
         # Web Search - SearXNG
