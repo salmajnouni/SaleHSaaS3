@@ -1,14 +1,8 @@
 FROM n8nio/n8n:2.14.2
-
-# Install Python 3 for N8N internal Python task runner
-USER root
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Verify installation
-RUN python3 --version && pip3 --version
-
-# Return to n8n user
-USER node
+# NOTE: n8nio/n8n:2.14.2 uses Docker Hardened Image (Alpine).
+# Hardened images strip package managers (apk/apt-get) for security.
+# Python 3 CANNOT be installed in this image.
+# n8n 2.14.x always emits "Failed to start Python task runner" at startup.
+# There is no env var to suppress this warning (N8N_RUNNERS_ENABLED is deprecated).
+# JS runner is registered and fully functional.
+# This warning is accepted as a known limitation and filtered in ops_detect_deviations.ps1.

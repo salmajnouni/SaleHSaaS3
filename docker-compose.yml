@@ -146,9 +146,7 @@ services:
         ipv4_address: 172.20.0.33
 
   n8n:
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile.n8n
+    image: n8nio/n8n:2.14.2
     container_name: salehsaas_n8n
     restart: unless-stopped
     depends_on:
