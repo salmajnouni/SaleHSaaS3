@@ -32,7 +32,7 @@ function Test-Endpoint {
     )
 
     try {
-        $resp = Invoke-WebRequest -Uri $Url -Method Get -TimeoutSec $TimeoutSec
+        $resp = Invoke-WebRequest -Uri $Url -Method Get -TimeoutSec $TimeoutSec -UseBasicParsing
         $ok = $AcceptedStatus -contains [int]$resp.StatusCode
         return [ordered]@{
             name = $Name

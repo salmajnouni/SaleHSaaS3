@@ -86,7 +86,21 @@ if ($entries.Count -eq 0) {
     exit 0
 }
 
-$deviations = @($entries | Where-Object { $_.status -in @("warn", "fail") })
+# Filter out deviations that have been superseded by a later "ok" for the same category+action
+$allDeviations = @($entries | Where-Object { $_.status -in @("warn", "fail") })
+$latestByKey = @{}
+foreach ($e in $entries) {
+    $k = "$($e.category)|$($e.action)"
+    if (-not $latestByKey.ContainsKey($k) -or $e.ts_utc -gt $latestByKey[$k].ts_utc) {
+        $latestByKey[$k] = $e
+    }
+}
+# Keep only deviations whose latest entry for the same category+action is still non-ok
+$deviations = @($allDeviations | Where-Object {
+    $k = "$($_.category)|$($_.action)"
+    $latest = $latestByKey[$k]
+    $latest.status -in @("warn", "fail")
+})
 $warnCount = @($deviations | Where-Object { $_.status -eq "warn" }).Count
 $failCount = @($deviations | Where-Object { $_.status -eq "fail" }).Count
 
