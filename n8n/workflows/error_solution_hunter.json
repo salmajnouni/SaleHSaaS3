@@ -1,507 +1,221 @@
-﻿{
-    "id":  "ErrSltnHntr001",
-    "name":  "ًں”چ Error Solution Hunter - ط¨ط§ط­ط« ط­ظ„ظˆظ„ ط§ظ„ط£ط®ط·ط§ط،",
-    "nodes":  [
-                  {
-                      "parameters":  {
-                                         "httpMethod":  "POST",
-                                         "path":  "error-hunt",
-                                         "responseMode":  "lastNode",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "eh-0001",
-                      "name":  "ًںŒگ Webhook - ط·ظ„ط¨ ظ…ظ† ط§ظ„ط´ط§طھ",
-                      "type":  "n8n-nodes-base.webhook",
-                      "typeVersion":  2,
-                      "position":  [
-                                       80,
-                                       320
-                                   ],
-                      "webhookId":  "error-solution-hunter"
-                  },
-                  {
-                      "parameters":  {
-
-                                     },
-                      "id":  "eh-0002",
-                      "name":  "â–¶ï¸ڈ طھط´ط؛ظٹظ„ ظٹط¯ظˆظٹ",
-                      "type":  "n8n-nodes-base.manualTrigger",
-                      "typeVersion":  1,
-                      "position":  [
-                                       80,
-                                       120
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "rule":  {
-                                                      "interval":  [
-                                                                       {
-                                                                           "field":  "cronExpression",
-                                                                           "expression":  "30 7 * * 0"
-                                                                       }
-                                                                   ]
-                                                  }
-                                     },
-                      "id":  "eh-0003",
-                      "name":  "âڈ° ط¬ط¯ظˆظ„ط© ط£ط³ط¨ظˆط¹ظٹط©",
-                      "type":  "n8n-nodes-base.scheduleTrigger",
-                      "typeVersion":  1.2,
-                      "position":  [
-                                       80,
-                                       520
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "// ======================================================\n// التحقق الصادق: بدون ادعاءات كاذبة\n// - إذا webhook: المشكلة من المستخدم مباشرة\n// - إذا schedule/manual: نقرأ من binary (ReadWriteFile node)\n// ======================================================\nconst inp = $input.item.json;\nconst body = inp.body || inp;\n\nlet problemText = \u0027\u0027;\nlet mode = \u0027scheduled\u0027;\n\nif (body.problem \u0026\u0026 String(body.problem).trim().length \u003e 3) {\n  problemText = String(body.problem).trim();\n  mode = \u0027webhook\u0027;\n} else {\n  const binaryData = $input.item.binary?.data?.data;\n  let journalRaw = \u0027\u0027;\n  if (binaryData) {\n    try { journalRaw = Buffer.from(binaryData, \u0027base64\u0027).toString(\u0027utf8\u0027); } catch(e) {}\n  }\n  let entries = [];\n  if (journalRaw) {\n    const lines = journalRaw.trim().split(\u0027\\n\u0027).filter(l =\u003e l.trim());\n    const parsed = lines.map(l =\u003e { try { return JSON.parse(l); } catch(e) { return null; } }).filter(Boolean);\n    const cutoff = new Date(Date.now() - 7*24*60*60*1000).toISOString();\n    entries = parsed.filter(e =\u003e (e.status === \u0027warn\u0027 || e.status === \u0027fail\u0027) \u0026\u0026 e.timestamp \u003e cutoff).slice(-20);\n  }\n  if (entries.length === 0) {\n    return [{ json: { skip: true, reason: \u0027لا توجد انحرافات في آخر 7 أيام — النظام سليم ✅\u0027, mode: \u0027scheduled\u0027 }}];\n  }\n  problemText = entries.map(e =\u003e `[${(e.status||\u0027?\u0027).toUpperCase()}] ${e.action||\u0027?\u0027}: ${e.summary||\u0027\u0027}`).join(\u0027\\n\u0027);\n}\nconst runId = `ESH-${Date.now()}`;\nconst runDate = new Date().toISOString();\nreturn [{ json: { problemText, mode, runId, runDate, skip: false } }];",
-                                         "mode":  "runOnceForEachItem"
-                                     },
-                      "id":  "eh-0004",
-                      "name":  "ًںژ¯ طھظ‡ظٹط¦ط© ظˆظ‚ط±ط§ط،ط© ط§ظ„ط³ط¬ظ„",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       460,
-                                       320
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "conditions":  {
-                                                            "options":  {
-                                                                            "caseSensitive":  true,
-                                                                            "leftValue":  "",
-                                                                            "typeValidation":  "loose"
-                                                                        },
-                                                            "conditions":  [
-                                                                               {
-                                                                                   "id":  "skip-check",
-                                                                                   "leftValue":  "={{ $json.skip }}",
-                                                                                   "rightValue":  false,
-                                                                                   "operator":  {
-                                                                                                    "type":  "boolean",
-                                                                                                    "operation":  "equals"
-                                                                                                }
-                                                                               }
-                                                                           ],
-                                                            "combinator":  "and"
-                                                        },
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "eh-0005",
-                      "name":  "â‌“ ظ‡ظ„ طھظˆط¬ط¯ ظ…ط´ط§ظƒظ„طں",
-                      "type":  "n8n-nodes-base.if",
-                      "typeVersion":  2,
-                      "position":  [
-                                       680,
-                                       320
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "POST",
-                                         "url":  "http://open_webui:8080/v1/chat/completions",
-                                         "sendHeaders":  true,
-                                         "headerParameters":  {
-                                                                  "parameters":  [
-                                                                                     {
-                                                                                         "name":  "Authorization",
-                                                                                         "value":  "={{ \u0027Bearer \u0027 + $vars.WEBUI_API_KEY }}"
-                                                                                     },
-                                                                                     {
-                                                                                         "name":  "Content-Type",
-                                                                                         "value":  "application/json"
-                                                                                     }
-                                                                                 ]
-                                                              },
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  {
-                                                          "model":  "qwen2.5:14b",
-                                                          "stream":  false,
-                                                          "temperature":  0.1,
-                                                          "messages":  [
-                                                                           {
-                                                                               "role":  "system",
-                                                                               "content":  "You are a DevOps expert specializing in Docker, n8n 2.x, ChromaDB, Ollama, and Python pipelines. Given technical problems or deviations, generate exactly 3 targeted English search queries to find real solutions from trusted developer communities. Each query must use site: operator targeting: github.com, stackoverflow.com, community.n8n.io, reddit.com/r/selfhosted, or reddit.com/r/LocalLLaMA. Return ONLY valid JSON with this exact format: {\"queries\": [\"query1\", \"query2\", \"query3\"]} â€” no other text."
-                                                                           },
-                                                                           {
-                                                                               "role":  "user",
-                                                                               "content":  "={{ \u0027Problems detected in ops_journal:\\n\\n\u0027 + $json.problemText + \u0027\\n\\nGenerate 3 precise search queries (English, with site: operators). Return JSON only.\u0027 }}"
-                                                                           }
-                                                                       ]
-                                                      },
-                                         "options":  {
-                                                         "timeout":  60000
-                                                     }
-                                     },
-                      "id":  "eh-0006",
-                      "name":  "ًں§  ط¨ظ†ط§ط، ط§ط³طھط¹ظ„ط§ظ…ط§طھ ط§ظ„ط¨ط­ط«",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       900,
-                                       220
-                                   ],
-                      "continueOnFail":  true
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "// ط§ط³طھط®ط±ط§ط¬ ط§ط³طھط¹ظ„ط§ظ…ط§طھ ط§ظ„ط¨ط­ط« ظ…ظ† ط±ط¯ LLM\n// ط¥ط°ط§ ظپط´ظ„ LLMطŒ ظ†ط³طھط®ط¯ظ… ط§ط³طھط¹ظ„ط§ظ…ط§طھ ط§ظپطھط±ط§ط¶ظٹط© ظ…ظ† ظ†طµ ط§ظ„ظ…ط´ظƒظ„ط©\nconst inp = $input.item.json;\nconst content = inp.choices?.[0]?.message?.content || \u0027\u0027;\nconst problemText = $(\u0027ًںژ¯ طھظ‡ظٹط¦ط© ظˆظ‚ط±ط§ط،ط© ط§ظ„ط³ط¬ظ„\u0027).first().json.problemText;\nconst runId = $(\u0027ًںژ¯ طھظ‡ظٹط¦ط© ظˆظ‚ط±ط§ط،ط© ط§ظ„ط³ط¬ظ„\u0027).first().json.runId;\n\nlet queries = [];\n\ntry {\n  const match = content.match(/\\{[\\s\\S]*\\}/);\n  if (match) {\n    const parsed = JSON.parse(match[0]);\n    if (Array.isArray(parsed.queries)) {\n      queries = parsed.queries.filter(q =\u003e typeof q === \u0027string\u0027 \u0026\u0026 q.trim().length \u003e 5);\n    }\n  }\n} catch(e) {\n  // JSON parse failed â€” fallback below\n}\n\n// Fallback: ط§ط³طھط¹ظ„ط§ظ…ط§طھ ط§ظپطھط±ط§ط¶ظٹط© ظ…ظ† ظƒظ„ظ…ط§طھ ط§ظ„ظ…ط´ظƒظ„ط©\nif (queries.length === 0) {\n  const words = (problemText || \u0027\u0027).split(/\\s+/).filter(w =\u003e /^[a-zA-Z0-9_\\-\\.]+$/.test(w) \u0026\u0026 w.length \u003e 3).slice(0, 4).join(\u0027 \u0027);\n  queries = [\n    `site:github.com/n8n-io ${words || \u0027docker connection error\u0027} issue`,\n    `site:stackoverflow.com docker ${words || \u0027n8n chromadb error\u0027}`,\n    `site:community.n8n.io ${words || \u0027workflow error fix\u0027}`\n  ];\n}\n\n// ط£ط±ط¬ط¹ ظƒظ„ ط§ط³طھط¹ظ„ط§ظ… ظƒظ€ item ظ…ظ†ظپطµظ„ (ط³ظٹظڈظ†ظپظژظ‘ط° SearXNG ظ…ط±ط© ظ„ظƒظ„ ظ…ظ†ظ‡ط§)\nreturn queries.slice(0, 3).map((q, i) =\u003e ({\n  json: { query: q, queryIndex: i + 1, runId, problemText }\n}));",
-                                         "mode":  "runOnceForEachItem"
-                                     },
-                      "id":  "eh-0007",
-                      "name":  "âœ‚ï¸ڈ طھظ‚ط³ظٹظ… ط§ظ„ط§ط³طھط¹ظ„ط§ظ…ط§طھ",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1120,
-                                       220
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "GET",
-                                         "url":  "http://searxng:8080/search",
-                                         "sendQuery":  true,
-                                         "queryParameters":  {
-                                                                 "parameters":  [
-                                                                                    {
-                                                                                        "name":  "q",
-                                                                                        "value":  "={{ $json.query }}"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "format",
-                                                                                        "value":  "json"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "language",
-                                                                                        "value":  "en"
-                                                                                    },
-                                                                                    {
-                                                                                        "name":  "categories",
-                                                                                        "value":  "general"
-                                                                                    }
-                                                                                ]
-                                                             },
-                                         "options":  {
-                                                         "timeout":  20000
-                                                     }
-                                     },
-                      "id":  "eh-0008",
-                      "name":  "ًں”چ ط¨ط­ط« SearXNG",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       1340,
-                                       220
-                                   ],
-                      "continueOnFail":  true
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "// ط¬ظ…ط¹ ظƒظ„ ظ†طھط§ط¦ط¬ ط§ظ„ط¨ط­ط« ظ…ظ† ط§ظ„ط§ط³طھط¹ظ„ط§ظ…ط§طھ ط§ظ„ط«ظ„ط§ط«\n// continueOnFail ط¹ظ„ظ‰ SearXNG ظٹط¹ظ†ظٹ ط¨ط¹ط¶ ط§ظ„ظ†طھط§ط¦ط¬ ظ‚ط¯ طھظƒظˆظ† errors\nconst allItems = $input.all();\n\n// ط§ط³طھط±ط¬ط¹ ط¨ظٹط§ظ†ط§طھ ط§ظ„طھظ‡ظٹط¦ط© ظ…ظ† ط§ظ„ط§ط³طھط¹ظ„ط§ظ…ط§طھ (ظ…ظڈظ…ط±ط±ط© ظپظٹ ظƒظ„ item)\nconst firstQuery = allItems.find(i =\u003e i.json.query);\nconst runId = firstQuery?.json?.runId || \u0027unknown\u0027;\nconst problemText = firstQuery?.json?.problemText || \u0027\u0027;\n\nlet allResults = [];\n\nfor (const item of allItems) {\n  // ظ‚ط¯ ظٹظƒظˆظ† item ظ†طھظٹط¬ط© SearXNG ط£ظˆ ط®ط·ط£ (continueOnFail)\n  const results = item.json.results || [];\n  // Note: ط¨ط¹ط¶ ط§ظ„ظ†طھط§ط¦ط¬ ظ‚ط¯ طھظƒظˆظ† ظ…ظ† query item (ظ„ظ… طھظ…ط± SearXNG)\n  if (Array.isArray(results)) {\n    for (const r of results.slice(0, 5)) {\n      if (r.url \u0026\u0026 r.title) {\n        allResults.push({\n          title: r.title || \u0027\u0027,\n          url: r.url || \u0027\u0027,\n          content: (r.content || \u0027\u0027).slice(0, 400)\n        });\n      }\n    }\n  }\n}\n\n// ط¥ط²ط§ظ„ط© ط§ظ„ظ…ظƒط±ط±ط§طھ\nconst seen = new Set();\nconst unique = allResults.filter(r =\u003e {\n  if (seen.has(r.url)) return false;\n  seen.add(r.url);\n  return true;\n});\n\n// ط¥ط°ط§ ظ„ظ… طھظƒظ† ظ‡ظ†ط§ظƒ ظ†طھط§ط¦ط¬ ط­ظ‚ظٹظ‚ظٹط©طŒ ظ†ظˆط¶ط­ ط°ظ„ظƒ ط¨ط¯ظ„ ط¥ط®ظپط§ط¦ظ‡\nconst hasResults = unique.length \u003e 0;\nconst note = hasResults\n  ? `${unique.length} ظ†طھظٹط¬ط© ظ…ظ† ط§ظ„ظ…طµط§ط¯ط±`\n  : \u0027ظ„ظ… طھظڈط±ط¬ط¹ SearXNG ظ†طھط§ط¦ط¬ - ظ‚ط¯ طھط­طھط§ط¬ ظ…ط±ط§ط¬ط¹ط© ط¥ط¹ط¯ط§ط¯ط§طھ engines ظپظٹ settings.yml\u0027;\n\nreturn [{ json: {\n  searchResults: unique.slice(0, 15),\n  problemText,\n  runId,\n  totalResults: unique.length,\n  hasResults,\n  note\n}}];",
-                                         "mode":  "runOnceForAllItems"
-                                     },
-                      "id":  "eh-0009",
-                      "name":  "ًں“‹ ط¬ظ…ط¹ ظ†طھط§ط¦ط¬ ط§ظ„ط¨ط­ط«",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       1560,
-                                       220
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "method":  "POST",
-                                         "url":  "http://open_webui:8080/v1/chat/completions",
-                                         "sendHeaders":  true,
-                                         "headerParameters":  {
-                                                                  "parameters":  [
-                                                                                     {
-                                                                                         "name":  "Authorization",
-                                                                                         "value":  "={{ \u0027Bearer \u0027 + $vars.WEBUI_API_KEY }}"
-                                                                                     },
-                                                                                     {
-                                                                                         "name":  "Content-Type",
-                                                                                         "value":  "application/json"
-                                                                                     }
-                                                                                 ]
-                                                              },
-                                         "sendBody":  true,
-                                         "specifyBody":  "json",
-                                         "jsonBody":  {
-                                                          "model":  "qwen2.5:14b",
-                                                          "stream":  false,
-                                                          "temperature":  0.2,
-                                                          "messages":  [
-                                                                           {
-                                                                               "role":  "system",
-                                                                               "content":  "ط£ظ†طھ ط®ط¨ظٹط± DevOps ظ…طھط®طµطµ ظپظٹ Docker Compose, n8n 2.x, ChromaDB, Ollama, Python pipelines. ط§ظ„ط¨ظٹط¦ط©: Windows 11 + Docker Desktop (WSL2) + Arabic SaaS platform. ظ…ط¨ط¯ط¤ظƒ: ط§ظ„ط­ظ‚ ط£ظˆظ„ط§ظ‹ â€” ظ„ط§ طھط¯ظ‘ط¹ظٹ ط£ظ† ط­ظ„ط§ظ‹ ظٹط¹ظ…ظ„ ظ…ط§ ظ„ظ… ظٹظƒظ† ظ…ظˆط«ظ‚ط§ظ‹ ظ…ظ† ط§ظ„ظ…طµط§ط¯ط±. ط¥ط°ط§ ظ„ظ… طھط¬ط¯ ط­ظ„ط§ظ‹ ظˆط§ط¶ط­ط§ظ‹طŒ ظ‚ظ„ ط°ظ„ظƒ طµط±ط§ط­ط©ظ‹ ظˆظ‚طھط±ط­ ط®ط·ظˆط§طھ طھط´ط®ظٹطµ."
-                                                                           },
-                                                                           {
-                                                                               "role":  "user",
-                                                                               "content":  "={{ \u0027ط§ظ„ظ…ط´ط§ظƒظ„ ط§ظ„ظ…ظƒطھط´ظپط© ظ…ظ† ops_journal:\\n\\n\u0027 + $json.problemText + \u0027\\n\\n---\\nظ†طھط§ط¦ط¬ ط§ظ„ط¨ط­ط« ظ…ظ† ط§ظ„ظ…طµط§ط¯ط± (\u0027 + $json.note + \u0027):\\n\\n\u0027 + JSON.stringify($json.searchResults, null, 2) + \u0027\\n\\n---\\nط§ظƒطھط¨ طھظ‚ط±ظٹط± ط­ظ„ظˆظ„ (ط¨ط§ظ„ط¹ط±ط¨ظٹط©) ظٹطھط¶ظ…ظ†:\\n1. طھط´ط®ظٹطµ ط§ظ„ظ…ط´ظƒظ„ط© (ط¬ظ…ظ„ط© ظˆط§ط­ط¯ط©)\\n2. ط§ظ„ط­ظ„ ط§ظ„ط£ظˆظ„ ط§ظ„ط£ظƒط«ط± ظ…ظˆط«ظˆظ‚ظٹط© ط¨ط§ظ„ط¶ط¨ط· (ظ…ط¹ ط£ظˆط§ظ…ط± ظ…ط­ط¯ط¯ط©)\\n3. ط­ظ„ ط¨ط¯ظٹظ„ ط¥ط°ط§ ظپط´ظ„ ط§ظ„ط£ظˆظ„\\n4. ط±ظˆط§ط¨ط· ط§ظ„ظ…طµط§ط¯ط± ط§ظ„طھظٹ ظˆط¬ط¯طھظ‡ط§\\n5. ط¥ط°ط§ ظ„ظ… طھط¬ط¯ ط­ظ„ط§ظ‹: ظˆط¶ظ‘ط­ ظ…ط§ ظٹط­طھط§ط¬ طھط´ط®ظٹطµط§ظ‹ ط¥ط¶ط§ظپظٹط§ظ‹\u0027 }}"
-                                                                           }
-                                                                       ]
-                                                      },
-                                         "options":  {
-                                                         "timeout":  120000
-                                                     }
-                                     },
-                      "id":  "eh-0010",
-                      "name":  "ًں’، ط®ط¨ظٹط± ط§ظ„ط­ظ„ظˆظ„ - DevOps",
-                      "type":  "n8n-nodes-base.httpRequest",
-                      "typeVersion":  4.2,
-                      "position":  [
-                                       1780,
-                                       220
-                                   ],
-                      "continueOnFail":  true
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "// ============================================\n// تجهيز تقرير الحلول كـ binary للكتابة\n// لا require(\u0027fs\u0027) — نستخدم $helpers.prepareBinaryData\n// يُكتب الملف بـ ReadWriteFile node التالي\n// ============================================\nconst inp = $input.item.json;\nconst solutionContent = inp.choices?.[0]?.message?.content || \u0027لم يُرجع النموذج رداً - قد يكون open_webui غير متاح أو الوقت انتهى\u0027;\nconst collectedData = $(\u0027📋 جمع نتائج البحث\u0027).first().json;\nconst { runId, problemText, totalResults, note } = collectedData;\nconst now = new Date();\nconst dateStr = now.toISOString().slice(0,19).replace(/[T:]/g,\u0027-\u0027);\nconst filename = `${dateStr}_${runId}.md`;\nconst filepath = `/app/logs/solution_reports/${filename}`;\nconst report = [\n  `# تقرير حلول الأخطاء`, ``,\n  `**الرقم:** ${runId}`, `**التاريخ:** ${now.toISOString()}`, `**مصادر البحث:** ${note}`, ``,\n  `## المشاكل المُحللة`, ``, \u0027```\u0027, problemText || \u0027(لم يُحدد)\u0027, \u0027```\u0027, ``,\n  `## الحلول المقترحة`, ``, solutionContent, ``\n].join(\u0027\\n\u0027);\nconst buffer = Buffer.from(report, \u0027utf8\u0027);\nconst binaryData = await $helpers.prepareBinaryData(buffer, filename, \u0027text/markdown\u0027);\nreturn [{ json: { runId, totalResults: totalResults||0, summary: solutionContent.slice(0,300), filepath, note }, binary: { reportData: binaryData } }];",
-                                         "mode":  "runOnceForEachItem"
-                                     },
-                      "id":  "eh-0011",
-                      "name":  "💾 تجهيز التقرير",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       2000,
-                                       220
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "jsCode":  "const inp = $input.item.json;\nif (inp.skip === true) {\n  return [{ json: { status: \u0027no_issues\u0027, message: inp.reason || \u0027لا توجد انحرافات\u0027, runId: \u0027N/A\u0027 }}];\n}\nconst saved = !inp.error \u0026\u0026 !!inp.filepath;\nconst status = saved ? \u0027success\u0027 : \u0027search_ok_save_failed\u0027;\nreturn [{ json: {\n  status,\n  message: saved ? `تم حفظ التقرير في: ${inp.filepath}` : `اكتمل البحث — الحفظ فشل${inp.error ? \u0027: \u0027 + (typeof inp.error === \u0027object\u0027 ? inp.error.message : String(inp.error)) : \u0027\u0027}`,\n  runId: inp.runId || \u0027unknown\u0027,\n  totalSources: inp.totalResults || 0,\n  summary: inp.summary || \u0027\u0027\n}}];",
-                                         "mode":  "runOnceForEachItem"
-                                     },
-                      "id":  "eh-0012",
-                      "name":  "â†©ï¸ڈ ط§ط³طھط¬ط§ط¨ط© ظ†ظ‡ط§ط¦ظٹط©",
-                      "type":  "n8n-nodes-base.code",
-                      "typeVersion":  2,
-                      "position":  [
-                                       2220,
-                                       320
-                                   ]
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "read",
-                                         "fileSelector":  "/app/logs/ops_journal.jsonl",
-                                         "options":  {
-
-                                                     }
-                                     },
-                      "id":  "eh-0013",
-                      "name":  "📂 قراءة ملف السجل",
-                      "type":  "n8n-nodes-base.readWriteFile",
-                      "typeVersion":  1,
-                      "position":  [
-                                       220,
-                                       320
-                                   ],
-                      "continueOnFail":  true
-                  },
-                  {
-                      "parameters":  {
-                                         "operation":  "write",
-                                         "fileName":  "={{ $json.filepath }}",
-                                         "dataPropertyName":  "reportData",
-                                         "options":  {
-                                                         "createDirectories":  true
-                                                     }
-                                     },
-                      "id":  "eh-0015",
-                      "name":  "💾 كتابة التقرير للقرص",
-                      "type":  "n8n-nodes-base.readWriteFile",
-                      "typeVersion":  1,
-                      "position":  [
-                                       2060,
-                                       220
-                                   ],
-                      "continueOnFail":  true
-                  }
-              ],
-    "connections":  {
-                        "🌐 Webhook - طلب من الشات":  {
-                                                          "main":  [
-                                                                       [
-                                                                           {
-                                                                               "node":  "📂 قراءة ملف السجل",
-                                                                               "type":  "main",
-                                                                               "index":  0
-                                                                           }
-                                                                       ]
-                                                                   ]
-                                                      },
-                        "▶️ تشغيل يدوي":  {
-                                              "main":  [
-                                                           [
-                                                               {
-                                                                   "node":  "📂 قراءة ملف السجل",
-                                                                   "type":  "main",
-                                                                   "index":  0
-                                                               }
-                                                           ]
-                                                       ]
-                                          },
-                        "⏰ جدولة أسبوعية":  {
-                                                "main":  [
-                                                             [
-                                                                 {
-                                                                     "node":  "📂 قراءة ملف السجل",
-                                                                     "type":  "main",
-                                                                     "index":  0
-                                                                 }
-                                                             ]
-                                                         ]
-                                            },
-                        "📂 قراءة ملف السجل":  {
-                                                   "main":  [
-                                                                [
-                                                                    {
-                                                                        "node":  "🎯 تهيئة وقراءة السجل",
-                                                                        "type":  "main",
-                                                                        "index":  0
-                                                                    }
-                                                                ]
-                                                            ]
-                                               },
-                        "🎯 تهيئة وقراءة السجل":  {
-                                                      "main":  [
-                                                                   [
-                                                                       {
-                                                                           "node":  "❓ هل توجد مشاكل؟",
-                                                                           "type":  "main",
-                                                                           "index":  0
-                                                                       }
-                                                                   ]
-                                                               ]
-                                                  },
-                        "❓ هل توجد مشاكل؟":  {
-                                                 "main":  [
-                                                              [
-                                                                  {
-                                                                      "node":  "🧠 بناء استعلامات البحث",
-                                                                      "type":  "main",
-                                                                      "index":  0
-                                                                  }
-                                                              ],
-                                                              [
-                                                                  {
-                                                                      "node":  "↩️ استجابة نهائية",
-                                                                      "type":  "main",
-                                                                      "index":  0
-                                                                  }
-                                                              ]
-                                                          ]
-                                             },
-                        "🧠 بناء استعلامات البحث":  {
-                                                        "main":  [
-                                                                     [
-                                                                         {
-                                                                             "node":  "✂️ تقسيم الاستعلامات",
-                                                                             "type":  "main",
-                                                                             "index":  0
-                                                                         }
-                                                                     ]
-                                                                 ]
-                                                    },
-                        "✂️ تقسيم الاستعلامات":  {
-                                                     "main":  [
-                                                                  [
-                                                                      {
-                                                                          "node":  "🔍 بحث SearXNG",
-                                                                          "type":  "main",
-                                                                          "index":  0
-                                                                      }
-                                                                  ]
-                                                              ]
-                                                 },
-                        "🔍 بحث SearXNG":  {
-                                               "main":  [
-                                                            [
-                                                                {
-                                                                    "node":  "📋 جمع نتائج البحث",
-                                                                    "type":  "main",
-                                                                    "index":  0
-                                                                }
-                                                            ]
-                                                        ]
-                                           },
-                        "📋 جمع نتائج البحث":  {
-                                                   "main":  [
-                                                                [
-                                                                    {
-                                                                        "node":  "💡 خبير الحلول - DevOps",
-                                                                        "type":  "main",
-                                                                        "index":  0
-                                                                    }
-                                                                ]
-                                                            ]
-                                               },
-                        "💡 خبير الحلول - DevOps":  {
-                                                        "main":  [
-                                                                     [
-                                                                         {
-                                                                             "node":  "💾 تجهيز التقرير",
-                                                                             "type":  "main",
-                                                                             "index":  0
-                                                                         }
-                                                                     ]
-                                                                 ]
-                                                    },
-                        "💾 تجهيز التقرير":  {
-                                                 "main":  [
-                                                              [
-                                                                  {
-                                                                      "node":  "💾 كتابة التقرير للقرص",
-                                                                      "type":  "main",
-                                                                      "index":  0
-                                                                  }
-                                                              ]
-                                                          ]
-                                             },
-                        "💾 كتابة التقرير للقرص":  {
-                                                       "main":  [
-                                                                    [
-                                                                        {
-                                                                            "node":  "↩️ استجابة نهائية",
-                                                                            "type":  "main",
-                                                                            "index":  0
-                                                                        }
-                                                                    ]
-                                                                ]
-                                                   }
-                    },
-    "active":  false,
-    "settings":  {
-                     "executionOrder":  "v1",
-                     "saveManualExecutions":  true,
-                     "callerPolicy":  "workflowsFromSameOwner",
-                     "errorWorkflow":  ""
-                 },
-    "versionId":  "1.0.0",
-    "meta":  {
-                 "templateCredsSetupCompleted":  true
-             },
-    "tags":  [
-                 {
-                     "name":  "devops",
-                     "createdAt":  "2026-04-07T00:00:00.000Z"
-                 },
-                 {
-                     "name":  "automation",
-                     "createdAt":  "2026-04-07T00:00:00.000Z"
-                 }
-             ]
+{
+  "id": "ErrSltnHntrV2",
+  "name": "Error Solution Hunter Real V2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "error-hunt-v2",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "eh2-0001",
+      "name": "webhook_in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [120, 260],
+      "webhookId": "error-solution-hunter-v2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json;\nconst body = inp.body || inp;\nconst text = (body.problem || body.error || '').toString().trim();\nif (!text) {\n  return [{ json: { ok: false, skip: true, reason: 'Missing problem/error in request body' } }];\n}\nconst runId = `ESHV2-${Date.now()}`;\nreturn [{ json: { ok: true, skip: false, runId, problemText: text } }];"
+      },
+      "id": "eh2-0002",
+      "name": "normalize_input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [340, 260]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "ok-check",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "eh2-0003",
+      "name": "has_problem_if",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [560, 260]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ 'site:community.n8n.io ' + $json.problemText }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "eh2-0004",
+      "name": "search_searxng",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 160],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('normalize_input').first().json;\nconst sr = $input.item.json;\nconst results = Array.isArray(sr.results) ? sr.results.slice(0, 5) : [];\nconst lines = results.map((r, i) => `${i + 1}. ${r.title || 'No title'}\\n   ${r.url || ''}`);\nconst report = [\n  '# Error Solution Hunter Report',\n  '',\n  `Run ID: ${base.runId}`,\n  `Problem: ${base.problemText}`,\n  '',\n  'Top References:',\n  lines.length ? lines.join('\\n') : 'No references returned from SearXNG',\n  '',\n  'Status: Real execution completed'\n].join('\\n');\nconst filename = `${base.runId}.md`;\nconst filepath = `/app/logs/solution_reports/${filename}`;\nconst b64 = Buffer.from(report, 'utf8').toString('base64');\nreturn [{\n  json: { runId: base.runId, filepath, refs: results.length },\n  binary: {\n    reportData: {\n      data: b64,\n      mimeType: 'text/markdown',\n      fileName: filename\n    }\n  }\n}];"
+      },
+      "id": "eh2-0005",
+      "name": "build_report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 160]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $json.filepath }}",
+        "dataPropertyName": "reportData",
+        "options": {
+          "createDirectories": true
+        }
+      },
+      "id": "eh2-0006",
+      "name": "write_report",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [1220, 160],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json || {};\nconst fail = $('normalize_input').first().json || {};\nif (fail.skip === true) {\n  return [{ json: { status: 'rejected', message: fail.reason } }];\n}\nconst built = $('build_report').first().json || {};\nconst runId = inp.runId || built.runId || 'unknown';\nconst reportPath = inp.filepath || built.filepath || '';\nconst refs = (inp.refs ?? built.refs ?? 0);\nconst writeErr = inp.error ? (typeof inp.error === 'object' ? (inp.error.message || JSON.stringify(inp.error)) : String(inp.error)) : '';\nconst status = writeErr ? 'partial_success' : 'success';\nconst message = writeErr ? `Search and report build succeeded, file write failed: ${writeErr}` : 'Workflow executed successfully';\nreturn [{ json: { status, message, runId, reportPath, refs } }];"
+      },
+      "id": "eh2-0007",
+      "name": "final_response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 260]
+    }
+  ],
+  "connections": {
+    "webhook_in": {
+      "main": [
+        [
+          {
+            "node": "normalize_input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalize_input": {
+      "main": [
+        [
+          {
+            "node": "has_problem_if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "has_problem_if": {
+      "main": [
+        [
+          {
+            "node": "search_searxng",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search_searxng": {
+      "main": [
+        [
+          {
+            "node": "build_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build_report": {
+      "main": [
+        [
+          {
+            "node": "write_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "write_report": {
+      "main": [
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "2.0.0",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "name": "devops"
+    },
+    {
+      "name": "automation"
+    }
+  ]
 }
