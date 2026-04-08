@@ -505,15 +505,20 @@ class Pipeline:
         if payloads:
             return payloads
 
-        # 2) Plain JSON object fallback (when user pastes action without fences)
-        json_like = re.findall(r"\{[\s\S]*?\}", text)
-        for chunk in json_like:
+        # 2) Plain JSON object fallback with nested-brace support
+        decoder = json.JSONDecoder()
+        idx = 0
+        while idx < len(text):
+            brace = text.find("{", idx)
+            if brace == -1:
+                break
             try:
-                obj = json.loads(chunk)
+                obj, end = decoder.raw_decode(text[brace:])
                 if isinstance(obj, dict) and obj.get("action"):
                     payloads.append(obj)
+                idx = brace + end
             except Exception:
-                continue
+                idx = brace + 1
 
         return payloads
 
@@ -582,10 +587,17 @@ class Pipeline:
             return None
 
         # Try JSON-first extraction to avoid misreading action names as workflow ids
-        for chunk in re.findall(r"\{[\s\S]*?\}", text):
+        decoder = json.JSONDecoder()
+        idx = 0
+        while idx < len(text):
+            brace = text.find("{", idx)
+            if brace == -1:
+                break
             try:
-                obj = json.loads(chunk)
+                obj, end = decoder.raw_decode(text[brace:])
+                idx = brace + end
             except Exception:
+                idx = brace + 1
                 continue
 
             if not isinstance(obj, dict):
@@ -619,7 +631,13 @@ class Pipeline:
         # Prefer id-like tokens that contain at least one digit (common in n8n workflow IDs)
         id_like_tokens = re.findall(r"\b[A-Za-z][A-Za-z0-9_-]*\d+[A-Za-z0-9_-]*\b", text)
         for tok in id_like_tokens:
-            if tok.lower() not in self._RESERVED_WORKFLOW_REFS:
+            low = tok.lower()
+            if low in self._RESERVED_WORKFLOW_REFS:
+                continue
+            if low in {"n8n-action", "n8n_action", "nn8n-action", "nn8n_action"}:
+                continue
+            if low.endswith("run_workflow") or low.endswith("trigger_workflow"):
+                continue
                 return tok
 
         # Fallback: any token that looks like an n8n id/name reference (e.g., CwCounclTele001)
@@ -628,6 +646,7 @@ class Pipeline:
             "workflow", "workflows", "trigger", "run", "json", "create", "file",
             "manual", "request", "arguments", "action", "python", "http",
             "list", "show", "execute", "code", "function", "functions",
+            "n8n-action", "n8n_action",
             "run_workflow", "list_workflows", "get_workflow", "activate_workflow",
             "deactivate_workflow", "list_executions", "diagnose_workflow",
             "auto_fix_workflow", "delete_workflow", "trigger_workflow"

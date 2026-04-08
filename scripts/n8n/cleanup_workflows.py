@@ -2,14 +2,15 @@
 """
 Clean up unused and duplicate n8n workflows
 """
+import os
 import requests
 import json
 from typing import List, Dict, Optional
 
 # n8n configuration
-N8N_URL = "http://localhost:5678"
-N8N_USER = "salmajnouni@gmail.com"
-N8N_PASSWORD = "SalehSaaS2026!"
+N8N_URL = os.getenv("N8N_URL", "http://localhost:5678")
+N8N_USER = os.getenv("N8N_LOGIN_EMAIL", "")
+N8N_PASSWORD = os.getenv("N8N_PASSWORD", "")
 
 # Workflows to keep (by exact name)
 WORKFLOWS_TO_KEEP = {
@@ -213,5 +214,7 @@ class N8NWorkflowManager:
         print("\n" + "="*60 + "\n")
 
 if __name__ == "__main__":
+    if not N8N_USER or not N8N_PASSWORD:
+        raise SystemExit("Missing N8N credentials. Set N8N_LOGIN_EMAIL and N8N_PASSWORD in your environment or .env first.")
     manager = N8NWorkflowManager(N8N_URL, N8N_USER, N8N_PASSWORD)
     manager.cleanup()

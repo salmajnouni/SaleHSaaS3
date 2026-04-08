@@ -108,3 +108,11 @@ archive/**/cache/
 # Runtime databases
 **/webui.db
 **/webui.db-journal
+
+# Open WebUI runtime uploads (chat attachments/screenshots)
+saleh_core_data/uploads/*
+!saleh_core_data/uploads/.gitkeep
+
+# Open WebUI/tokenizer runtime cache
+saleh_core_data/cache/tiktoken/*
+!saleh_core_data/cache/tiktoken/.gitkeep

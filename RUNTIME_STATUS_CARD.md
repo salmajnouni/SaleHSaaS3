@@ -44,6 +44,8 @@ Scope: current operational truth for this repository.
 - Chroma collection: `saleh_knowledge_qwen3`
 - Embedding model: `qwen3-embedding:0.6b` (1024 dims)
 - Chroma API mode in active paths: `v1`
+- Open WebUI behavior settings (main model, RAG model, web search, locale, signup) are managed from the Open WebUI Admin interface and persisted in `saleh_core_data`.
+- `docker-compose.yml` now keeps only infrastructure bindings for Open WebUI (Ollama URL, Pipelines URL/API key, secret key, Tika URL).
 
 ## RAG Verification (2026-04-06)
 
@@ -76,6 +78,36 @@ Scope: current operational truth for this repository.
 - Run: `./ops_detect_deviations.ps1 -SinceHours 168`
 - Output report: `logs/deviation_report_latest.json`
 - Optional journal append: `./ops_detect_deviations.ps1 -SinceHours 168 -AppendScanEvent`
+
+### Runtime Smoke (real execution check)
+
+- Run: `./ops_runtime_smoke.ps1`
+- Report output: `logs/runtime_smoke_latest.json`
+- Journal event: `runtime/runtime_smoke` (unless `-SkipJournal` is used)
+
+## Visibility Rule
+
+- No hidden runtime paths are accepted in this project.
+- Any live execution path must be visible through the operational truth chain, not only by reading source code manually.
+- If a service, workflow, pipeline, tool, or scheduled task affects production behavior and is absent from the visibility layer below, treat that as an operational defect.
+
+### Minimum Visibility Layer
+
+- Active services and current state.
+- Optional/disabled services and the explicit reason they are disabled.
+- Active execution paths: `pipelines`, loaded Open WebUI tools, and active `n8n` workflows.
+- Canonical Chroma collection and embedding model.
+- Latest RAG verification, latest benchmark result, and latest deviation scan result.
+- Latest impactful entries from `logs/ops_journal.jsonl`.
+
+### Current Source of Truth for Visibility
+
+- Runtime topology: `docker-compose.yml`
+- Quick operational card: `RUNTIME_STATUS_CARD.md`
+- Governing rules: `الحقائق التشغيلية الحاكمة - v0.1.md`
+- Measured event trail: `logs/ops_journal.jsonl`
+
+Any future dashboard or operational UI must surface these same items directly. A polished interface that hides runtime reality is not an acceptable operating surface.
 
 ## AI Agent Limitations (Hard Limits)
 
