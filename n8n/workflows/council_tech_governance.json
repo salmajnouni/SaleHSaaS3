@@ -1,0 +1,329 @@
+{
+  "id": "CounclTechGov001",
+  "name": "Technical Governance Council (MoA)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "council-tech-governance",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "tg-0001",
+      "name": "webhook_in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [80, 300],
+      "webhookId": "council-tech-governance-wh"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json;\nconst body = inp.body || inp;\nconst question = (body.question || body.topic || body.message || '').toString().trim();\nif (!question) {\n  return [{ json: { ok: false, skip: true, reason: 'Missing question/topic in request body' } }];\n}\nconst sessionId = `TGC-${Date.now()}`;\nconst context = (body.context || '').toString().trim();\nreturn [{ json: { ok: true, skip: false, sessionId, question, context } }];"
+      },
+      "id": "tg-0002",
+      "name": "normalize_input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "ok-check",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "tg-0003",
+      "name": "has_question_if",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "={{ $json.question }}" },
+            { "name": "format", "value": "json" },
+            { "name": "language", "value": "ar-SA" },
+            { "name": "categories", "value": "it" }
+          ]
+        },
+        "options": { "timeout": 25000 }
+      },
+      "id": "tg-0004",
+      "name": "search_web",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 8, include: ['documents','distances'] }) }}",
+        "options": { "timeout": 20000 }
+      },
+      "id": "tg-0005",
+      "name": "search_rag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('normalize_input').first().json;\nconst webRaw = $('search_web').first().json || {};\nconst ragRaw = $('search_rag').first().json || {};\n\nconst webResults = Array.isArray(webRaw.results) ? webRaw.results.slice(0, 5) : [];\nconst webContext = webResults.map((r, i) => `[${i+1}] ${r.title || ''}: ${r.url || ''}`).join('\\n') || 'No web results';\n\nconst ragDocs = ragRaw.documents ? ragRaw.documents[0] || [] : [];\nconst ragDistances = ragRaw.distances ? ragRaw.distances[0] || [] : [];\nconst ragContext = ragDocs.slice(0, 5).map((d, i) => `[RAG-${i+1}] (dist: ${ragDistances[i]?.toFixed(3) || '?'}): ${typeof d === 'string' ? d.slice(0, 400) : ''}`).join('\\n') || 'No RAG results';\n\nreturn [{ json: { ...base, webContext, ragContext, webCount: webResults.length, ragCount: ragDocs.length } }];"
+      },
+      "id": "tg-0006",
+      "name": "merge_context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير أمن سيبراني وبنية تحتية تقنية. محلل رقم 1 في مجلس الحوكمة التقنية. أعط تحليلك المهني بناءً على المعلومات المتاحة. كن صريحاً ودقيقاً. اذكر المخاطر إن وجدت. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "tg-0007",
+      "name": "expert_security",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 100],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت مهندس معمارية أنظمة ومتخصص في DevOps والحاويات. محلل رقم 2 في مجلس الحوكمة التقنية. ركز على قابلية التوسع والاستقرار وأفضل الممارسات المعمارية. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "tg-0008",
+      "name": "expert_architecture",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت متخصص في الأداء والجودة والاختبار. محلل رقم 3 في مجلس الحوكمة التقنية. ركز على الأداء العملي والموثوقية والجودة. انتقد الحلول غير العملية. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "tg-0009",
+      "name": "expert_quality",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 500],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error from ' + nodeName + ': ' + e.message; }\n};\nconst securityOpinion = getReply('expert_security');\nconst archOpinion = getReply('expert_architecture');\nconst qualityOpinion = getReply('expert_quality');\nreturn [{ json: { ...base, securityOpinion, archOpinion, qualityOpinion } }];"
+      },
+      "id": "tg-0010",
+      "name": "collect_opinions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت محامي الشيطان في مجلس الحوكمة التقنية. مهمتك هي تحدي الآراء الثلاثة وكشف النقاط الضعيفة والافتراضات الخاطئة والمخاطر المخفية. كن صارماً لكن عادلاً. أجب بالعربية.' }, { role: 'user', content: 'السؤال الأصلي: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\nحلل هذه الآراء واكشف نقاط الضعف والمخاطر المخفية.' }], temperature: 0.6, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "tg-0011",
+      "name": "devils_advocate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1660, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('collect_opinions').first().json;\nconst daRaw = $input.item.json;\nconst challenge = daRaw.choices?.[0]?.message?.content || 'No challenge generated';\nreturn [{ json: { ...base, challenge } }];"
+      },
+      "id": "tg-0012",
+      "name": "merge_challenge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1880, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت رئيس مجلس الحوكمة التقنية. مهمتك: 1) ادمج آراء الخبراء الثلاثة 2) خذ ملاحظات محامي الشيطان بعين الاعتبار 3) أصدر القرار النهائي بالتوصيات 4) قيّم مستوى الثقة (مرتفع/متوسط/منخفض). أنتج تقريراً منظماً يبدأ بالتوصية ثم التبرير. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\n--- تحدي محامي الشيطان ---\\n' + $json.challenge + '\\n\\nالرجاء إصدار القرار النهائي.' }], temperature: 0.3, max_tokens: 3000 }) }}",
+        "options": { "timeout": 180000 }
+      },
+      "id": "tg-0013",
+      "name": "chair_synthesis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2100, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('merge_challenge').first().json;\nconst chairRaw = $input.item.json;\nconst verdict = chairRaw.choices?.[0]?.message?.content || 'No synthesis generated';\nconst now = new Date();\nconst dateStr = now.toISOString().slice(0,10);\nconst filename = `${base.sessionId}_tech_governance.md`;\nconst filepath = `/app/logs/council_sessions/${filename}`;\n\nconst report = [\n  '# Technical Governance Council Session',\n  '',\n  `**Session ID:** ${base.sessionId}`,\n  `**Date:** ${now.toISOString()}`,\n  `**Question:** ${base.question}`,\n  `**Web Sources:** ${base.webCount} | **RAG Sources:** ${base.ragCount}`,\n  '',\n  '## Expert Opinions',\n  '',\n  '### Security Expert',\n  base.securityOpinion,\n  '',\n  '### Architecture Expert',\n  base.archOpinion,\n  '',\n  '### Quality Expert',\n  base.qualityOpinion,\n  '',\n  '## Devils Advocate Challenge',\n  base.challenge,\n  '',\n  '## Chair Final Verdict',\n  verdict\n].join('\\n');\n\nconst b64 = Buffer.from(report, 'utf8').toString('base64');\nreturn [{\n  json: { sessionId: base.sessionId, filepath, question: base.question, verdict, webCount: base.webCount, ragCount: base.ragCount },\n  binary: { reportData: { data: b64, mimeType: 'text/markdown', fileName: filename } }\n}];"
+      },
+      "id": "tg-0014",
+      "name": "build_session_report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2320, 300]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $json.filepath }}",
+        "dataPropertyName": "reportData",
+        "options": { "createDirectories": true }
+      },
+      "id": "tg-0015",
+      "name": "write_session",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [2540, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json || {};\nconst fail = $('normalize_input').first().json || {};\nif (fail.skip === true) {\n  return [{ json: { status: 'rejected', council: 'tech_governance', message: fail.reason } }];\n}\nconst built = $('build_session_report').first().json || {};\nreturn [{ json: {\n  status: 'success',\n  council: 'tech_governance',\n  sessionId: built.sessionId || 'unknown',\n  question: built.question || '',\n  verdict: built.verdict || '',\n  sources: { web: built.webCount || 0, rag: built.ragCount || 0 },\n  reportPath: built.filepath || ''\n} }];"
+      },
+      "id": "tg-0016",
+      "name": "final_response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2760, 300]
+    }
+  ],
+  "connections": {
+    "webhook_in": {
+      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+    },
+    "normalize_input": {
+      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+    },
+    "has_question_if": {
+      "main": [
+        [ { "node": "search_web", "type": "main", "index": 0 } ],
+        [ { "node": "final_response", "type": "main", "index": 0 } ]
+      ]
+    },
+    "search_web": {
+      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+    },
+    "search_rag": {
+      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+    },
+    "merge_context": {
+      "main": [[ { "node": "expert_security", "type": "main", "index": 0 } ]]
+    },
+    "expert_security": {
+      "main": [[ { "node": "expert_architecture", "type": "main", "index": 0 } ]]
+    },
+    "expert_architecture": {
+      "main": [[ { "node": "expert_quality", "type": "main", "index": 0 } ]]
+    },
+    "expert_quality": {
+      "main": [[ { "node": "collect_opinions", "type": "main", "index": 0 } ]]
+    },
+    "collect_opinions": {
+      "main": [[ { "node": "devils_advocate", "type": "main", "index": 0 } ]]
+    },
+    "devils_advocate": {
+      "main": [[ { "node": "merge_challenge", "type": "main", "index": 0 } ]]
+    },
+    "merge_challenge": {
+      "main": [[ { "node": "chair_synthesis", "type": "main", "index": 0 } ]]
+    },
+    "chair_synthesis": {
+      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+    },
+    "build_session_report": {
+      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+    },
+    "write_session": {
+      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "1.0.0",
+  "meta": { "templateCredsSetupCompleted": true },
+  "tags": [{ "name": "council" }, { "name": "governance" }]
+}

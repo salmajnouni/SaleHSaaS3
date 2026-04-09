@@ -1,0 +1,328 @@
+{
+  "id": "CounclLegalRev001",
+  "name": "Legal Review Council (MAD Debate)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "council-legal-review",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "lr-0001",
+      "name": "webhook_in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [80, 300],
+      "webhookId": "council-legal-review-wh"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json;\nconst body = inp.body || inp;\nconst question = (body.question || body.topic || body.message || '').toString().trim();\nif (!question) {\n  return [{ json: { ok: false, skip: true, reason: 'Missing question/topic in request body' } }];\n}\nconst sessionId = `LRC-${Date.now()}`;\nconst context = (body.context || '').toString().trim();\nreturn [{ json: { ok: true, skip: false, sessionId, question, context } }];"
+      },
+      "id": "lr-0002",
+      "name": "normalize_input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "ok-check",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "lr-0003",
+      "name": "has_question_if",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "={{ $json.question + ' نظام سعودي قانون' }}" },
+            { "name": "format", "value": "json" },
+            { "name": "language", "value": "ar-SA" }
+          ]
+        },
+        "options": { "timeout": 25000 }
+      },
+      "id": "lr-0004",
+      "name": "search_web",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 10, include: ['documents','distances'] }) }}",
+        "options": { "timeout": 20000 }
+      },
+      "id": "lr-0005",
+      "name": "search_rag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('normalize_input').first().json;\nconst webRaw = $('search_web').first().json || {};\nconst ragRaw = $('search_rag').first().json || {};\n\nconst webResults = Array.isArray(webRaw.results) ? webRaw.results.slice(0, 5) : [];\nconst webContext = webResults.map((r, i) => `[${i+1}] ${r.title || ''}: ${r.url || ''}`).join('\\n') || 'No web results';\n\nconst ragDocs = ragRaw.documents ? ragRaw.documents[0] || [] : [];\nconst ragDistances = ragRaw.distances ? ragRaw.distances[0] || [] : [];\nconst ragContext = ragDocs.slice(0, 8).map((d, i) => `[RAG-${i+1}] (dist: ${ragDistances[i]?.toFixed(3) || '?'}): ${typeof d === 'string' ? d.slice(0, 500) : ''}`).join('\\n') || 'No RAG results';\n\nreturn [{ json: { ...base, webContext, ragContext, webCount: webResults.length, ragCount: ragDocs.length } }];"
+      },
+      "id": "lr-0006",
+      "name": "merge_context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل القانوني المؤيد في مجلس المراجعة القانونية. مهمتك الدفاع عن الموقف المطروح وإيجاد السند القانوني من الأنظمة السعودية. استشهد بنصوص نظامية محددة (اسم النظام، رقم المادة). أجب بالعربية.' }, { role: 'user', content: 'المسألة القانونية: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة القانونية:\\n' + $json.ragContext }], temperature: 0.3, max_tokens: 2000 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "lr-0007",
+      "name": "analyst_affirmative",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 150],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل القانوني المعارض في مجلس المراجعة القانونية. مهمتك الطعن في الموقف المطروح وكشف الثغرات القانونية والمخاطر التنظيمية. ابحث عن استثناءات ومواد تعارض الموقف. أجب بالعربية.' }, { role: 'user', content: 'المسألة القانونية: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة القانونية:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 2000 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "lr-0008",
+      "name": "analyst_negative",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 450],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst affirmativeArg = getReply('analyst_affirmative');\nconst negativeArg = getReply('analyst_negative');\nreturn [{ json: { ...base, affirmativeArg, negativeArg, debateRound: 1 } }];"
+      },
+      "id": "lr-0009",
+      "name": "collect_debate_r1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل المؤيد. اقرأ رد المعارض وقدم ردك النهائي. عزز حجتك وعالج النقاط التي أثارها المعارض. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n--- حجتك الأولى ---\\n' + $json.affirmativeArg + '\\n\\n--- رد المعارض ---\\n' + $json.negativeArg + '\\n\\nقدم ردك النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "lr-0010",
+      "name": "rebuttal_affirmative",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1660, 150],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل المعارض. اقرأ رد المؤيد وقدم ردك النهائي. عزز حجتك وعالج النقاط التي أثارها المؤيد. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n--- حجتك الأولى ---\\n' + $json.negativeArg + '\\n\\n--- رد المؤيد ---\\n' + $json.affirmativeArg + '\\n\\nقدم ردك النهائي.' }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "lr-0011",
+      "name": "rebuttal_negative",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1660, 450],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('collect_debate_r1').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst rebuttalAff = getReply('rebuttal_affirmative');\nconst rebuttalNeg = getReply('rebuttal_negative');\nreturn [{ json: { ...base, rebuttalAff, rebuttalNeg, debateRound: 2 } }];"
+      },
+      "id": "lr-0012",
+      "name": "collect_debate_r2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1880, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت القاضي المحايد في مجلس المراجعة القانونية. استمعت لجولتين من المناظرة بين المحلل المؤيد والمعارض. مهمتك:\\n1) حدد من كانت حجته أقوى ولماذا\\n2) أصدر الحكم القانوني (مع/ضد/جزئي)\\n3) حدد المواد النظامية الحاكمة\\n4) قيّم مستوى المخاطر القانونية (عالي/متوسط/منخفض)\\n5) قدم التوصية النهائية\\n\\nتنبيه: هذا رأي استشاري وليس فتوى قانونية. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n=== الجولة الأولى ===\\n--- المؤيد ---\\n' + $json.affirmativeArg + '\\n--- المعارض ---\\n' + $json.negativeArg + '\\n\\n=== الجولة الثانية (الرد) ===\\n--- رد المؤيد ---\\n' + $json.rebuttalAff + '\\n--- رد المعارض ---\\n' + $json.rebuttalNeg + '\\n\\nأصدر حكمك النهائي.' }], temperature: 0.2, max_tokens: 3000 }) }}",
+        "options": { "timeout": 180000 }
+      },
+      "id": "lr-0013",
+      "name": "judge_verdict",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2100, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('collect_debate_r2').first().json;\nconst judgeRaw = $input.item.json;\nconst verdict = judgeRaw.choices?.[0]?.message?.content || 'No verdict generated';\nconst now = new Date();\nconst filename = `${base.sessionId}_legal_review.md`;\nconst filepath = `/app/logs/council_sessions/${filename}`;\n\nconst report = [\n  '# Legal Review Council Session (MAD Debate)',\n  '',\n  `**Session ID:** ${base.sessionId}`,\n  `**Date:** ${now.toISOString()}`,\n  `**Legal Question:** ${base.question}`,\n  `**Web Sources:** ${base.webCount} | **RAG Sources:** ${base.ragCount}`,\n  '',\n  '## Round 1: Opening Arguments',\n  '',\n  '### Affirmative Analyst',\n  base.affirmativeArg,\n  '',\n  '### Negative Analyst',\n  base.negativeArg,\n  '',\n  '## Round 2: Rebuttals',\n  '',\n  '### Affirmative Rebuttal',\n  base.rebuttalAff,\n  '',\n  '### Negative Rebuttal',\n  base.rebuttalNeg,\n  '',\n  '## Judge Verdict',\n  verdict,\n  '',\n  '---',\n  '*This is an advisory opinion, not legal advice.*'\n].join('\\n');\n\nconst b64 = Buffer.from(report, 'utf8').toString('base64');\nreturn [{\n  json: { sessionId: base.sessionId, filepath, question: base.question, verdict, webCount: base.webCount, ragCount: base.ragCount },\n  binary: { reportData: { data: b64, mimeType: 'text/markdown', fileName: filename } }\n}];"
+      },
+      "id": "lr-0014",
+      "name": "build_session_report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2320, 300]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $json.filepath }}",
+        "dataPropertyName": "reportData",
+        "options": { "createDirectories": true }
+      },
+      "id": "lr-0015",
+      "name": "write_session",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [2540, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json || {};\nconst fail = $('normalize_input').first().json || {};\nif (fail.skip === true) {\n  return [{ json: { status: 'rejected', council: 'legal_review', message: fail.reason } }];\n}\nconst built = $('build_session_report').first().json || {};\nreturn [{ json: {\n  status: 'success',\n  council: 'legal_review',\n  sessionId: built.sessionId || 'unknown',\n  question: built.question || '',\n  verdict: built.verdict || '',\n  sources: { web: built.webCount || 0, rag: built.ragCount || 0 },\n  reportPath: built.filepath || '',\n  disclaimer: 'Advisory opinion only - not legal advice'\n} }];"
+      },
+      "id": "lr-0016",
+      "name": "final_response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2760, 300]
+    }
+  ],
+  "connections": {
+    "webhook_in": {
+      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+    },
+    "normalize_input": {
+      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+    },
+    "has_question_if": {
+      "main": [
+        [ { "node": "search_web", "type": "main", "index": 0 } ],
+        [ { "node": "final_response", "type": "main", "index": 0 } ]
+      ]
+    },
+    "search_web": {
+      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+    },
+    "search_rag": {
+      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+    },
+    "merge_context": {
+      "main": [[ { "node": "analyst_affirmative", "type": "main", "index": 0 } ]]
+    },
+    "analyst_affirmative": {
+      "main": [[ { "node": "analyst_negative", "type": "main", "index": 0 } ]]
+    },
+    "analyst_negative": {
+      "main": [[ { "node": "collect_debate_r1", "type": "main", "index": 0 } ]]
+    },
+    "collect_debate_r1": {
+      "main": [[ { "node": "rebuttal_affirmative", "type": "main", "index": 0 } ]]
+    },
+    "rebuttal_affirmative": {
+      "main": [[ { "node": "rebuttal_negative", "type": "main", "index": 0 } ]]
+    },
+    "rebuttal_negative": {
+      "main": [[ { "node": "collect_debate_r2", "type": "main", "index": 0 } ]]
+    },
+    "collect_debate_r2": {
+      "main": [[ { "node": "judge_verdict", "type": "main", "index": 0 } ]]
+    },
+    "judge_verdict": {
+      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+    },
+    "build_session_report": {
+      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+    },
+    "write_session": {
+      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "1.0.0",
+  "meta": { "templateCredsSetupCompleted": true },
+  "tags": [{ "name": "council" }, { "name": "legal" }]
+}

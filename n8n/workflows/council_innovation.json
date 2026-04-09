@@ -1,0 +1,289 @@
+{
+  "id": "CounclInnovate001",
+  "name": "Innovation Council (Agent Forest)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "council-innovation",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "in-0001",
+      "name": "webhook_in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [80, 300],
+      "webhookId": "council-innovation-wh"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json;\nconst body = inp.body || inp;\nconst question = (body.question || body.idea || body.topic || body.message || '').toString().trim();\nif (!question) {\n  return [{ json: { ok: false, skip: true, reason: 'Missing question/idea/topic in request body' } }];\n}\nconst sessionId = `INC-${Date.now()}`;\nconst context = (body.context || '').toString().trim();\nreturn [{ json: { ok: true, skip: false, sessionId, question, context } }];"
+      },
+      "id": "in-0002",
+      "name": "normalize_input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "ok-check",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "in-0003",
+      "name": "has_question_if",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://searxng:8080/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "={{ $json.question + ' innovation trends 2025 2026' }}" },
+            { "name": "format", "value": "json" },
+            { "name": "categories", "value": "it,science" }
+          ]
+        },
+        "options": { "timeout": 25000 }
+      },
+      "id": "in-0004",
+      "name": "search_web",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 6, include: ['documents','distances'] }) }}",
+        "options": { "timeout": 20000 }
+      },
+      "id": "in-0005",
+      "name": "search_rag",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('normalize_input').first().json;\nconst webRaw = $('search_web').first().json || {};\nconst ragRaw = $('search_rag').first().json || {};\n\nconst webResults = Array.isArray(webRaw.results) ? webRaw.results.slice(0, 5) : [];\nconst webContext = webResults.map((r, i) => `[${i+1}] ${r.title || ''}: ${r.url || ''}`).join('\\n') || 'No web results';\n\nconst ragDocs = ragRaw.documents ? ragRaw.documents[0] || [] : [];\nconst ragDistances = ragRaw.distances ? ragRaw.distances[0] || [] : [];\nconst ragContext = ragDocs.slice(0, 5).map((d, i) => `[RAG-${i+1}] (dist: ${ragDistances[i]?.toFixed(3) || '?'}): ${typeof d === 'string' ? d.slice(0, 400) : ''}`).join('\\n') || 'No RAG results';\n\nreturn [{ json: { ...base, webContext, ragContext, webCount: webResults.length, ragCount: ragDocs.length } }];"
+      },
+      "id": "in-0006",
+      "name": "merge_context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير ابتكار وريادة أعمال. عضو رقم 1 في مجلس الابتكار. قيّم الفكرة من حيث: 1) الجدوى التقنية 2) حجم السوق المحتمل 3) الميزة التنافسية. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.6, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "in-0007",
+      "name": "expert_entrepreneur",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 60],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير تقني وذكاء اصطناعي. عضو رقم 2 في مجلس الابتكار. قيّم الفكرة من حيث: 1) النضج التقني 2) التعقيد التنفيذي 3) البدائل المتاحة. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "in-0008",
+      "name": "expert_tech",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 260],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير استراتيجي ومالي. عضو رقم 3 في مجلس الابتكار. قيّم الفكرة من حيث: 1) العائد على الاستثمار 2) المخاطر المالية 3) التوافق مع رؤية 2030. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "in-0009",
+      "name": "expert_strategy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 460],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst entrepreneurVote = getReply('expert_entrepreneur');\nconst techVote = getReply('expert_tech');\nconst strategyVote = getReply('expert_strategy');\nreturn [{ json: { ...base, entrepreneurVote, techVote, strategyVote } }];"
+      },
+      "id": "in-0010",
+      "name": "collect_votes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://open_webui:8080/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت رئيس مجلس الابتكار. راجعت تصويتات وتحليلات 3 خبراء. مهمتك:\\n1) احسب نتيجة التصويت (مؤيد/محايد/ضد)\\n2) ادمج أفضل الأفكار من كل خبير\\n3) أصدر القرار النهائي: تبني / تطوير إضافي / رفض\\n4) حدد الخطوات التالية المقترحة\\n5) قيّم مستوى الابتكار (اختراقي/تحسيني/تقليدي)\\nأجب بالعربية بتقرير منظم.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\n--- خبير الريادة ---\\n' + $json.entrepreneurVote + '\\n\\n--- خبير التقنية ---\\n' + $json.techVote + '\\n\\n--- خبير الاستراتيجية ---\\n' + $json.strategyVote + '\\n\\nأصدر قرارك النهائي.' }], temperature: 0.3, max_tokens: 3000 }) }}",
+        "options": { "timeout": 180000 }
+      },
+      "id": "in-0011",
+      "name": "chair_decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const base = $('collect_votes').first().json;\nconst chairRaw = $input.item.json;\nconst decision = chairRaw.choices?.[0]?.message?.content || 'No decision generated';\nconst now = new Date();\nconst filename = `${base.sessionId}_innovation.md`;\nconst filepath = `/app/logs/council_sessions/${filename}`;\n\nconst report = [\n  '# Innovation Council Session (Agent Forest)',\n  '',\n  `**Session ID:** ${base.sessionId}`,\n  `**Date:** ${now.toISOString()}`,\n  `**Idea/Question:** ${base.question}`,\n  `**Web Sources:** ${base.webCount} | **RAG Sources:** ${base.ragCount}`,\n  '',\n  '## Expert Votes',\n  '',\n  '### Entrepreneur Expert (Feasibility & Market)',\n  base.entrepreneurVote,\n  '',\n  '### Tech Expert (Technical Maturity)',\n  base.techVote,\n  '',\n  '### Strategy Expert (ROI & Vision 2030)',\n  base.strategyVote,\n  '',\n  '## Chair Final Decision',\n  decision\n].join('\\n');\n\nconst b64 = Buffer.from(report, 'utf8').toString('base64');\nreturn [{\n  json: { sessionId: base.sessionId, filepath, question: base.question, decision, webCount: base.webCount, ragCount: base.ragCount },\n  binary: { reportData: { data: b64, mimeType: 'text/markdown', fileName: filename } }\n}];"
+      },
+      "id": "in-0012",
+      "name": "build_session_report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1900, 300]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $json.filepath }}",
+        "dataPropertyName": "reportData",
+        "options": { "createDirectories": true }
+      },
+      "id": "in-0013",
+      "name": "write_session",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [2120, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inp = $input.item.json || {};\nconst fail = $('normalize_input').first().json || {};\nif (fail.skip === true) {\n  return [{ json: { status: 'rejected', council: 'innovation', message: fail.reason } }];\n}\nconst built = $('build_session_report').first().json || {};\nreturn [{ json: {\n  status: 'success',\n  council: 'innovation',\n  sessionId: built.sessionId || 'unknown',\n  question: built.question || '',\n  decision: built.decision || '',\n  sources: { web: built.webCount || 0, rag: built.ragCount || 0 },\n  reportPath: built.filepath || ''\n} }];"
+      },
+      "id": "in-0014",
+      "name": "final_response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2340, 300]
+    }
+  ],
+  "connections": {
+    "webhook_in": {
+      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+    },
+    "normalize_input": {
+      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+    },
+    "has_question_if": {
+      "main": [
+        [ { "node": "search_web", "type": "main", "index": 0 } ],
+        [ { "node": "final_response", "type": "main", "index": 0 } ]
+      ]
+    },
+    "search_web": {
+      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+    },
+    "search_rag": {
+      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+    },
+    "merge_context": {
+      "main": [[ { "node": "expert_entrepreneur", "type": "main", "index": 0 } ]]
+    },
+    "expert_entrepreneur": {
+      "main": [[ { "node": "expert_tech", "type": "main", "index": 0 } ]]
+    },
+    "expert_tech": {
+      "main": [[ { "node": "expert_strategy", "type": "main", "index": 0 } ]]
+    },
+    "expert_strategy": {
+      "main": [[ { "node": "collect_votes", "type": "main", "index": 0 } ]]
+    },
+    "collect_votes": {
+      "main": [[ { "node": "chair_decision", "type": "main", "index": 0 } ]]
+    },
+    "chair_decision": {
+      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+    },
+    "build_session_report": {
+      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+    },
+    "write_session": {
+      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "1.0.0",
+  "meta": { "templateCredsSetupCompleted": true },
+  "tags": [{ "name": "council" }, { "name": "innovation" }]
+}
