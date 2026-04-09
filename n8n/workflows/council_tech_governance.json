@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error from ' + nodeName + ': ' + e.message; }\n};\nconst securityOpinion = getReply('expert_security');\nconst archOpinion = getReply('expert_architecture');\nconst qualityOpinion = getReply('expert_quality');\nreturn [{ json: { ...base, securityOpinion, archOpinion, qualityOpinion } }];"
+        "jsCode": "const base = $('merge_context').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error from ' + nodeName + ': ' + e.message; }\n};\nconst securityOpinion = getReply('expert_security');\nconst archOpinion = getReply('expert_architecture');\nconst qualityOpinion = getReply('expert_quality');\nreturn [{ json: { ...base, securityOpinion, archOpinion, qualityOpinion } }];"
       },
       "id": "tg-0010",
       "name": "collect_opinions",
@@ -221,8 +221,8 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت رئيس مجلس الحوكمة التقنية. مهمتك: 1) ادمج آراء الخبراء الثلاثة 2) خذ ملاحظات محامي الشيطان بعين الاعتبار 3) أصدر القرار النهائي بالتوصيات 4) قيّم مستوى الثقة (مرتفع/متوسط/منخفض). أنتج تقريراً منظماً يبدأ بالتوصية ثم التبرير. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\n--- تحدي محامي الشيطان ---\\n' + $json.challenge + '\\n\\nالرجاء إصدار القرار النهائي.' }], temperature: 0.3, max_tokens: 3000 }) }}",
-        "options": { "timeout": 180000 }
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت رئيس مجلس الحوكمة التقنية. مهمتك: 1) ادمج آراء الخبراء الثلاثة 2) خذ ملاحظات محامي الشيطان بعين الاعتبار 3) أصدر القرار النهائي بالتوصيات 4) قيّم مستوى الثقة (مرتفع/متوسط/منخفض). أنتج تقريراً منظماً يبدأ بالتوصية ثم التبرير. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\n--- تحدي محامي الشيطان ---\\n' + $json.challenge + '\\n\\nالرجاء إصدار القرار النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "options": { "timeout": 300000 }
       },
       "id": "tg-0013",
       "name": "chair_synthesis",

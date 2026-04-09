@@ -166,7 +166,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst entrepreneurVote = getReply('expert_entrepreneur');\nconst techVote = getReply('expert_tech');\nconst strategyVote = getReply('expert_strategy');\nreturn [{ json: { ...base, entrepreneurVote, techVote, strategyVote } }];"
+        "jsCode": "const base = $('merge_context').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst entrepreneurVote = getReply('expert_entrepreneur');\nconst techVote = getReply('expert_tech');\nconst strategyVote = getReply('expert_strategy');\nreturn [{ json: { ...base, entrepreneurVote, techVote, strategyVote } }];"
       },
       "id": "in-0010",
       "name": "collect_votes",
@@ -187,8 +187,8 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت رئيس مجلس الابتكار. راجعت تصويتات وتحليلات 3 خبراء. مهمتك:\\n1) احسب نتيجة التصويت (مؤيد/محايد/ضد)\\n2) ادمج أفضل الأفكار من كل خبير\\n3) أصدر القرار النهائي: تبني / تطوير إضافي / رفض\\n4) حدد الخطوات التالية المقترحة\\n5) قيّم مستوى الابتكار (اختراقي/تحسيني/تقليدي)\\nأجب بالعربية بتقرير منظم.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\n--- خبير الريادة ---\\n' + $json.entrepreneurVote + '\\n\\n--- خبير التقنية ---\\n' + $json.techVote + '\\n\\n--- خبير الاستراتيجية ---\\n' + $json.strategyVote + '\\n\\nأصدر قرارك النهائي.' }], temperature: 0.3, max_tokens: 3000 }) }}",
-        "options": { "timeout": 180000 }
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت رئيس مجلس الابتكار. راجعت تصويتات وتحليلات 3 خبراء. مهمتك:\\n1) احسب نتيجة التصويت (مؤيد/محايد/ضد)\\n2) ادمج أفضل الأفكار من كل خبير\\n3) أصدر القرار النهائي: تبني / تطوير إضافي / رفض\\n4) حدد الخطوات التالية المقترحة\\n5) قيّم مستوى الابتكار (اختراقي/تحسيني/تقليدي)\\nأجب بالعربية بتقرير منظم.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\n--- خبير الريادة ---\\n' + $json.entrepreneurVote + '\\n\\n--- خبير التقنية ---\\n' + $json.techVote + '\\n\\n--- خبير الاستراتيجية ---\\n' + $json.strategyVote + '\\n\\nأصدر قرارك النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "options": { "timeout": 300000 }
       },
       "id": "in-0011",
       "name": "chair_decision",

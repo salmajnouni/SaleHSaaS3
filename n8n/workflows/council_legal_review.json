@@ -143,7 +143,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst affirmativeArg = getReply('analyst_affirmative');\nconst negativeArg = getReply('analyst_negative');\nreturn [{ json: { ...base, affirmativeArg, negativeArg, debateRound: 1 } }];"
+        "jsCode": "const base = $('merge_context').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst affirmativeArg = getReply('analyst_affirmative');\nconst negativeArg = getReply('analyst_negative');\nreturn [{ json: { ...base, affirmativeArg, negativeArg, debateRound: 1 } }];"
       },
       "id": "lr-0009",
       "name": "collect_debate_r1",
@@ -199,7 +199,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('collect_debate_r1').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst rebuttalAff = getReply('rebuttal_affirmative');\nconst rebuttalNeg = getReply('rebuttal_negative');\nreturn [{ json: { ...base, rebuttalAff, rebuttalNeg, debateRound: 2 } }];"
+        "jsCode": "const base = $('collect_debate_r1').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst rebuttalAff = getReply('rebuttal_affirmative');\nconst rebuttalNeg = getReply('rebuttal_negative');\nreturn [{ json: { ...base, rebuttalAff, rebuttalNeg, debateRound: 2 } }];"
       },
       "id": "lr-0012",
       "name": "collect_debate_r2",
@@ -220,8 +220,8 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:14b', messages: [{ role: 'system', content: 'أنت القاضي المحايد في مجلس المراجعة القانونية. استمعت لجولتين من المناظرة بين المحلل المؤيد والمعارض. مهمتك:\\n1) حدد من كانت حجته أقوى ولماذا\\n2) أصدر الحكم القانوني (مع/ضد/جزئي)\\n3) حدد المواد النظامية الحاكمة\\n4) قيّم مستوى المخاطر القانونية (عالي/متوسط/منخفض)\\n5) قدم التوصية النهائية\\n\\nتنبيه: هذا رأي استشاري وليس فتوى قانونية. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n=== الجولة الأولى ===\\n--- المؤيد ---\\n' + $json.affirmativeArg + '\\n--- المعارض ---\\n' + $json.negativeArg + '\\n\\n=== الجولة الثانية (الرد) ===\\n--- رد المؤيد ---\\n' + $json.rebuttalAff + '\\n--- رد المعارض ---\\n' + $json.rebuttalNeg + '\\n\\nأصدر حكمك النهائي.' }], temperature: 0.2, max_tokens: 3000 }) }}",
-        "options": { "timeout": 180000 }
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت القاضي المحايد في مجلس المراجعة القانونية. استمعت لجولتين من المناظرة بين المحلل المؤيد والمعارض. مهمتك:\\n1) حدد من كانت حجته أقوى ولماذا\\n2) أصدر الحكم القانوني (مع/ضد/جزئي)\\n3) حدد المواد النظامية الحاكمة\\n4) قيّم مستوى المخاطر القانونية (عالي/متوسط/منخفض)\\n5) قدم التوصية النهائية\\n\\nتنبيه: هذا رأي استشاري وليس فتوى قانونية. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n=== الجولة الأولى ===\\n--- المؤيد ---\\n' + $json.affirmativeArg + '\\n--- المعارض ---\\n' + $json.negativeArg + '\\n\\n=== الجولة الثانية (الرد) ===\\n--- رد المؤيد ---\\n' + $json.rebuttalAff + '\\n--- رد المعارض ---\\n' + $json.rebuttalNeg + '\\n\\nأصدر حكمك النهائي.' }], temperature: 0.2, max_tokens: 1500 }) }}",
+        "options": { "timeout": 300000 }
       },
       "id": "lr-0013",
       "name": "judge_verdict",
