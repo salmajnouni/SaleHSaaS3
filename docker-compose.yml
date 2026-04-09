@@ -128,6 +128,8 @@ services:
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.33
+    ports:
+      - "127.0.0.1:8888:8080"
 
   n8n:
     image: n8nio/n8n:2.14.2
@@ -146,10 +148,10 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-      - N8N_HOST=76dd8b219703a4.lhr.life
-      - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://76dd8b219703a4.lhr.life/
-      - N8N_EDITOR_BASE_URL=https://76dd8b219703a4.lhr.life/
+      - N8N_HOST=localhost
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - N8N_EDITOR_BASE_URL=http://localhost:5678/
       - GENERIC_TIMEZONE=Asia/Riyadh
       - TZ=Asia/Riyadh
       - N8N_VARIABLES_WEBUI_API_KEY=${WEBUI_API_KEY}
@@ -261,13 +263,17 @@ services:
     environment:
       - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN}
 
+  # python_agent: DEPRECATED 2026-04-10
+  # Build context ./python_agent no longer exists. Service had no defined purpose.
+  # docker.sock was removed for security. Kept as reference only.
+  # If reactivated: create ./python_agent/ with Dockerfile first.
   python_agent:
     build:
       context: ./python_agent
     container_name: salehsaas_python_agent
     restart: unless-stopped
     profiles:
-      - python-agent
+      - disabled
     # SECURITY: docker.sock removed — was granting full Docker control with no real purpose
     # Activate only when a real use case is defined: docker compose --profile python-agent up
     env_file:

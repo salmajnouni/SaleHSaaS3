@@ -280,11 +280,11 @@ def data_connector():
 def agents():
     """AI Agents management."""
     agents_list = [
-        {"id": "financial", "name": "وكيل الذكاء المالي", "icon": "💰", "status": "نشط"},
-        {"id": "legal", "name": "وكيل الامتثال القانوني", "icon": "⚖️", "status": "نشط"},
-        {"id": "cybersecurity", "name": "وكيل الأمن السيبراني", "icon": "🛡️", "status": "نشط"},
-        {"id": "social_media", "name": "وكيل التواصل الاجتماعي", "icon": "📱", "status": "نشط"},
-        {"id": "hr", "name": "وكيل الموارد البشرية", "icon": "👥", "status": "نشط"},
+        {"id": "social_media", "name": "وكيل التسويق متعدد القنوات", "icon": "📱", "status": "نشط"},
+        {"id": "financial", "name": "وكيل الذكاء المالي", "icon": "💰", "status": "مخطط"},
+        {"id": "legal", "name": "وكيل الامتثال القانوني", "icon": "⚖️", "status": "مخطط"},
+        {"id": "cybersecurity", "name": "وكيل الأمن السيبراني", "icon": "🛡️", "status": "مخطط"},
+        {"id": "hr", "name": "وكيل الموارد البشرية", "icon": "👥", "status": "مخطط"},
     ]
     return render_template('agents.html', config=PLATFORM_CONFIG, agents=agents_list)
 
