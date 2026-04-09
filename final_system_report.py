@@ -7,6 +7,7 @@ Warning: this script contains historical labels and should not override
 runtime truth from docker-compose.yml.
 """
 import subprocess
+import os
 import requests
 import json
 from datetime import datetime
@@ -136,7 +137,7 @@ def main():
     
     # Pipelines
     try:
-        headers = {"Authorization": "Bearer 0p_salehsaas-pipelines-key-2026"}
+        headers = {"Authorization": f"Bearer {os.environ.get('PIPELINES_API_KEY', '')}"}
         r = requests.get("http://localhost:9099/api/v1", headers=headers, timeout=5)
         services_status["Pipelines API"] = "🟢 Online"
     except:

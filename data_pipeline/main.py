@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import logging
 import tempfile
 import requests as http_requests
 from fastapi import FastAPI, UploadFile, File, HTTPException
@@ -47,6 +48,10 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 
+import re as _re
+
+_VALID_COLLECTION = _re.compile(r"^[a-zA-Z0-9_-]{1,64}$")
+
 @app.post("/process-file/", summary="Process an uploaded file, chunk it, store in ChromaDB and LoRA queue")
 async def process_file(file: UploadFile = File(...), collection_name: str = os.getenv("COLLECTION_NAME", "saleh_knowledge_qwen3")):
     """
@@ -54,9 +59,14 @@ async def process_file(file: UploadFile = File(...), collection_name: str = os.g
     extracts text via Apache Tika, splits into chunks,
     stores them in ChromaDB for RAG, and appends to LoRA queue.
     """
+    if not _VALID_COLLECTION.match(collection_name):
+        raise HTTPException(status_code=400, detail="Invalid collection name.")
     try:
-        # Save the uploaded file temporarily
-        file_path = os.path.join(INCOMING_DIR, file.filename)
+        # Save the uploaded file temporarily (sanitize filename to prevent path traversal)
+        safe_name = os.path.basename(file.filename)
+        if not safe_name:
+            raise HTTPException(status_code=400, detail="Invalid filename.")
+        file_path = os.path.join(INCOMING_DIR, safe_name)
         with open(file_path, "wb") as buffer:
             content = await file.read()
             buffer.write(content)
@@ -117,7 +127,8 @@ async def process_file(file: UploadFile = File(...), collection_name: str = os.g
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.getLogger(__name__).error(f"process-file error: {e}")
+        raise HTTPException(status_code=500, detail="Internal processing error.")
 
 
 @app.get("/health", summary="Health check")

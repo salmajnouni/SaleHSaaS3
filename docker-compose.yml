@@ -19,7 +19,7 @@ services:
     environment:
       - POSTGRES_DB=salehsaas
       - POSTGRES_USER=salehsaas
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-salehsaas_pass}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -44,7 +44,7 @@ services:
       salehsaas_net:
         ipv4_address: 172.20.0.20
     ports:
-      - "8010:8000"
+      - "127.0.0.1:8010:8000"
 
   pipelines:
     image: ghcr.io/open-webui/pipelines:main
@@ -56,18 +56,18 @@ services:
       - ./pipelines:/app/pipelines
       - ./saleh_core_data/glossary:/app/backend/data/glossary:ro
     environment:
-      - PIPELINES_API_KEY=${PIPELINES_API_KEY:-0p_salehsaas-pipelines-key-2026}
+      - PIPELINES_API_KEY=${PIPELINES_API_KEY}
       - N8N_BASE_URL=http://n8n:5678
-      - N8N_API_KEY=${N8N_API_KEY:-0p_salehsaas-n8n-api-key-dev-2026}
+      - N8N_API_KEY=${N8N_API_KEY}
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-salehsaas_pass}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
       - N8N_LOGIN_EMAIL=${N8N_LOGIN_EMAIL:-salmajnouni@gmail.com}
-      - N8N_LOGIN_PASSWORD=${N8N_PASSWORD:-SalehSaaS2026!}
+      - N8N_LOGIN_PASSWORD=${N8N_PASSWORD}
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.31
     ports:
-      - "9099:9099"
+      - "127.0.0.1:9099:9099"
 
   open_webui:
     image: ghcr.io/open-webui/open-webui:v0.8.12
@@ -81,8 +81,8 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - ENABLE_PIPELINES=True
       - PIPELINES_URLS=http://pipelines:9099
-      - PIPELINES_API_KEY=${PIPELINES_API_KEY:-0p_salehsaas-pipelines-key-2026}
-      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-salehsaas_super_secret_key}
+      - PIPELINES_API_KEY=${PIPELINES_API_KEY}
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
       - TIKA_SERVER_URL=http://tika:9998
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -121,7 +121,7 @@ services:
     container_name: salehsaas_searxng
     restart: unless-stopped
     environment:
-      - SEARXNG_SECRET=${SEARXNG_SECRET:-salehsaas-searxng-secret-2026}
+      - SEARXNG_SECRET=${SEARXNG_SECRET}
     volumes:
       - ./config/searxng/settings.yml:/etc/searxng/settings.yml:ro
       - ./config/searxng/limiter.toml:/etc/searxng/limiter.toml:ro
@@ -142,34 +142,32 @@ services:
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=salehsaas
       - DB_POSTGRESDB_USER=salehsaas
-      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD:-salehsaas_pass}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
       - N8N_BASIC_AUTH_ACTIVE=true
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-salehsaas_pass}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
       - N8N_HOST=76dd8b219703a4.lhr.life
       - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://76dd8b219703a4.lhr.life/
       - N8N_EDITOR_BASE_URL=https://76dd8b219703a4.lhr.life/
       - GENERIC_TIMEZONE=Asia/Riyadh
       - TZ=Asia/Riyadh
-      - N8N_VARIABLES_WEBUI_API_KEY=${WEBUI_API_KEY:-sk-773169e4bcce483fb5e8268e9bf393dc}
+      - N8N_VARIABLES_WEBUI_API_KEY=${WEBUI_API_KEY}
       - N8N_VARIABLES_COUNCIL_MODEL=qwen2.5:7b
-      - N8N_VARIABLES_SALEH_TELEGRAM_CHAT_ID=${SALEH_TELEGRAM_CHAT_ID:-161458544}
-      - N8N_VARIABLES_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-OPTIONAL_CONFIGURE_FOR_TELEGRAM_INTEGRATION}
+      - N8N_VARIABLES_SALEH_TELEGRAM_CHAT_ID=${SALEH_TELEGRAM_CHAT_ID}
+      - N8N_VARIABLES_TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - N8N_BLOCK_SVC_REGISTRATION_EMAIL=true
       - N8N_METRICS=true
       - N8N_LOG_LEVEL=info
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_RESTRICT_FILE_ACCESS_TO=/home/node/.n8n;/app/logs;/app/core
       - N8N_RUNNERS_MODE=external
       - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
-      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-salehsaas-runners-secret-2026}
+      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./core:/app/core
       - ./logs:/app/logs
-      - //./pipe/dockerDesktopLinuxEngine://./pipe/docker-engine
-      - c:/saleh26:/app/host_saleh26:ro
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.40
@@ -183,7 +181,7 @@ services:
     depends_on:
       - n8n
     environment:
-      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN:-salehsaas-runners-secret-2026}
+      - N8N_RUNNERS_AUTH_TOKEN=${N8N_RUNNERS_AUTH_TOKEN}
       - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
     networks:
       salehsaas_net:
@@ -229,7 +227,7 @@ services:
       salehsaas_net:
         ipv4_address: 172.20.0.62
     ports:
-      - "8001:8001"
+      - "127.0.0.1:8001:8001"
 
   open-terminal:
     image: ghcr.io/open-webui/open-terminal
@@ -238,11 +236,10 @@ services:
     profiles:
       - open-terminal
     environment:
-      - OPEN_TERMINAL_API_KEY=${OPEN_TERMINAL_API_KEY:-uytyutujhgjhgh7640k!}
+      - OPEN_TERMINAL_API_KEY=${OPEN_TERMINAL_API_KEY}
     volumes:
       - open-terminal-data:/home/user
       - C:/saleh26/salehsaas/SaleHSaaS3/saleh:/home/user/projects
-      - C:/Users/SALEH ALMAJNOUNI/.ssh:/home/user/.ssh
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.80
@@ -262,7 +259,7 @@ services:
     ports:
       - "11235:11235"
     environment:
-      - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN:-salehsaas_crawl_secret_2026}
+      - CRAWL4AI_API_TOKEN=${CRAWL4AI_API_TOKEN}
 
   python_agent:
     build:

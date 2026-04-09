@@ -29,8 +29,8 @@ class Pipeline:
         n8n_api_key: str = os.getenv("N8N_API_KEY", "")
         n8n_basic_user: str = os.getenv("N8N_BASIC_AUTH_USER", "")
         n8n_basic_password: str = os.getenv("N8N_BASIC_AUTH_PASSWORD", "")
-        n8n_login_email: str = os.getenv("N8N_LOGIN_EMAIL", "salmajnouni@gmail.com")
-        n8n_login_password: str = os.getenv("N8N_LOGIN_PASSWORD", "SalehSaaS2026!")
+        n8n_login_email: str = os.getenv("N8N_LOGIN_EMAIL", "")
+        n8n_login_password: str = os.getenv("N8N_LOGIN_PASSWORD", "")
         # RAG - ChromaDB
         chromadb_url: str = "http://chromadb:8000"
         chromadb_tenant: str = "default_tenant"
@@ -638,7 +638,6 @@ class Pipeline:
                 continue
             if low.endswith("run_workflow") or low.endswith("trigger_workflow"):
                 continue
-                return tok
 
         # Fallback: any token that looks like an n8n id/name reference (e.g., CwCounclTele001)
         tokens = re.findall(r"\b[A-Za-z][A-Za-z0-9_-]{3,}\b", text)
@@ -1056,9 +1055,15 @@ class Pipeline:
             action_matches = [json.dumps(p, ensure_ascii=False) for p in user_action_payloads]
 
         # Natural-language fallback: infer action from latest user text
+        _DESTRUCTIVE_ACTIONS = {"delete_workflow", "auto_fix_workflow", "deactivate_workflow"}
         if not action_matches:
             inferred = self._infer_action_from_user_text(latest_user_content)
             if inferred:
+                inferred_action = inferred.get("action", "")
+                if inferred_action in _DESTRUCTIVE_ACTIONS:
+                    execution_results = [f"⚠️ الإجراء '{inferred_action}' يتطلب تأكيد صريح عبر JSON action payload. لا يمكن تنفيذه من نص عادي."]
+                    body = self._append_to_body(body, "\n".join(execution_results))
+                    return body
                 action_matches = [json.dumps(inferred, ensure_ascii=False)]
 
         if not wf_matches and not action_matches:

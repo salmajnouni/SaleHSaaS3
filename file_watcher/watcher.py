@@ -86,7 +86,7 @@ def check_pipeline_health() -> bool:
 
 def watch_loop():
     """الحلقة الرئيسية لمراقبة المجلد"""
-    consecutive_failures = 0
+    file_failures = {}  # track failures per file
 
     while True:
         try:
@@ -114,17 +114,18 @@ def watch_loop():
 
                     success = upload_file(filepath)
 
+                    fname = filepath.name
                     if success:
                         move_file(filepath, PROCESSED_DIR)
-                        consecutive_failures = 0
+                        file_failures.pop(fname, None)
                     else:
-                        consecutive_failures += 1
-                        if consecutive_failures >= 3:
-                            log.warning(f"Moving {filepath.name} to failed/ after 3 attempts")
+                        file_failures[fname] = file_failures.get(fname, 0) + 1
+                        if file_failures[fname] >= 3:
+                            log.warning(f"Moving {fname} to failed/ after {file_failures[fname]} attempts")
                             move_file(filepath, FAILED_DIR)
-                            consecutive_failures = 0
+                            file_failures.pop(fname, None)
                         else:
-                            log.info(f"Will retry {filepath.name} next cycle...")
+                            log.info(f"Will retry {fname} next cycle (attempt {file_failures[fname]}/3)...")
 
             time.sleep(POLL_INTERVAL)
 

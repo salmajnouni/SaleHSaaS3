@@ -3,6 +3,7 @@
 Comprehensive System Health and Functionality Test
 فحص شامل لصحة النظام والعمليات الأساسية
 """
+import os
 import requests
 import json
 import time
@@ -133,7 +134,7 @@ class SystemTester:
             self.log(f"Query: {TEST_QUERIES['ar']}", "INFO")
             
             # Test using pipelines API (n8n_controller)
-            headers = {"Authorization": "Bearer 0p_salehsaas-pipelines-key-2026"}
+            headers = {"Authorization": f"Bearer {os.environ.get('PIPELINES_API_KEY', '')}"}
             
             payload = {
                 "collection": "saleh_knowledge",

@@ -16,7 +16,9 @@ import sys
 import os
 
 N8N_URL = os.environ.get("N8N_URL", "http://localhost:5678")
-API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzM4ZjBkYi1kOTIwLTRmMGItOTE3Yi0xZjg3MDAyMDdiNjgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjkxNDA2MDctZTQ0MC00ZDZiLTk3NjktOWJiNmFhNjkxMTliIiwiaWF0IjoxNzcyNTIwMTYzLCJleHAiOjE3NzUwNzcyMDB9.sET4Cp57eYI5y_w9gfmFiPY260YolvUh9sVIglp7muA"
+API_KEY = os.environ.get("N8N_API_KEY", "")
+if not API_KEY:
+    print("ERROR: N8N_API_KEY environment variable not set."); sys.exit(1)
 
 HEADERS = {
     "X-N8N-API-KEY": API_KEY,

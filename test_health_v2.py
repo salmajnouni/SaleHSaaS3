@@ -2,6 +2,7 @@
 """
 Improved System Health Test with Better Error Handling
 """
+import os
 import requests
 import subprocess
 import json
@@ -80,7 +81,7 @@ def test_open_webui():
 
 def test_pipelines_api():
     print("[*] Pipelines API Status...")
-    headers = {"Authorization": "Bearer 0p_salehsaas-pipelines-key-2026"}
+    headers = {"Authorization": f"Bearer {os.environ.get('PIPELINES_API_KEY', '')}"}
     r = requests.get("http://localhost:9099/api/v1", headers=headers, timeout=5)
     print(f"    Status: {r.status_code}")
     if r.status_code in [200, 404]:

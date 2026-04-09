@@ -72,10 +72,17 @@ class Tools:
             if not containers:
                 return "No running containers found."
             container = containers[0]
-            with open(path, 'w') as f:
-                f.write(content)
-            log.info(f"File {path} created with content: {content}")
-            return f"File {path} created with content: {content}"
+            import tarfile, io
+            data = content.encode('utf-8')
+            tar_stream = io.BytesIO()
+            info = tarfile.TarInfo(name=path.lstrip('/'))
+            info.size = len(data)
+            with tarfile.open(fileobj=tar_stream, mode='w') as tar:
+                tar.addfile(info, io.BytesIO(data))
+            tar_stream.seek(0)
+            container.put_archive('/', tar_stream)
+            log.info(f"File {path} created inside container {container.name}")
+            return f"File {path} created inside container {container.name}"
         except Exception as e:
             return f"Error creating file: {str(e)}"
 
@@ -87,7 +94,7 @@ class Tools:
             if not containers:
                 return "No running containers found."
             container = containers[0]
-            result = container.exec_run(f"cat {path}")
+            result = container.exec_run(["cat", "--", path])
             return result.output.decode()
         except Exception as e:
             return f"Error viewing file: {str(e)}"
