@@ -72,17 +72,33 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
+        "url": "http://host.docker.internal:11434/api/embed",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 6, include: ['documents','distances'] }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "in-00e1",
+      "name": "embed_question",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [740, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8010/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/query",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 6, include: ['documents','distances'] }) }}",
         "options": { "timeout": 20000 }
       },
       "id": "in-0005",
       "name": "search_rag",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 400],
+      "position": [860, 400],
       "continueOnFail": true
     },
     {
@@ -246,6 +262,9 @@
       ]
     },
     "search_web": {
+      "main": [[ { "node": "embed_question", "type": "main", "index": 0 } ]]
+    },
+    "embed_question": {
       "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
     },
     "search_rag": {
