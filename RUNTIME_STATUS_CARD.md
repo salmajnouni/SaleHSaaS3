@@ -1,6 +1,6 @@
 # Runtime Status Card
 
-Updated: 2026-04-06
+Updated: 2026-04-10
 Scope: current operational truth for this repository.
 
 ## Active Runtime (docker-compose.yml)
@@ -41,20 +41,56 @@ Scope: current operational truth for this repository.
 
 ## Operational Defaults
 
-- Chroma collection: `saleh_knowledge_qwen3`
+- Chroma collection: `saleh_knowledge_qwen3` (11,566 docs, 1024 dims, cosine)
 - Embedding model: `qwen3-embedding:0.6b` (1024 dims)
 - Chroma API mode in active paths: `v1`
+- **ChromaDB has NO built-in embedding function** — must use `query_embeddings` (not `query_texts`)
 - Open WebUI behavior settings (main model, RAG model, web search, locale, signup) are managed from the Open WebUI Admin interface and persisted in `saleh_core_data`.
 - `docker-compose.yml` now keeps only infrastructure bindings for Open WebUI (Ollama URL, Pipelines URL/API key, secret key, Tika URL).
 
-## RAG Verification (2026-04-06)
+## Ollama (Host)
 
-- End-to-end RAG was verified on the live path (`pipelines/saleh_legal_rag.py`)
+- Runs on host, accessible from containers via `host.docker.internal:11434`
+- GPU: AMD Radeon 8060S (64GB VRAM)
+- `OLLAMA_KEEP_ALIVE=-1` (User env) — models stay loaded forever
+- Warmup script: `scripts/warmup_models.ps1` (run after Ollama restart)
+- Loaded models (production):
+  - `qwen3:32b` (31GB, 100% GPU) — council chair/judge
+  - `qwen2.5:7b` (8.2GB, 100% GPU) — council experts
+  - `qwen3-embedding:0.6b` (6.3GB, 100% GPU) — RAG embeddings
+  - Total VRAM: ~45.5GB / 64GB
+
+## Advisory Councils (n8n)
+
+- 3 council workflows, all active and tested:
+  - **CounclInnovate001** — Innovation (Agent Forest): 3 experts vote + chair. ~3min
+  - **CounclTechGov001** — Tech Governance (MoA): 3 experts + devil's advocate + chair. ~4min
+  - **CounclLegalRev001** — Legal Review (MAD Debate): affirmative vs negative, 2 rounds + judge. ~8min
+- Flow: `normalize_input → search_web → embed_question → search_rag → merge_context → experts → collect → chair/judge → final_response`
+- RAG: `embed_question` (Ollama `/api/embed`) → `search_rag` (ChromaDB `query_embeddings`). Fixed 2026-04-10.
+- n8n Code node (vm2 sandbox) has NO `fetch()` — use HTTP Request nodes for external calls
+- All sequential flow (no parallel branches — n8n v2.14.2 bug with `$('node')` references)
+
+## n8n Authentication
+
+- User: `salmajnouni@gmail.com` — password synced to `.env` `N8N_PASSWORD` (updated 2026-04-10)
+- API keys are JWT tokens created from n8n UI (Settings → API Keys). NOT random strings.
+- Active API key: `saleh-agent` (public-api scope, expires 2027-05-24) — stored in `.env` `N8N_API_KEY`
+- `N8N_BASIC_AUTH_PASSWORD` is legacy — n8n 2.x uses internal user accounts in Postgres
+
+## RAG Verification
+
+**Pipeline RAG (2026-04-06)**:
+- Path: `pipelines/saleh_legal_rag.py`
 - Query: `ما هي شروط الفسخ في العقود القانونية السعودية؟`
 - Retrieval: `15` chunks (top similarity `0.606`) from `saleh_knowledge_qwen3`
 - Context injection: `11253` chars via `inlet()`
-- LLM response streamed successfully via `pipe()`
 - Journal record: `logs/ops_journal.jsonl` action `rag_e2e_verified`
+
+**Council RAG (2026-04-10)**:
+- Fixed: `query_texts` → `embed_question` + `query_embeddings` (ChromaDB has no built-in embedding)
+- Innovation council test: RAG=6 chunks, Web=5 results, Decision=2392 chars
+- All 3 councils verified working with RAG context
 
 ## Backup Status (Verified 2026-04-06)
 
