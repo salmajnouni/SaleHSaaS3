@@ -19,7 +19,17 @@ while ($retries -lt 30) {
 }
 if ($retries -ge 30) { Write-Host "[warmup] ERROR: Ollama not reachable"; exit 1 }
 
-$models = @("qwen3:32b", "qwen2.5:7b")
+# Embedding model first (smallest, fastest)
+Write-Host "[warmup] Loading qwen3-embedding:0.6b into VRAM..."
+try {
+    $embedBody = @{ model = "qwen3-embedding:0.6b"; input = "warmup"; keep_alive = -1 } | ConvertTo-Json
+    $null = Invoke-RestMethod -Uri "$OllamaUrl/api/embed" -Method POST -Body $embedBody -ContentType "application/json" -TimeoutSec 60
+    Write-Host "[warmup] qwen3-embedding:0.6b loaded successfully"
+} catch {
+    Write-Host "[warmup] WARNING: Failed to load qwen3-embedding:0.6b - $($_.Exception.Message)"
+}
+
+$models = @("qwen2.5:7b", "qwen3:32b")
 
 foreach ($model in $models) {
     Write-Host "[warmup] Loading $model into VRAM..."
