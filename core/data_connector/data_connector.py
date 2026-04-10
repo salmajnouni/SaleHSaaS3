@@ -44,12 +44,13 @@ class SQLConnector:
             print(f"❌ Connection failed: {e}")
             return False
 
-    def query(self, sql: str) -> Optional[pd.DataFrame]:
+    def query(self, sql: str, params: dict = None) -> Optional[pd.DataFrame]:
         """
         Executes a SQL query and returns results as a DataFrame.
 
         Args:
-            sql (str): The SQL query to execute.
+            sql (str): The SQL query to execute. Use :param_name for parameters.
+            params (dict, optional): Parameter values for the query.
 
         Returns:
             pd.DataFrame or None: The query results.
@@ -58,7 +59,9 @@ class SQLConnector:
             print("Not connected. Call connect() first.")
             return None
         try:
-            df = pd.read_sql(sql, self.engine)
+            from sqlalchemy import text
+            stmt = text(sql)
+            df = pd.read_sql(stmt, self.engine, params=params)
             print(f"✅ Query returned {len(df)} rows.")
             return df
         except Exception as e:
@@ -78,17 +81,26 @@ class SQLConnector:
 class FileConnector:
     """Reads and processes various file types: CSV, Excel, PDF, Word, JSON."""
 
-    def read(self, file_path: str) -> Optional[Union[pd.DataFrame, str, dict]]:
+    def read(self, file_path: str, base_dir: str = None) -> Optional[Union[pd.DataFrame, str, dict]]:
         """
         Reads a file and returns its content in a usable format.
 
         Args:
             file_path (str): The path to the file.
+            base_dir (str, optional): If set, file_path must be under this directory (path traversal protection).
 
         Returns:
             pd.DataFrame, str, or dict depending on the file type.
         """
-        path = Path(file_path)
+        path = Path(file_path).resolve()
+
+        # Path traversal protection
+        if base_dir:
+            base = Path(base_dir).resolve()
+            if not str(path).startswith(str(base)):
+                print(f"❌ Access denied: path outside allowed directory")
+                return None
+
         if not path.exists():
             print(f"❌ File not found: {file_path}")
             return None

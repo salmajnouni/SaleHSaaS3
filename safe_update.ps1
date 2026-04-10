@@ -2,8 +2,16 @@
 # SaleH OS - سكريبت التحديث الآمن مع النسخ الاحتياطي التلقائي
 # ═══════════════════════════════════════════════════════════════════
 
-$ProjectPath = "D:\salehsaas3"
-$BackupRoot  = "D:\salehsaas3_backups"
+# Auto-detect project root from git
+$ProjectPath = git rev-parse --show-toplevel 2>$null
+if (-not $ProjectPath) {
+    $ProjectPath = $PSScriptRoot
+    if (-not (Test-Path "$ProjectPath\.git")) {
+        Write-Host "  ✗ لا يمكن تحديد مجلد المشروع. شغل السكريبت من داخل المشروع." -ForegroundColor Red
+        exit 1
+    }
+}
+$BackupRoot  = Join-Path (Split-Path $ProjectPath) "salehsaas3_backups"
 $Timestamp   = Get-Date -Format "yyyy-MM-dd_HH-mm-ss"
 $BackupPath  = "$BackupRoot\backup_$Timestamp"
 
@@ -74,10 +82,16 @@ Write-Host ""
 Write-Host "▶ الخطوة 3: تحديث المستودع من GitHub..." -ForegroundColor Yellow
 
 git fetch origin
-git reset --hard origin/main
-
-Write-Host ""
-Write-Host "  ✅ تم تحديث المستودع بنجاح!" -ForegroundColor Green
+$pullResult = git pull --ff-only origin main 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "" 
+    Write-Host "  ⚠ تعذر التحديث التلقائي (fast-forward). تحقق من التعارضات:" -ForegroundColor Yellow
+    Write-Host "  $pullResult" -ForegroundColor Gray
+    Write-Host "  للتحديث الإجباري: git reset --hard origin/main (☠ يحذف التعديلات المحلية)" -ForegroundColor Red
+} else {
+    Write-Host ""
+    Write-Host "  ✅ تم تحديث المستودع بنجاح!" -ForegroundColor Green
+}
 
 # ── الخطوة 4: التحقق من وجود dev_studio ──────────────────────────
 Write-Host ""

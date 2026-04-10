@@ -3,6 +3,18 @@ import requests
 import time
 import json
 import sys
+import os
+from pathlib import Path
+
+# Load .env for credentials (never hardcode secrets)
+_env_file = Path(__file__).resolve().parents[1] / ".env"
+if _env_file.exists():
+    with open(_env_file) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if "=" in _line and not _line.startswith("#"):
+                _k, _v = _line.split("=", 1)
+                os.environ.setdefault(_k.strip(), _v.strip().strip('"').strip("'"))
 
 PASS = 0
 FAIL = 0
@@ -39,8 +51,9 @@ check("n8n", check_container("n8n", "http://localhost:5678/healthz"))
 check("Data Pipeline", check_container("data_pipeline", "http://localhost:8001/health"))
 
 def check_pipelines():
+    api_key = os.environ.get("WEBUI_API_KEY", "")
     r = requests.get("http://localhost:9099/v1/models",
-                     headers={"Authorization": "Bearer ojMTUkjgYW6BtINckMJv0D92jF-p2Oej"},
+                     headers={"Authorization": f"Bearer {api_key}"},
                      timeout=10)
     return r.status_code == 200, f"HTTP {r.status_code}"
 
@@ -138,11 +151,10 @@ check("RAG query (embed+search)", check_chroma_query)
 # --- n8n API ---
 print("\n[5] n8n API")
 
-N8N_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOTJhNTYwYS1iOTBkLTRiY2YtODljNy0zODIyMWRiYTQ4YmQiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiNjMxZDAzM2YtNzc1MC00YzdlLWE1OGMtYWMyN2JkNDA4ODdiIiwiaWF0IjoxNzc0NjIwOTEyLCJleHAiOjE4MDYxNTYwMDB9.hEVgXGIjcJtbYg8xxLV_eFNN3Q8SxeSwng_GeE3yYP8"
-
 def check_n8n_api():
+    n8n_jwt = os.environ.get("N8N_API_KEY", "")
     r = requests.get("http://localhost:5678/api/v1/workflows",
-                     headers={"X-N8N-API-KEY": N8N_JWT}, timeout=10)
+                     headers={"X-N8N-API-KEY": n8n_jwt}, timeout=10)
     if r.status_code != 200:
         return False, f"HTTP {r.status_code}"
     wfs = r.json().get("data", [])
@@ -150,9 +162,11 @@ def check_n8n_api():
     return True, f"{active}/{len(wfs)} active workflows"
 
 def check_n8n_login():
+    email = os.environ.get("N8N_LOGIN_EMAIL", os.environ.get("N8N_USER", ""))
+    password = os.environ.get("N8N_PASSWORD", "")
     r = requests.post("http://localhost:5678/rest/login", json={
-        "emailOrLdapLoginId": "salmajnouni@gmail.com",
-        "password": "PXoCzqp7f3GokT7Bo9zwPZFBWjpfuOYQ"
+        "emailOrLdapLoginId": email,
+        "password": password
     }, timeout=10)
     return r.status_code == 200, f"HTTP {r.status_code}"
 

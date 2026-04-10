@@ -20,6 +20,12 @@ This document provides a detailed overview of all services running within the Sa
 | **Browserless** | `salehsaas_browser` | `3001:3000` | **(متصفح آلي)** خدمة متصفح بلا واجهة للمهام التي تحتاج تنفيذًا متصفحياً. |
 | **Open Terminal** | `salehsaas_open-terminal` | `8000:8000` | **(الطرفية الداخلية)** بيئة طرفية مرتبطة بالمجلد المحلي `saleh/`. |
 
+### خدمات خارجية (WSL2)
+
+| Service Name | Host | Port | Description (الوصف) |
+| :--- | :--- | :--- | :--- |
+| **sanirejal API** | WSL2 (Ubuntu-22.04) | `8500` | **(إدارة التدريب)** REST API لإدارة ومراقبة تدريب نموذج autoresearch على GPU. |
+
 ### API Endpoints
 
 #### Data Pipeline (`http://localhost:8001`)
@@ -44,3 +50,14 @@ This document provides a detailed overview of all services running within the Sa
 
 - يستخدم كطرفية داخلية، وليس كبديل لـ Open WebUI.
 - المجلد المحلي `saleh/` يظهر بداخله على المسار `/home/user/projects`.
+
+#### sanirejal API (`http://localhost:8500`) — WSL2
+
+- `GET /health`: فحص حالة الخدمة.
+- `GET /status`: حالة التدريب الحالية (running/stopped، الخطوة، loss).
+- `GET /logs`: آخر سطور سجل التدريب.
+- `GET /loss_history`: سجل تاريخ قيم الخسارة.
+- `GET /gpu`: معلومات GPU (ROCm/AMD).
+- `GET /config`: المعاملات الفائقة الحالية للتدريب.
+- `POST /train/start`: بدء جلسة تدريب جديدة.
+- `POST /train/stop`: إيقاف التدريب الجاري.

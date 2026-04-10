@@ -25,6 +25,20 @@
 │  │  Knowledge Watcher      Browserless :3001                     │    │
 │  │  172.20.0.61            172.20.0.70                           │    │
 │  └──────────────────────────────────────────────────────────────┘    │
+│                                                                       │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │              WSL2 Ubuntu-22.04 — Training Subsystem           │    │
+│  │                                                               │    │
+│  │  autoresearch (/home/saleh/autoresearch)                      │    │
+│  │    └─ train_cpu.py (GPT ~11.5M params, AMD ROCm 6.3)        │    │
+│  │    └─ checkpoints/ (periodic + final.pt)                      │    │
+│  │                                                               │    │
+│  │  sanirejal API :8500                                          │    │
+│  │    └─ /health /status /logs /gpu /config                      │    │
+│  │    └─ /train/start /train/stop                                │    │
+│  │                                                               │    │
+│  │  GPU: AMD Radeon 8060S (ROCm 6.3, librocdxg WSL2 DXG)       │    │
+│  └──────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -83,6 +97,33 @@ Open WebUI
       ├──► Ollama :11434 (توليد الإجابة - llama3.1 أو غيره)
       │
       └──► SearXNG :8080 (بحث الإنترنت - اختياري)
+```
+
+---
+
+## تدفق التدريب والمعرفة (Training ↔ RAG)
+
+```
+WSL2 Ubuntu-22.04
+      │
+      ├──► autoresearch/train_cpu.py
+      │         │
+      │         ├──► GPU (AMD Radeon 8060S, ROCm 6.3)
+      │         │         └──► checkpoints/ (كل 1000 خطوة + final.pt)
+      │         │
+      │         └──► sanirejal API :8500 (مراقبة وتحكم)
+      │                   │
+      │                   └──► Open WebUI :3000 (Tool مسجلة على Evo2)
+      │
+      ├──► researchai/rag_docs/ (7 وثائق معرفية)
+      │         │
+      │         └──► Open WebUI Knowledge Base
+      │                   │
+      │                   └──► ChromaDB (فهرسة + بحث دلالي)
+      │
+      └──► Cline (VS Code)
+                │
+                └──► Evo2 عبر OpenAI-compatible API :3000
 ```
 
 ---

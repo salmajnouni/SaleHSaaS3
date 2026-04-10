@@ -119,7 +119,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
             { "name": "Content-Type", "value": "application/json" }
           ]
         },
@@ -142,7 +142,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
             { "name": "Content-Type", "value": "application/json" }
           ]
         },
@@ -165,7 +165,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
             { "name": "Content-Type", "value": "application/json" }
           ]
         },
@@ -198,7 +198,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
             { "name": "Content-Type", "value": "application/json" }
           ]
         },
@@ -231,7 +231,7 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer sk-773169e4bcce483fb5e8268e9bf393dc" },
+            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
             { "name": "Content-Type", "value": "application/json" }
           ]
         },

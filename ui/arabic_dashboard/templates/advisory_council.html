@@ -256,15 +256,15 @@
                         <div class="timeline-line"></div>
                         <div class="decision-box">{{ session.chair_decision or 'لا يوجد قرار موحد محفوظ بعد.' }}</div>
                         <div class="d-flex flex-wrap gap-2 mt-3">
-                            <button class="btn btn-sm btn-outline-success" onclick="submitSessionDecision('{{ session.session_id }}', 'approve')">
+                            <button class="btn btn-sm btn-outline-success" onclick="submitSessionDecision('{{ session.session_id|e }}', 'approve')">
                                 <i class="fas fa-check me-1"></i>
                                 اعتماد
                             </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="submitSessionDecision('{{ session.session_id }}', 'restudy')">
+                            <button class="btn btn-sm btn-outline-warning" onclick="submitSessionDecision('{{ session.session_id|e }}', 'restudy')">
                                 <i class="fas fa-rotate me-1"></i>
                                 إعادة دراسة
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="submitSessionDecision('{{ session.session_id }}', 'reject')">
+                            <button class="btn btn-sm btn-outline-danger" onclick="submitSessionDecision('{{ session.session_id|e }}', 'reject')">
                                 <i class="fas fa-ban me-1"></i>
                                 رفض
                             </button>
@@ -307,7 +307,7 @@
                         <div class="small mt-2" style="color: #ffb4a9;">فشل الربط: {{ request.delivery_error }}</div>
                         {% endif %}
                         <div class="d-flex gap-2 mt-3">
-                            <button class="btn btn-sm btn-outline-info" onclick="dispatchRequest('{{ request.requestId }}')">
+                            <button class="btn btn-sm btn-outline-info" onclick="dispatchRequest('{{ request.requestId|e }}')">
                                 <i class="fas fa-paper-plane me-1"></i>
                                 إرسال إلى workflow
                             </button>

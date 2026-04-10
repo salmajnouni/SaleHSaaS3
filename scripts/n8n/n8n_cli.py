@@ -43,12 +43,13 @@ class N8nCLI:
         self.admin_key = N8N_ADMIN_KEY
         
     def _run_docker_cmd(self, cmd: str) -> Dict[str, Any]:
-        """Execute command inside n8n container"""
-        full_cmd = f'docker exec salehsaas_n8n {cmd}'
+        """Execute command inside n8n container (safe: no shell=True)"""
+        # Split into list to avoid shell injection; prepend docker exec
+        cmd_list = ["docker", "exec", "salehsaas_n8n"] + cmd.split()
         try:
             result = subprocess.run(
-                full_cmd, 
-                shell=True, 
+                cmd_list, 
+                shell=False, 
                 capture_output=True, 
                 text=True,
                 timeout=30
@@ -107,8 +108,17 @@ class N8nCLI:
         
         return workflows
     
+    @staticmethod
+    def _validate_id(value: str) -> str:
+        """Validate workflow/execution IDs to prevent injection."""
+        clean = str(value).strip()
+        if not re.match(r'^[A-Za-z0-9_-]{1,64}$', clean):
+            raise ValueError(f"Invalid ID: {clean[:30]}")
+        return clean
+
     def get_workflow(self, workflow_id: str) -> Dict[str, Any]:
         """Get workflow details"""
+        workflow_id = self._validate_id(workflow_id)
         print(f"🔍 Getting workflow: {workflow_id}")
         
         cmd = f'n8n export:workflow --id {workflow_id}'

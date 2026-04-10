@@ -16,6 +16,10 @@ Scope: current operational truth for this repository.
 - `tika` (`salehsaas_tika`)
 - `searxng` (`salehsaas_searxng`)
 
+## External Services (WSL2)
+
+- `sanirejal_api` (WSL2 Ubuntu-22.04) -> `http://localhost:8500` — إدارة تدريب autoresearch على GPU (AMD ROCm 6.3)
+
 ## Optional (profiles — not started by default)
 
 - `open-terminal` (profile: `open-terminal`) -> `http://localhost:8000`

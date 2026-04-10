@@ -23,6 +23,17 @@ class Pipeline:
         "workflow", "workflows", "run", "trigger", "action", "args",
     }
 
+    # Strict pattern: alphanumeric, dash, underscore only (prevent injection)
+    _SAFE_ID_PATTERN = re.compile(r'^[A-Za-z0-9_-]{1,64}$')
+
+    @staticmethod
+    def _sanitize_id(value: str) -> str:
+        """Validate and sanitize workflow/execution IDs to prevent injection."""
+        clean = str(value).strip()
+        if not Pipeline._SAFE_ID_PATTERN.match(clean):
+            raise ValueError(f"Invalid ID format: {clean[:30]}")
+        return clean
+
     class Valves(BaseModel):
         pipelines: List[str] = ["*"]
         n8n_url: str = os.getenv("N8N_BASE_URL", "http://n8n:5678")
@@ -66,6 +77,9 @@ class Pipeline:
         return headers
 
     def _n8n_api(self, method: str, endpoint: str, data: dict = None) -> dict:
+        # Validate endpoint doesn't contain injection attempts
+        if not re.match(r'^[A-Za-z0-9/_?&=.-]+$', endpoint):
+            return {"error": f"Invalid API endpoint: {endpoint[:50]}"}
         api_url = f"{self.valves.n8n_url}/api/v1{endpoint}"
         auth = None
         if self.valves.n8n_basic_user and self.valves.n8n_basic_password:

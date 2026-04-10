@@ -8,6 +8,37 @@
 
 # Changelog
 
+## [4.4.0] - 2026-04-10
+
+### منظومة التدريب والبحث الذاتي (autoresearch)
+- إعداد بيئة تدريب GPU كاملة على WSL2 Ubuntu-22.04 مع AMD ROCm 6.3 (Radeon 8060S)
+- بناء `librocdxg` من المصدر لدعم WSL2 DXG مع AMD ROCm
+- تثبيت PyTorch 2.9.0+rocm6.3 وتهيئة متغيرات البيئة (`HSA_ENABLE_DXG_DETECTION`, `HSA_OVERRIDE_GFX_VERSION=11.0.0`)
+- تنفيذ تجارب تدريبية متعددة (DEPTH=4, 6, 8) مع قياس الأداء ومقارنة val_bpb
+- تدريب مطوّل (10 ساعات، 183,559 خطوة، 30 حقبة) — انخفاض loss من 9.01 إلى 3.25
+- إضافة منظومة حفظ النقاط التفتيشية (`torch.save`) في `train_cpu.py`: حفظ دوري كل 1000 خطوة + حفظ نهائي `final.pt`
+
+### واجهة إدارة التدريب — sanirejal API
+- بناء `sanirejal_api.py` — خدمة REST على المنفذ 8500 لإدارة التدريب عن بُعد
+- 6 نقاط نهاية: `/health`, `/status`, `/logs`, `/loss_history`, `/gpu`, `/config`
+- نقطتان للتحكم: `POST /train/start`, `POST /train/stop`
+- تسجيل الخدمة كأداة (Tool) في Open WebUI مرتبطة بنموذج Evo2
+
+### قاعدة المعرفة RAG — autoresearch Training Knowledge
+- إنشاء قاعدة معرفة مخصصة بمعرّف `86c62169-96e8-4d6d-86f4-17fc0f51c258`
+- تأليف 7 وثائق معرفية شاملة في `researchai/rag_docs/`
+- رفع جميع الوثائق إلى Open WebUI وفهرستها في ChromaDB
+- ربط قاعدة المعرفة بنموذج Evo2 عبر `knowledgeIds` في meta
+
+### نموذج Evo2 وتكامل Cline
+- إنشاء نموذج Evo2 في Open WebUI مع System Prompt مخصص (الرئيس)
+- ربط Evo2 بقاعدة المعرفة وأداة sanirejal
+- تهيئة إضافة Cline في VS Code للعمل مع Evo2 عبر OpenAI-compatible API
+
+### أداة البحث على الإنترنت
+- إنشاء `web_research.py` — أداة بحث عبر SearxNG المحلي
+- دمجها مع `ar.sh` كأداة CLI للبحث السريع
+
 ## [4.3.3] - 2026-03-30
 
 ### توثيق تشغيلي

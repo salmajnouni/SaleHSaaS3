@@ -17,7 +17,13 @@ from pathlib import Path
 from threading import Lock
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'salehsaas-dev-key-change-in-production')
+
+# SECRET_KEY must be set via environment; fail-safe with random key in dev
+_secret = os.environ.get('SECRET_KEY', '')
+if not _secret:
+    import secrets
+    _secret = secrets.token_hex(32)
+app.secret_key = _secret
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 LOGS_DIR = BASE_DIR / "logs"
@@ -318,6 +324,17 @@ def settings():
 
 
 # ─── API Endpoints ────────────────────────────────────────────────────────────
+
+def _is_local_request() -> bool:
+    """Check if request originates from localhost (reject external API calls)."""
+    remote = request.remote_addr
+    return remote in ("127.0.0.1", "::1", "localhost")
+
+@app.before_request
+def _restrict_api():
+    """Block external access to API endpoints."""
+    if request.path.startswith('/api/') and not _is_local_request():
+        return jsonify({"error": "API access restricted to localhost"}), 403
 
 @app.route('/api/status')
 def api_status():

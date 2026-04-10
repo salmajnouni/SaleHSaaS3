@@ -238,7 +238,6 @@ def discover_laws_from_boe(max_pages=15):
                 f"{BOE_SEARCH_URL}",
                 params={"PageNumber": page},
                 timeout=30,
-                verify=False
             )
             resp.raise_for_status()
             html = resp.text
@@ -329,7 +328,7 @@ def guess_category(name):
 def fetch_law_html(law_id):
     """Fetch law page HTML from BOE"""
     url = BOE_LAW_URL.format(law_id=law_id)
-    resp = requests.get(url, timeout=60, verify=False)
+    resp = requests.get(url, timeout=60)
     resp.raise_for_status()
     return resp.text
 

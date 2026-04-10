@@ -19,11 +19,11 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-outline-warning flex-fill"
-                            onclick="runAgent('{{ agent.id }}', '{{ agent.name }}')">
+                            onclick="runAgent('{{ agent.id|e }}', '{{ agent.name|e }}')">
                         <i class="fas fa-play me-1"></i> تشغيل
                     </button>
                     <button class="btn btn-sm btn-outline-info flex-fill"
-                            onclick="viewAgentDetails('{{ agent.id }}')">
+                            onclick="viewAgentDetails('{{ agent.id|e }}')">
                         <i class="fas fa-info-circle me-1"></i> تفاصيل
                     </button>
                 </div>
