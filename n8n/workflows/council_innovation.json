@@ -13,7 +13,10 @@
       "name": "webhook_in",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [80, 300],
+      "position": [
+        80,
+        300
+      ],
       "webhookId": "council-innovation-wh"
     },
     {
@@ -24,18 +27,28 @@
       "name": "normalize_input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "id": "ok-check",
               "leftValue": "={{ $json.ok }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -46,7 +59,10 @@
       "name": "has_question_if",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [520, 300]
+      "position": [
+        520,
+        300
+      ]
     },
     {
       "parameters": {
@@ -55,18 +71,32 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "q", "value": "={{ $json.question + ' innovation trends 2025 2026' }}" },
-            { "name": "format", "value": "json" },
-            { "name": "categories", "value": "it,science" }
+            {
+              "name": "q",
+              "value": "={{ $json.question + ' innovation trends 2025 2026' }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "categories",
+              "value": "it,science"
+            }
           ]
         },
-        "options": { "timeout": 25000 }
+        "options": {
+          "timeout": 25000
+        }
       },
       "id": "in-0004",
       "name": "search_web",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 200],
+      "position": [
+        740,
+        200
+      ],
       "continueOnFail": true
     },
     {
@@ -76,13 +106,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
-        "options": { "timeout": 30000 }
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "in-00e1",
       "name": "embed_question",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 400],
+      "position": [
+        740,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -92,13 +127,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 6, include: ['documents','distances'] }) }}",
-        "options": { "timeout": 20000 }
+        "options": {
+          "timeout": 20000
+        }
       },
       "id": "in-0005",
       "name": "search_rag",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [860, 400],
+      "position": [
+        860,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -109,7 +149,10 @@
       "name": "merge_context",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300]
+      "position": [
+        960,
+        300
+      ]
     },
     {
       "parameters": {
@@ -118,20 +161,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير ابتكار وريادة أعمال. عضو رقم 1 في مجلس الابتكار. قيّم الفكرة من حيث: 1) الجدوى التقنية 2) حجم السوق المحتمل 3) الميزة التنافسية. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.6, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "in-0007",
       "name": "expert_entrepreneur",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 60],
+      "position": [
+        1200,
+        60
+      ],
       "continueOnFail": true
     },
     {
@@ -141,20 +195,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير تقني وذكاء اصطناعي. عضو رقم 2 في مجلس الابتكار. قيّم الفكرة من حيث: 1) النضج التقني 2) التعقيد التنفيذي 3) البدائل المتاحة. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "in-0008",
       "name": "expert_tech",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 260],
+      "position": [
+        1200,
+        260
+      ],
       "continueOnFail": true
     },
     {
@@ -164,20 +229,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير استراتيجي ومالي. عضو رقم 3 في مجلس الابتكار. قيّم الفكرة من حيث: 1) العائد على الاستثمار 2) المخاطر المالية 3) التوافق مع رؤية 2030. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "in-0009",
       "name": "expert_strategy",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 460],
+      "position": [
+        1200,
+        460
+      ],
       "continueOnFail": true
     },
     {
@@ -188,7 +264,10 @@
       "name": "collect_votes",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 300]
+      "position": [
+        1440,
+        300
+      ]
     },
     {
       "parameters": {
@@ -197,20 +276,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت رئيس مجلس الابتكار. راجعت تصويتات وتحليلات 3 خبراء. مهمتك:\\n1) احسب نتيجة التصويت (مؤيد/محايد/ضد)\\n2) ادمج أفضل الأفكار من كل خبير\\n3) أصدر القرار النهائي: تبني / تطوير إضافي / رفض\\n4) حدد الخطوات التالية المقترحة\\n5) قيّم مستوى الابتكار (اختراقي/تحسيني/تقليدي)\\nأجب بالعربية بتقرير منظم.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\n--- خبير الريادة ---\\n' + $json.entrepreneurVote + '\\n\\n--- خبير التقنية ---\\n' + $json.techVote + '\\n\\n--- خبير الاستراتيجية ---\\n' + $json.strategyVote + '\\n\\nأصدر قرارك النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
-        "options": { "timeout": 300000 }
+        "options": {
+          "timeout": 300000
+        }
       },
       "id": "in-0011",
       "name": "chair_decision",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1680, 300],
+      "position": [
+        1680,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -221,20 +311,28 @@
       "name": "build_session_report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1900, 300]
+      "position": [
+        1900,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "write",
         "fileName": "={{ $json.filepath }}",
         "dataPropertyName": "reportData",
-        "options": { "createDirectories": true }
+        "options": {
+          "createDirectories": true
+        }
       },
       "id": "in-0013",
       "name": "write_session",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
-      "position": [2120, 300],
+      "position": [
+        2120,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -245,54 +343,183 @@
       "name": "final_response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2340, 300]
+      "position": [
+        2340,
+        300
+      ]
     }
   ],
   "connections": {
     "webhook_in": {
-      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "normalize_input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "normalize_input": {
-      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "has_question_if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "has_question_if": {
       "main": [
-        [ { "node": "search_web", "type": "main", "index": 0 } ],
-        [ { "node": "final_response", "type": "main", "index": 0 } ]
+        [
+          {
+            "node": "search_web",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "search_web": {
-      "main": [[ { "node": "embed_question", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "embed_question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "embed_question": {
-      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "search_rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "search_rag": {
-      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "merge_context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "merge_context": {
-      "main": [[ { "node": "expert_entrepreneur", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "expert_entrepreneur",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "expert_tech",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "expert_strategy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_entrepreneur": {
-      "main": [[ { "node": "expert_tech", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_votes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_tech": {
-      "main": [[ { "node": "expert_strategy", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_votes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_strategy": {
-      "main": [[ { "node": "collect_votes", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_votes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "collect_votes": {
-      "main": [[ { "node": "chair_decision", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "chair_decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "chair_decision": {
-      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "build_session_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "build_session_report": {
-      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "write_session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "write_session": {
-      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -303,6 +530,15 @@
     "errorWorkflow": ""
   },
   "versionId": "1.0.0",
-  "meta": { "templateCredsSetupCompleted": true },
-  "tags": [{ "name": "council" }, { "name": "innovation" }]
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "name": "council"
+    },
+    {
+      "name": "innovation"
+    }
+  ]
 }

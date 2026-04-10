@@ -13,7 +13,10 @@
       "name": "webhook_in",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [80, 300],
+      "position": [
+        80,
+        300
+      ],
       "webhookId": "council-legal-review-wh"
     },
     {
@@ -24,18 +27,28 @@
       "name": "normalize_input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "id": "ok-check",
               "leftValue": "={{ $json.ok }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -46,7 +59,10 @@
       "name": "has_question_if",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [520, 300]
+      "position": [
+        520,
+        300
+      ]
     },
     {
       "parameters": {
@@ -55,18 +71,32 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "q", "value": "={{ $json.question + ' نظام سعودي قانون' }}" },
-            { "name": "format", "value": "json" },
-            { "name": "language", "value": "ar-SA" }
+            {
+              "name": "q",
+              "value": "={{ $json.question + ' نظام سعودي قانون' }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "language",
+              "value": "ar-SA"
+            }
           ]
         },
-        "options": { "timeout": 25000 }
+        "options": {
+          "timeout": 25000
+        }
       },
       "id": "lr-0004",
       "name": "search_web",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 200],
+      "position": [
+        740,
+        200
+      ],
       "continueOnFail": true
     },
     {
@@ -76,13 +106,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
-        "options": { "timeout": 30000 }
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "lr-00e1",
       "name": "embed_question",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 400],
+      "position": [
+        740,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -92,13 +127,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 10, include: ['documents','distances'] }) }}",
-        "options": { "timeout": 20000 }
+        "options": {
+          "timeout": 20000
+        }
       },
       "id": "lr-0005",
       "name": "search_rag",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [860, 400],
+      "position": [
+        860,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -109,7 +149,10 @@
       "name": "merge_context",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300]
+      "position": [
+        960,
+        300
+      ]
     },
     {
       "parameters": {
@@ -118,20 +161,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل القانوني المؤيد في مجلس المراجعة القانونية. مهمتك الدفاع عن الموقف المطروح وإيجاد السند القانوني من الأنظمة السعودية. استشهد بنصوص نظامية محددة (اسم النظام، رقم المادة). أجب بالعربية.' }, { role: 'user', content: 'المسألة القانونية: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة القانونية:\\n' + $json.ragContext }], temperature: 0.3, max_tokens: 2000 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "lr-0007",
       "name": "analyst_affirmative",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 150],
+      "position": [
+        1200,
+        150
+      ],
       "continueOnFail": true
     },
     {
@@ -141,20 +195,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل القانوني المعارض في مجلس المراجعة القانونية. مهمتك الطعن في الموقف المطروح وكشف الثغرات القانونية والمخاطر التنظيمية. ابحث عن استثناءات ومواد تعارض الموقف. أجب بالعربية.' }, { role: 'user', content: 'المسألة القانونية: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة القانونية:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 2000 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "lr-0008",
       "name": "analyst_negative",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 450],
+      "position": [
+        1200,
+        450
+      ],
       "continueOnFail": true
     },
     {
@@ -165,7 +230,10 @@
       "name": "collect_debate_r1",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 300]
+      "position": [
+        1440,
+        300
+      ]
     },
     {
       "parameters": {
@@ -174,20 +242,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل المؤيد. اقرأ رد المعارض وقدم ردك النهائي. عزز حجتك وعالج النقاط التي أثارها المعارض. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n--- حجتك الأولى ---\\n' + $json.affirmativeArg + '\\n\\n--- رد المعارض ---\\n' + $json.negativeArg + '\\n\\nقدم ردك النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "lr-0010",
       "name": "rebuttal_affirmative",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1660, 150],
+      "position": [
+        1660,
+        150
+      ],
       "continueOnFail": true
     },
     {
@@ -197,20 +276,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت المحلل المعارض. اقرأ رد المؤيد وقدم ردك النهائي. عزز حجتك وعالج النقاط التي أثارها المؤيد. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n--- حجتك الأولى ---\\n' + $json.negativeArg + '\\n\\n--- رد المؤيد ---\\n' + $json.affirmativeArg + '\\n\\nقدم ردك النهائي.' }], temperature: 0.4, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "lr-0011",
       "name": "rebuttal_negative",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1660, 450],
+      "position": [
+        1660,
+        450
+      ],
       "continueOnFail": true
     },
     {
@@ -221,7 +311,10 @@
       "name": "collect_debate_r2",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1880, 300]
+      "position": [
+        1880,
+        300
+      ]
     },
     {
       "parameters": {
@@ -230,20 +323,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت القاضي المحايد في مجلس المراجعة القانونية. استمعت لجولتين من المناظرة بين المحلل المؤيد والمعارض. مهمتك:\\n1) حدد من كانت حجته أقوى ولماذا\\n2) أصدر الحكم القانوني (مع/ضد/جزئي)\\n3) حدد المواد النظامية الحاكمة\\n4) قيّم مستوى المخاطر القانونية (عالي/متوسط/منخفض)\\n5) قدم التوصية النهائية\\n\\nتنبيه: هذا رأي استشاري وليس فتوى قانونية. أجب بالعربية.' }, { role: 'user', content: 'المسألة: ' + $json.question + '\\n\\n=== الجولة الأولى ===\\n--- المؤيد ---\\n' + $json.affirmativeArg + '\\n--- المعارض ---\\n' + $json.negativeArg + '\\n\\n=== الجولة الثانية (الرد) ===\\n--- رد المؤيد ---\\n' + $json.rebuttalAff + '\\n--- رد المعارض ---\\n' + $json.rebuttalNeg + '\\n\\nأصدر حكمك النهائي.' }], temperature: 0.2, max_tokens: 1500 }) }}",
-        "options": { "timeout": 300000 }
+        "options": {
+          "timeout": 300000
+        }
       },
       "id": "lr-0013",
       "name": "judge_verdict",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2100, 300],
+      "position": [
+        2100,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -254,20 +358,28 @@
       "name": "build_session_report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2320, 300]
+      "position": [
+        2320,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "write",
         "fileName": "={{ $json.filepath }}",
         "dataPropertyName": "reportData",
-        "options": { "createDirectories": true }
+        "options": {
+          "createDirectories": true
+        }
       },
       "id": "lr-0015",
       "name": "write_session",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
-      "position": [2540, 300],
+      "position": [
+        2540,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -278,60 +390,205 @@
       "name": "final_response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2760, 300]
+      "position": [
+        2760,
+        300
+      ]
     }
   ],
   "connections": {
     "webhook_in": {
-      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "normalize_input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "normalize_input": {
-      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "has_question_if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "has_question_if": {
       "main": [
-        [ { "node": "search_web", "type": "main", "index": 0 } ],
-        [ { "node": "final_response", "type": "main", "index": 0 } ]
+        [
+          {
+            "node": "search_web",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "search_web": {
-      "main": [[ { "node": "embed_question", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "embed_question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "embed_question": {
-      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "search_rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "search_rag": {
-      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "merge_context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "merge_context": {
-      "main": [[ { "node": "analyst_affirmative", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "analyst_affirmative",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "analyst_negative",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "analyst_affirmative": {
-      "main": [[ { "node": "analyst_negative", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_debate_r1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "analyst_negative": {
-      "main": [[ { "node": "collect_debate_r1", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_debate_r1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "collect_debate_r1": {
-      "main": [[ { "node": "rebuttal_affirmative", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "rebuttal_affirmative",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "rebuttal_negative",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "rebuttal_affirmative": {
-      "main": [[ { "node": "rebuttal_negative", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_debate_r2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "rebuttal_negative": {
-      "main": [[ { "node": "collect_debate_r2", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_debate_r2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "collect_debate_r2": {
-      "main": [[ { "node": "judge_verdict", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "judge_verdict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "judge_verdict": {
-      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "build_session_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "build_session_report": {
-      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "write_session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "write_session": {
-      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -342,6 +599,15 @@
     "errorWorkflow": ""
   },
   "versionId": "1.0.0",
-  "meta": { "templateCredsSetupCompleted": true },
-  "tags": [{ "name": "council" }, { "name": "legal" }]
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "name": "council"
+    },
+    {
+      "name": "legal"
+    }
+  ]
 }

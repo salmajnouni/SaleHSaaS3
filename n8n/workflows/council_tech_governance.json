@@ -13,7 +13,10 @@
       "name": "webhook_in",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [80, 300],
+      "position": [
+        80,
+        300
+      ],
       "webhookId": "council-tech-governance-wh"
     },
     {
@@ -24,18 +27,28 @@
       "name": "normalize_input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 300]
+      "position": [
+        300,
+        300
+      ]
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
           "conditions": [
             {
               "id": "ok-check",
               "leftValue": "={{ $json.ok }}",
               "rightValue": true,
-              "operator": { "type": "boolean", "operation": "equals" }
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -46,7 +59,10 @@
       "name": "has_question_if",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [520, 300]
+      "position": [
+        520,
+        300
+      ]
     },
     {
       "parameters": {
@@ -55,19 +71,36 @@
         "sendQuery": true,
         "queryParameters": {
           "parameters": [
-            { "name": "q", "value": "={{ $json.question }}" },
-            { "name": "format", "value": "json" },
-            { "name": "language", "value": "ar-SA" },
-            { "name": "categories", "value": "it" }
+            {
+              "name": "q",
+              "value": "={{ $json.question }}"
+            },
+            {
+              "name": "format",
+              "value": "json"
+            },
+            {
+              "name": "language",
+              "value": "ar-SA"
+            },
+            {
+              "name": "categories",
+              "value": "it"
+            }
           ]
         },
-        "options": { "timeout": 25000 }
+        "options": {
+          "timeout": 25000
+        }
       },
       "id": "tg-0004",
       "name": "search_web",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 200],
+      "position": [
+        740,
+        200
+      ],
       "continueOnFail": true
     },
     {
@@ -77,13 +110,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
-        "options": { "timeout": 30000 }
+        "options": {
+          "timeout": 30000
+        }
       },
       "id": "tg-00e1",
       "name": "embed_question",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [740, 400],
+      "position": [
+        740,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -93,13 +131,18 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 8, include: ['documents','distances'] }) }}",
-        "options": { "timeout": 20000 }
+        "options": {
+          "timeout": 20000
+        }
       },
       "id": "tg-0005",
       "name": "search_rag",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [860, 400],
+      "position": [
+        860,
+        400
+      ],
       "continueOnFail": true
     },
     {
@@ -110,7 +153,10 @@
       "name": "merge_context",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 300]
+      "position": [
+        960,
+        300
+      ]
     },
     {
       "parameters": {
@@ -119,20 +165,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير أمن سيبراني وبنية تحتية تقنية. محلل رقم 1 في مجلس الحوكمة التقنية. أعط تحليلك المهني بناءً على المعلومات المتاحة. كن صريحاً ودقيقاً. اذكر المخاطر إن وجدت. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "tg-0007",
       "name": "expert_security",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 100],
+      "position": [
+        1200,
+        100
+      ],
       "continueOnFail": true
     },
     {
@@ -142,20 +199,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت مهندس معمارية أنظمة ومتخصص في DevOps والحاويات. محلل رقم 2 في مجلس الحوكمة التقنية. ركز على قابلية التوسع والاستقرار وأفضل الممارسات المعمارية. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "tg-0008",
       "name": "expert_architecture",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 300],
+      "position": [
+        1200,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -165,20 +233,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت متخصص في الأداء والجودة والاختبار. محلل رقم 3 في مجلس الحوكمة التقنية. ركز على الأداء العملي والموثوقية والجودة. انتقد الحلول غير العملية. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\nسياق من الويب:\\n' + $json.webContext + '\\n\\nسياق من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "tg-0009",
       "name": "expert_quality",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1200, 500],
+      "position": [
+        1200,
+        500
+      ],
       "continueOnFail": true
     },
     {
@@ -189,7 +268,10 @@
       "name": "collect_opinions",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1440, 300]
+      "position": [
+        1440,
+        300
+      ]
     },
     {
       "parameters": {
@@ -198,20 +280,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت محامي الشيطان في مجلس الحوكمة التقنية. مهمتك هي تحدي الآراء الثلاثة وكشف النقاط الضعيفة والافتراضات الخاطئة والمخاطر المخفية. كن صارماً لكن عادلاً. أجب بالعربية.' }, { role: 'user', content: 'السؤال الأصلي: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\nحلل هذه الآراء واكشف نقاط الضعف والمخاطر المخفية.' }], temperature: 0.6, max_tokens: 1500 }) }}",
-        "options": { "timeout": 120000 }
+        "options": {
+          "timeout": 120000
+        }
       },
       "id": "tg-0011",
       "name": "devils_advocate",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1660, 300],
+      "position": [
+        1660,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -222,7 +315,10 @@
       "name": "merge_challenge",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1880, 300]
+      "position": [
+        1880,
+        300
+      ]
     },
     {
       "parameters": {
@@ -231,20 +327,31 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "Authorization", "value": "Bearer {{ $vars.WEBUI_API_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت رئيس مجلس الحوكمة التقنية. مهمتك: 1) ادمج آراء الخبراء الثلاثة 2) خذ ملاحظات محامي الشيطان بعين الاعتبار 3) أصدر القرار النهائي بالتوصيات 4) قيّم مستوى الثقة (مرتفع/متوسط/منخفض). أنتج تقريراً منظماً يبدأ بالتوصية ثم التبرير. أجب بالعربية.' }, { role: 'user', content: 'السؤال: ' + $json.question + '\\n\\n--- رأي خبير الأمن ---\\n' + $json.securityOpinion + '\\n\\n--- رأي خبير المعمارية ---\\n' + $json.archOpinion + '\\n\\n--- رأي خبير الجودة ---\\n' + $json.qualityOpinion + '\\n\\n--- تحدي محامي الشيطان ---\\n' + $json.challenge + '\\n\\nالرجاء إصدار القرار النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
-        "options": { "timeout": 300000 }
+        "options": {
+          "timeout": 300000
+        }
       },
       "id": "tg-0013",
       "name": "chair_synthesis",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2100, 300],
+      "position": [
+        2100,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -255,20 +362,28 @@
       "name": "build_session_report",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2320, 300]
+      "position": [
+        2320,
+        300
+      ]
     },
     {
       "parameters": {
         "operation": "write",
         "fileName": "={{ $json.filepath }}",
         "dataPropertyName": "reportData",
-        "options": { "createDirectories": true }
+        "options": {
+          "createDirectories": true
+        }
       },
       "id": "tg-0015",
       "name": "write_session",
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
-      "position": [2540, 300],
+      "position": [
+        2540,
+        300
+      ],
       "continueOnFail": true
     },
     {
@@ -279,60 +394,205 @@
       "name": "final_response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2760, 300]
+      "position": [
+        2760,
+        300
+      ]
     }
   ],
   "connections": {
     "webhook_in": {
-      "main": [[ { "node": "normalize_input", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "normalize_input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "normalize_input": {
-      "main": [[ { "node": "has_question_if", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "has_question_if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "has_question_if": {
       "main": [
-        [ { "node": "search_web", "type": "main", "index": 0 } ],
-        [ { "node": "final_response", "type": "main", "index": 0 } ]
+        [
+          {
+            "node": "search_web",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "search_web": {
-      "main": [[ { "node": "embed_question", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "embed_question",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "embed_question": {
-      "main": [[ { "node": "search_rag", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "search_rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "search_rag": {
-      "main": [[ { "node": "merge_context", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "merge_context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "merge_context": {
-      "main": [[ { "node": "expert_security", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "expert_security",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "expert_architecture",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "expert_quality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_security": {
-      "main": [[ { "node": "expert_architecture", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_opinions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_architecture": {
-      "main": [[ { "node": "expert_quality", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_opinions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "expert_quality": {
-      "main": [[ { "node": "collect_opinions", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "collect_opinions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "collect_opinions": {
-      "main": [[ { "node": "devils_advocate", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "devils_advocate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "devils_advocate": {
-      "main": [[ { "node": "merge_challenge", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "merge_challenge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "merge_challenge": {
-      "main": [[ { "node": "chair_synthesis", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "chair_synthesis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "chair_synthesis": {
-      "main": [[ { "node": "build_session_report", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "build_session_report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "build_session_report": {
-      "main": [[ { "node": "write_session", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "write_session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "write_session": {
-      "main": [[ { "node": "final_response", "type": "main", "index": 0 } ]]
+      "main": [
+        [
+          {
+            "node": "final_response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -343,6 +603,15 @@
     "errorWorkflow": ""
   },
   "versionId": "1.0.0",
-  "meta": { "templateCredsSetupCompleted": true },
-  "tags": [{ "name": "council" }, { "name": "governance" }]
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "name": "council"
+    },
+    {
+      "name": "governance"
+    }
+  ]
 }

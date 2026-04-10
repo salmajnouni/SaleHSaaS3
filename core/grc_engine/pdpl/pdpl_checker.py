@@ -44,21 +44,15 @@ class PDPLComplianceChecker:
 
     def run_checks(self, database_connections):
         """
-        Runs all PDPL checks against a list of database connections.
-        Currently simulated for text scanning.
+        Runs PDPL checks against a list of database connection names.
+
+        ⚠️ Database scanning is NOT implemented — only scan_text() is real.
+        The knowledge watcher calls scan_text() directly on incoming content.
         """
         self.findings = []
-        print(f"Running PDPL checks on {len(database_connections)} database(s)...")
-
-        # Mock database scanning for now, but using the new scan_text logic
-        for db_conn in database_connections:
-            # In a real scenario, we would fetch data from the database here
-            mock_data = "User data from DB contains ID 1234567890"
-            res = self.scan_text(mock_data, source_name=db_conn)
-            self.findings.extend(res)
-
         return {
             "framework": "Personal Data Protection Law (PDPL)",
-            "status": "Incomplete" if self.findings else "Compliant",
-            "findings": self.findings
+            "status": "Not Implemented (database scanning)",
+            "findings": [],
+            "note": "Use scan_text() for real PII detection. DB scanning is a stub.",
         }
