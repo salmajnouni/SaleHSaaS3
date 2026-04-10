@@ -12,6 +12,7 @@ import os
 import json
 import requests
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from datetime import datetime
 from pathlib import Path
 from threading import Lock
@@ -24,6 +25,32 @@ if not _secret:
     import secrets
     _secret = secrets.token_hex(32)
 app.secret_key = _secret
+
+# ─── CSRF Protection ─────────────────────────────────────────────────────────
+csrf = CSRFProtect(app)
+
+# Exempt JSON API endpoints (they use localhost-only enforcement)
+csrf.exempt('api_status')
+csrf.exempt('api_grc_scan')
+csrf.exempt('api_run_agent')
+csrf.exempt('api_generate_social')
+csrf.exempt('api_council_sessions')
+csrf.exempt('api_request_council_study')
+csrf.exempt('api_dispatch_council_request')
+csrf.exempt('api_council_session_decision')
+
+# ─── Rate Limiting ────────────────────────────────────────────────────────────
+try:
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        default_limits=["120 per minute"],
+        storage_uri="memory://",
+    )
+except ImportError:
+    limiter = None
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 LOGS_DIR = BASE_DIR / "logs"
@@ -336,6 +363,25 @@ def _restrict_api():
     if request.path.startswith('/api/') and not _is_local_request():
         return jsonify({"error": "API access restricted to localhost"}), 403
 
+@app.after_request
+def _set_security_headers(response):
+    """Add security headers to every response."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    if 'text/html' in response.content_type:
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+            "img-src 'self' data:; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none';"
+        )
+    return response
+
 @app.route('/api/status')
 def api_status():
     """Returns the current platform status."""
@@ -401,6 +447,7 @@ def api_council_sessions():
 
 
 @app.route('/api/advisory-council/request', methods=['POST'])
+@(limiter.limit("10 per minute") if limiter else (lambda f: f))
 def api_request_council_study():
     """Queues a new council request from the dashboard."""
     blocked = _enforce_local_only()
@@ -462,6 +509,7 @@ def api_request_council_study():
 
 
 @app.route('/api/advisory-council/request/<request_id>/dispatch', methods=['POST'])
+@(limiter.limit("10 per minute") if limiter else (lambda f: f))
 def api_dispatch_council_request(request_id: str):
     """Retries sending a queued request to the workflow."""
     blocked = _enforce_local_only()
@@ -494,6 +542,7 @@ def api_dispatch_council_request(request_id: str):
 
 
 @app.route('/api/advisory-council/session/<session_id>/decision', methods=['POST'])
+@(limiter.limit("10 per minute") if limiter else (lambda f: f))
 def api_council_session_decision(session_id: str):
     """Stores dashboard approval/reject/restudy decisions for a session."""
     blocked = _enforce_local_only()
