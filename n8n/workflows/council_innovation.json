@@ -163,7 +163,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "=Bearer {{ $env.WEBUI_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -173,9 +173,9 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير ابتكار وريادة أعمال. عضو رقم 1 في مجلس الابتكار. قيّم الفكرة من حيث: 1) الجدوى التقنية 2) حجم السوق المحتمل 3) الميزة التنافسية. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.6, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط®ط¨ظٹط± ط§ط¨طھظƒط§ط± ظˆط±ظٹط§ط¯ط© ط£ط¹ظ…ط§ظ„. ط¹ط¶ظˆ ط±ظ‚ظ… 1 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط§ط¨طھظƒط§ط±. ظ‚ظٹظ‘ظ… ط§ظ„ظپظƒط±ط© ظ…ظ† ط­ظٹط«: 1) ط§ظ„ط¬ط¯ظˆظ‰ ط§ظ„طھظ‚ظ†ظٹط© 2) ط­ط¬ظ… ط§ظ„ط³ظˆظ‚ ط§ظ„ظ…ط­طھظ…ظ„ 3) ط§ظ„ظ…ظٹط²ط© ط§ظ„طھظ†ط§ظپط³ظٹط©. ط£ط¹ط· طھطµظˆظٹطھظƒ (ظ…ط¤ظٹط¯/ظ…ط­ط§ظٹط¯/ط¶ط¯) ظ…ط¹ طھط¨ط±ظٹط± ظˆط§ط¶ط­. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظپظƒط±ط©/ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.6, max_tokens: 1500 }) }}",
         "options": {
-          "timeout": 120000
+          "timeout": 300000
         }
       },
       "id": "in-0007",
@@ -197,7 +197,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "=Bearer {{ $env.WEBUI_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -207,9 +207,9 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير تقني وذكاء اصطناعي. عضو رقم 2 في مجلس الابتكار. قيّم الفكرة من حيث: 1) النضج التقني 2) التعقيد التنفيذي 3) البدائل المتاحة. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط®ط¨ظٹط± طھظ‚ظ†ظٹ ظˆط°ظƒط§ط، ط§طµط·ظ†ط§ط¹ظٹ. ط¹ط¶ظˆ ط±ظ‚ظ… 2 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط§ط¨طھظƒط§ط±. ظ‚ظٹظ‘ظ… ط§ظ„ظپظƒط±ط© ظ…ظ† ط­ظٹط«: 1) ط§ظ„ظ†ط¶ط¬ ط§ظ„طھظ‚ظ†ظٹ 2) ط§ظ„طھط¹ظ‚ظٹط¯ ط§ظ„طھظ†ظپظٹط°ظٹ 3) ط§ظ„ط¨ط¯ط§ط¦ظ„ ط§ظ„ظ…طھط§ط­ط©. ط£ط¹ط· طھطµظˆظٹطھظƒ (ظ…ط¤ظٹط¯/ظ…ط­ط§ظٹط¯/ط¶ط¯) ظ…ط¹ طھط¨ط±ظٹط± ظˆط§ط¶ط­. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظپظƒط±ط©/ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
         "options": {
-          "timeout": 120000
+          "timeout": 300000
         }
       },
       "id": "in-0008",
@@ -231,7 +231,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "=Bearer {{ $env.WEBUI_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -241,9 +241,9 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'أنت خبير استراتيجي ومالي. عضو رقم 3 في مجلس الابتكار. قيّم الفكرة من حيث: 1) العائد على الاستثمار 2) المخاطر المالية 3) التوافق مع رؤية 2030. أعط تصويتك (مؤيد/محايد/ضد) مع تبرير واضح. أجب بالعربية.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\nمعلومات من الويب:\\n' + $json.webContext + '\\n\\nمعلومات من قاعدة المعرفة:\\n' + $json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط®ط¨ظٹط± ط§ط³طھط±ط§طھظٹط¬ظٹ ظˆظ…ط§ظ„ظٹ. ط¹ط¶ظˆ ط±ظ‚ظ… 3 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط§ط¨طھظƒط§ط±. ظ‚ظٹظ‘ظ… ط§ظ„ظپظƒط±ط© ظ…ظ† ط­ظٹط«: 1) ط§ظ„ط¹ط§ط¦ط¯ ط¹ظ„ظ‰ ط§ظ„ط§ط³طھط«ظ…ط§ط± 2) ط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ…ط§ظ„ظٹط© 3) ط§ظ„طھظˆط§ظپظ‚ ظ…ط¹ ط±ط¤ظٹط© 2030. ط£ط¹ط· طھطµظˆظٹطھظƒ (ظ…ط¤ظٹط¯/ظ…ط­ط§ظٹط¯/ط¶ط¯) ظ…ط¹ طھط¨ط±ظٹط± ظˆط§ط¶ط­. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظپظƒط±ط©/ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nظ…ط¹ظ„ظˆظ…ط§طھ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
         "options": {
-          "timeout": 120000
+          "timeout": 300000
         }
       },
       "id": "in-0009",
@@ -278,7 +278,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{ $vars.WEBUI_API_KEY }}"
+              "value": "=Bearer {{ $env.WEBUI_API_KEY }}"
             },
             {
               "name": "Content-Type",
@@ -288,9 +288,9 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nأنت رئيس مجلس الابتكار. راجعت تصويتات وتحليلات 3 خبراء. مهمتك:\\n1) احسب نتيجة التصويت (مؤيد/محايد/ضد)\\n2) ادمج أفضل الأفكار من كل خبير\\n3) أصدر القرار النهائي: تبني / تطوير إضافي / رفض\\n4) حدد الخطوات التالية المقترحة\\n5) قيّم مستوى الابتكار (اختراقي/تحسيني/تقليدي)\\nأجب بالعربية بتقرير منظم.' }, { role: 'user', content: 'الفكرة/السؤال: ' + $json.question + '\\n\\n--- خبير الريادة ---\\n' + $json.entrepreneurVote + '\\n\\n--- خبير التقنية ---\\n' + $json.techVote + '\\n\\n--- خبير الاستراتيجية ---\\n' + $json.strategyVote + '\\n\\nأصدر قرارك النهائي.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nط£ظ†طھ ط±ط¦ظٹط³ ظ…ط¬ظ„ط³ ط§ظ„ط§ط¨طھظƒط§ط±. ط±ط§ط¬ط¹طھ طھطµظˆظٹطھط§طھ ظˆطھط­ظ„ظٹظ„ط§طھ 3 ط®ط¨ط±ط§ط،. ظ…ظ‡ظ…طھظƒ:\\n1) ط§ط­ط³ط¨ ظ†طھظٹط¬ط© ط§ظ„طھطµظˆظٹطھ (ظ…ط¤ظٹط¯/ظ…ط­ط§ظٹط¯/ط¶ط¯)\\n2) ط§ط¯ظ…ط¬ ط£ظپط¶ظ„ ط§ظ„ط£ظپظƒط§ط± ظ…ظ† ظƒظ„ ط®ط¨ظٹط±\\n3) ط£طµط¯ط± ط§ظ„ظ‚ط±ط§ط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ: طھط¨ظ†ظٹ / طھط·ظˆظٹط± ط¥ط¶ط§ظپظٹ / ط±ظپط¶\\n4) ط­ط¯ط¯ ط§ظ„ط®ط·ظˆط§طھ ط§ظ„طھط§ظ„ظٹط© ط§ظ„ظ…ظ‚طھط±ط­ط©\\n5) ظ‚ظٹظ‘ظ… ظ…ط³طھظˆظ‰ ط§ظ„ط§ط¨طھظƒط§ط± (ط§ط®طھط±ط§ظ‚ظٹ/طھط­ط³ظٹظ†ظٹ/طھظ‚ظ„ظٹط¯ظٹ)\\nط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط© ط¨طھظ‚ط±ظٹط± ظ…ظ†ط¸ظ….' }, { role: 'user', content: 'ط§ظ„ظپظƒط±ط©/ط§ظ„ط³ط¤ط§ظ„: ' + $json.question + '\\n\\n--- ط®ط¨ظٹط± ط§ظ„ط±ظٹط§ط¯ط© ---\\n' + $json.entrepreneurVote + '\\n\\n--- ط®ط¨ظٹط± ط§ظ„طھظ‚ظ†ظٹط© ---\\n' + $json.techVote + '\\n\\n--- ط®ط¨ظٹط± ط§ظ„ط§ط³طھط±ط§طھظٹط¬ظٹط© ---\\n' + $json.strategyVote + '\\n\\nط£طµط¯ط± ظ‚ط±ط§ط±ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.3, max_tokens: 1500 }) }}",
         "options": {
-          "timeout": 300000
+          "timeout": 600000
         }
       },
       "id": "in-0011",
@@ -430,16 +430,6 @@
             "node": "expert_entrepreneur",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "expert_tech",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "expert_strategy",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -448,7 +438,7 @@
       "main": [
         [
           {
-            "node": "collect_votes",
+            "node": "expert_tech",
             "type": "main",
             "index": 0
           }
@@ -459,7 +449,7 @@
       "main": [
         [
           {
-            "node": "collect_votes",
+            "node": "expert_strategy",
             "type": "main",
             "index": 0
           }
