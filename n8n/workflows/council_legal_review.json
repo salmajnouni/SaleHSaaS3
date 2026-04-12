@@ -1,6 +1,9 @@
 {
   "id": "CounclLegalRev001",
   "name": "Legal Review Council (MAD Debate)",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -102,31 +105,10 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:11434/api/embed",
+        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
-        "options": {
-          "timeout": 30000
-        }
-      },
-      "id": "lr-00e1",
-      "name": "embed_question",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        740,
-        400
-      ],
-      "continueOnFail": true
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "http://host.docker.internal:8010/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/query",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 10, include: ['documents','distances'] }) }}",
+        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 10, include: ['documents','distances'] }) }}",
         "options": {
           "timeout": 20000
         }
@@ -136,7 +118,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        860,
+        740,
         400
       ],
       "continueOnFail": true
@@ -173,7 +155,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ط§ظ„ظ…ط¤ظٹط¯ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ط§ظ„ط¯ظپط§ط¹ ط¹ظ† ط§ظ„ظ…ظˆظ‚ظپ ط§ظ„ظ…ط·ط±ظˆط­ ظˆط¥ظٹط¬ط§ط¯ ط§ظ„ط³ظ†ط¯ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ظ…ظ† ط§ظ„ط£ظ†ط¸ظ…ط© ط§ظ„ط³ط¹ظˆط¯ظٹط©. ط§ط³طھط´ظ‡ط¯ ط¨ظ†طµظˆطµ ظ†ط¸ط§ظ…ظٹط© ظ…ط­ط¯ط¯ط© (ط§ط³ظ… ط§ظ„ظ†ط¸ط§ظ…طŒ ط±ظ‚ظ… ط§ظ„ظ…ط§ط¯ط©). ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.3, max_tokens: 2000 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ط§ظ„ظ…ط¤ظٹط¯ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ط§ظ„ط¯ظپط§ط¹ ط¹ظ† ط§ظ„ظ…ظˆظ‚ظپ ط§ظ„ظ…ط·ط±ظˆط­ ظˆط¥ظٹط¬ط§ط¯ ط§ظ„ط³ظ†ط¯ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ظ…ظ† ط§ظ„ط£ظ†ط¸ظ…ط© ط§ظ„ط³ط¹ظˆط¯ظٹط©. ط§ط³طھط´ظ‡ط¯ ط¨ظ†طµظˆطµ ظ†ط¸ط§ظ…ظٹط© ظ…ط­ط¯ط¯ط© (ط§ط³ظ… ط§ظ„ظ†ط¸ط§ظ…طŒ ط±ظ‚ظ… ط§ظ„ظ…ط§ط¯ط©). ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.3, max_tokens: 2000 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -207,7 +189,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ط§ظ„ظ…ط¹ط§ط±ط¶ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ط§ظ„ط·ط¹ظ† ظپظٹ ط§ظ„ظ…ظˆظ‚ظپ ط§ظ„ظ…ط·ط±ظˆط­ ظˆظƒط´ظپ ط§ظ„ط«ط؛ط±ط§طھ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط© ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„طھظ†ط¸ظٹظ…ظٹط©. ط§ط¨ط­ط« ط¹ظ† ط§ط³طھط«ظ†ط§ط،ط§طھ ظˆظ…ظˆط§ط¯ طھط¹ط§ط±ط¶ ط§ظ„ظ…ظˆظ‚ظپ. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 2000 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ ط§ظ„ظ…ط¹ط§ط±ط¶ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ط§ظ„ط·ط¹ظ† ظپظٹ ط§ظ„ظ…ظˆظ‚ظپ ط§ظ„ظ…ط·ط±ظˆط­ ظˆظƒط´ظپ ط§ظ„ط«ط؛ط±ط§طھ ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط© ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„طھظ†ط¸ظٹظ…ظٹط©. ط§ط¨ط­ط« ط¹ظ† ط§ط³طھط«ظ†ط§ط،ط§طھ ظˆظ…ظˆط§ط¯ طھط¹ط§ط±ط¶ ط§ظ„ظ…ظˆظ‚ظپ. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 2000 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -224,7 +206,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('merge_context').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst affirmativeArg = getReply('analyst_affirmative');\nconst negativeArg = getReply('analyst_negative');\nreturn [{ json: { ...base, affirmativeArg, negativeArg, debateRound: 1 } }];"
+        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst affirmativeArg = getReply('analyst_affirmative');\nconst negativeArg = getReply('analyst_negative');\nreturn [{ json: { ...base, affirmativeArg, negativeArg, debateRound: 1 } }];"
       },
       "id": "lr-0009",
       "name": "collect_debate_r1",
@@ -254,7 +236,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¤ظٹط¯. ط§ظ‚ط±ط£ ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ظˆظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ. ط¹ط²ط² ط­ط¬طھظƒ ظˆط¹ط§ظ„ط¬ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„طھظٹ ط£ط«ط§ط±ظ‡ط§ ط§ظ„ظ…ط¹ط§ط±ط¶. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $('collect_debate_r1').first().json.question + '\\n\\n--- ط­ط¬طھظƒ ط§ظ„ط£ظˆظ„ظ‰ ---\\n' + $('collect_debate_r1').first().json.affirmativeArg + '\\n\\n--- ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $('collect_debate_r1').first().json.negativeArg + '\\n\\nظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¤ظٹط¯. ط§ظ‚ط±ط£ ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ظˆظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ. ط¹ط²ط² ط­ط¬طھظƒ ظˆط¹ط§ظ„ط¬ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„طھظٹ ط£ط«ط§ط±ظ‡ط§ ط§ظ„ظ…ط¹ط§ط±ط¶. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $('collect_debate_r1').first().json.question + '\\n\\n--- ط­ط¬طھظƒ ط§ظ„ط£ظˆظ„ظ‰ ---\\n' + $('collect_debate_r1').first().json.affirmativeArg + '\\n\\n--- ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $('collect_debate_r1').first().json.negativeArg + '\\n\\nظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.3, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -288,7 +270,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¹ط§ط±ط¶. ط§ظ‚ط±ط£ ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ظˆظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ. ط¹ط²ط² ط­ط¬طھظƒ ظˆط¹ط§ظ„ط¬ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„طھظٹ ط£ط«ط§ط±ظ‡ط§ ط§ظ„ظ…ط¤ظٹط¯. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $('collect_debate_r1').first().json.question + '\\n\\n--- ط­ط¬طھظƒ ط§ظ„ط£ظˆظ„ظ‰ ---\\n' + $('collect_debate_r1').first().json.negativeArg + '\\n\\n--- ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $('collect_debate_r1').first().json.affirmativeArg + '\\n\\nظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¹ط§ط±ط¶. ط§ظ‚ط±ط£ ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ظˆظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ. ط¹ط²ط² ط­ط¬طھظƒ ظˆط¹ط§ظ„ط¬ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„طھظٹ ط£ط«ط§ط±ظ‡ط§ ط§ظ„ظ…ط¤ظٹط¯. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $('collect_debate_r1').first().json.question + '\\n\\n--- ط­ط¬طھظƒ ط§ظ„ط£ظˆظ„ظ‰ ---\\n' + $('collect_debate_r1').first().json.negativeArg + '\\n\\n--- ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $('collect_debate_r1').first().json.affirmativeArg + '\\n\\nظ‚ط¯ظ… ط±ط¯ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.4, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -305,7 +287,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('collect_debate_r1').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst rebuttalAff = getReply('rebuttal_affirmative');\nconst rebuttalNeg = getReply('rebuttal_negative');\nreturn [{ json: { ...base, rebuttalAff, rebuttalNeg, debateRound: 2 } }];"
+        "jsCode": "const base = $('collect_debate_r1').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error: ' + e.message; }\n};\nconst rebuttalAff = getReply('rebuttal_affirmative');\nconst rebuttalNeg = getReply('rebuttal_negative');\nreturn [{ json: { ...base, rebuttalAff, rebuttalNeg, debateRound: 2 } }];"
       },
       "id": "lr-0012",
       "name": "collect_debate_r2",
@@ -335,7 +317,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nط£ظ†طھ ط§ظ„ظ‚ط§ط¶ظٹ ط§ظ„ظ…ط­ط§ظٹط¯ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ط§ط³طھظ…ط¹طھ ظ„ط¬ظˆظ„طھظٹظ† ظ…ظ† ط§ظ„ظ…ظ†ط§ط¸ط±ط© ط¨ظٹظ† ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¤ظٹط¯ ظˆط§ظ„ظ…ط¹ط§ط±ط¶. ظ…ظ‡ظ…طھظƒ:\\n1) ط­ط¯ط¯ ظ…ظ† ظƒط§ظ†طھ ط­ط¬طھظ‡ ط£ظ‚ظˆظ‰ ظˆظ„ظ…ط§ط°ط§\\n2) ط£طµط¯ط± ط§ظ„ط­ظƒظ… ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ (ظ…ط¹/ط¶ط¯/ط¬ط²ط¦ظٹ)\\n3) ط­ط¯ط¯ ط§ظ„ظ…ظˆط§ط¯ ط§ظ„ظ†ط¸ط§ظ…ظٹط© ط§ظ„ط­ط§ظƒظ…ط©\\n4) ظ‚ظٹظ‘ظ… ظ…ط³طھظˆظ‰ ط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط© (ط¹ط§ظ„ظٹ/ظ…طھظˆط³ط·/ظ…ظ†ط®ظپط¶)\\n5) ظ‚ط¯ظ… ط§ظ„طھظˆطµظٹط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©\\n\\nطھظ†ط¨ظٹظ‡: ظ‡ط°ط§ ط±ط£ظٹ ط§ط³طھط´ط§ط±ظٹ ظˆظ„ظٹط³ ظپطھظˆظ‰ ظ‚ط§ظ†ظˆظ†ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $json.question + '\\n\\n=== ط§ظ„ط¬ظˆظ„ط© ط§ظ„ط£ظˆظ„ظ‰ ===\\n--- ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $json.affirmativeArg + '\\n--- ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $json.negativeArg + '\\n\\n=== ط§ظ„ط¬ظˆظ„ط© ط§ظ„ط«ط§ظ†ظٹط© (ط§ظ„ط±ط¯) ===\\n--- ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $json.rebuttalAff + '\\n--- ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $json.rebuttalNeg + '\\n\\nط£طµط¯ط± ط­ظƒظ…ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.2, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط§ظ„ظ‚ط§ط¶ظٹ ط§ظ„ظ…ط­ط§ظٹط¯ ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ظ…ط±ط§ط¬ط¹ط© ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط©. ط§ط³طھظ…ط¹طھ ظ„ط¬ظˆظ„طھظٹظ† ظ…ظ† ط§ظ„ظ…ظ†ط§ط¸ط±ط© ط¨ظٹظ† ط§ظ„ظ…ط­ظ„ظ„ ط§ظ„ظ…ط¤ظٹط¯ ظˆط§ظ„ظ…ط¹ط§ط±ط¶. ظ…ظ‡ظ…طھظƒ:\\n1) ط­ط¯ط¯ ظ…ظ† ظƒط§ظ†طھ ط­ط¬طھظ‡ ط£ظ‚ظˆظ‰ ظˆظ„ظ…ط§ط°ط§\\n2) ط£طµط¯ط± ط§ظ„ط­ظƒظ… ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹ (ظ…ط¹/ط¶ط¯/ط¬ط²ط¦ظٹ)\\n3) ط­ط¯ط¯ ط§ظ„ظ…ظˆط§ط¯ ط§ظ„ظ†ط¸ط§ظ…ظٹط© ط§ظ„ط­ط§ظƒظ…ط©\\n4) ظ‚ظٹظ‘ظ… ظ…ط³طھظˆظ‰ ط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ‚ط§ظ†ظˆظ†ظٹط© (ط¹ط§ظ„ظٹ/ظ…طھظˆط³ط·/ظ…ظ†ط®ظپط¶)\\n5) ظ‚ط¯ظ… ط§ظ„طھظˆطµظٹط© ط§ظ„ظ†ظ‡ط§ط¦ظٹط©\\n\\nطھظ†ط¨ظٹظ‡: ظ‡ط°ط§ ط±ط£ظٹ ط§ط³طھط´ط§ط±ظٹ ظˆظ„ظٹط³ ظپطھظˆظ‰ ظ‚ط§ظ†ظˆظ†ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ظ…ط³ط£ظ„ط©: ' + $json.question + '\\n\\n=== ط§ظ„ط¬ظˆظ„ط© ط§ظ„ط£ظˆظ„ظ‰ ===\\n--- ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $json.affirmativeArg + '\\n--- ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $json.negativeArg + '\\n\\n=== ط§ظ„ط¬ظˆظ„ط© ط§ظ„ط«ط§ظ†ظٹط© (ط§ظ„ط±ط¯) ===\\n--- ط±ط¯ ط§ظ„ظ…ط¤ظٹط¯ ---\\n' + $json.rebuttalAff + '\\n--- ط±ط¯ ط§ظ„ظ…ط¹ط§ط±ط¶ ---\\n' + $json.rebuttalNeg + '\\n\\nط£طµط¯ط± ط­ظƒظ…ظƒ ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.2, max_tokens: 3000 }) }}",
         "options": {
           "timeout": 600000
         }
@@ -438,17 +420,6 @@
       ]
     },
     "search_web": {
-      "main": [
-        [
-          {
-            "node": "embed_question",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "embed_question": {
       "main": [
         [
           {
@@ -581,22 +552,30 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "errorWorkflow": "",
+    "availableInMCP": false
   },
-  "versionId": "1.0.0",
+  "staticData": null,
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "pinData": null,
+  "versionId": "659e1e41-6474-4cf4-9cd0-6034c9ff3482",
   "tags": [
     {
+      "updatedAt": "2026-04-08T20:13:05.715Z",
+      "createdAt": "2026-04-08T20:13:05.715Z",
+      "id": "rDLU9g2iRGhumB46",
       "name": "council"
     },
     {
+      "updatedAt": "2026-04-08T20:13:07.864Z",
+      "createdAt": "2026-04-08T20:13:07.864Z",
+      "id": "Pbw43uXcv5dXNHFQ",
       "name": "legal"
     }
   ]

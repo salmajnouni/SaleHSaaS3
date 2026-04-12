@@ -1,6 +1,9 @@
 {
   "id": "CounclTechGov001",
   "name": "Technical Governance Council (MoA)",
+  "description": null,
+  "active": true,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -106,31 +109,10 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:11434/api/embed",
+        "url": "http://host.docker.internal:8010/api/v1/collections/saleh_knowledge_qwen3/query",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: [$('normalize_input').first().json.question] }) }}",
-        "options": {
-          "timeout": 30000
-        }
-      },
-      "id": "tg-00e1",
-      "name": "embed_question",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        740,
-        400
-      ],
-      "continueOnFail": true
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "http://host.docker.internal:8010/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/query",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ query_embeddings: $json.embeddings, n_results: 8, include: ['documents','distances'] }) }}",
+        "jsonBody": "={{ JSON.stringify({ query_texts: [$json.question], n_results: 8, include: ['documents','distances'] }) }}",
         "options": {
           "timeout": 20000
         }
@@ -140,7 +122,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        860,
+        740,
         400
       ],
       "continueOnFail": true
@@ -177,7 +159,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط®ط¨ظٹط± ط£ظ…ظ† ط³ظٹط¨ط±ط§ظ†ظٹ ظˆط¨ظ†ظٹط© طھط­طھظٹط© طھظ‚ظ†ظٹط©. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 1 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط£ط¹ط· طھط­ظ„ظٹظ„ظƒ ط§ظ„ظ…ظ‡ظ†ظٹ ط¨ظ†ط§ط،ظ‹ ط¹ظ„ظ‰ ط§ظ„ظ…ط¹ظ„ظˆظ…ط§طھ ط§ظ„ظ…طھط§ط­ط©. ظƒظ† طµط±ظٹط­ط§ظ‹ ظˆط¯ظ‚ظٹظ‚ط§ظ‹. ط§ط°ظƒط± ط§ظ„ظ…ط®ط§ط·ط± ط¥ظ† ظˆط¬ط¯طھ. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط®ط¨ظٹط± ط£ظ…ظ† ط³ظٹط¨ط±ط§ظ†ظٹ ظˆط¨ظ†ظٹط© طھط­طھظٹط© طھظ‚ظ†ظٹط©. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 1 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط£ط¹ط· طھط­ظ„ظٹظ„ظƒ ط§ظ„ظ…ظ‡ظ†ظٹ ط¨ظ†ط§ط،ظ‹ ط¹ظ„ظ‰ ط§ظ„ظ…ط¹ظ„ظˆظ…ط§طھ ط§ظ„ظ…طھط§ط­ط©. ظƒظ† طµط±ظٹط­ط§ظ‹ ظˆط¯ظ‚ظٹظ‚ط§ظ‹. ط§ط°ظƒط± ط§ظ„ظ…ط®ط§ط·ط± ط¥ظ† ظˆط¬ط¯طھ. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -211,7 +193,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…ظ‡ظ†ط¯ط³ ظ…ط¹ظ…ط§ط±ظٹط© ط£ظ†ط¸ظ…ط© ظˆظ…طھط®طµطµ ظپظٹ DevOps ظˆط§ظ„ط­ط§ظˆظٹط§طھ. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 2 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط±ظƒط² ط¹ظ„ظ‰ ظ‚ط§ط¨ظ„ظٹط© ط§ظ„طھظˆط³ط¹ ظˆط§ظ„ط§ط³طھظ‚ط±ط§ط± ظˆط£ظپط¶ظ„ ط§ظ„ظ…ظ…ط§ط±ط³ط§طھ ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…ظ‡ظ†ط¯ط³ ظ…ط¹ظ…ط§ط±ظٹط© ط£ظ†ط¸ظ…ط© ظˆظ…طھط®طµطµ ظپظٹ DevOps ظˆط§ظ„ط­ط§ظˆظٹط§طھ. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 2 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط±ظƒط² ط¹ظ„ظ‰ ظ‚ط§ط¨ظ„ظٹط© ط§ظ„طھظˆط³ط¹ ظˆط§ظ„ط§ط³طھظ‚ط±ط§ط± ظˆط£ظپط¶ظ„ ط§ظ„ظ…ظ…ط§ط±ط³ط§طھ ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.4, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -245,7 +227,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…طھط®طµطµ ظپظٹ ط§ظ„ط£ط¯ط§ط، ظˆط§ظ„ط¬ظˆط¯ط© ظˆط§ظ„ط§ط®طھط¨ط§ط±. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 3 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط±ظƒط² ط¹ظ„ظ‰ ط§ظ„ط£ط¯ط§ط، ط§ظ„ط¹ظ…ظ„ظٹ ظˆط§ظ„ظ…ظˆط«ظˆظ‚ظٹط© ظˆط§ظ„ط¬ظˆط¯ط©. ط§ظ†طھظ‚ط¯ ط§ظ„ط­ظ„ظˆظ„ ط؛ظٹط± ط§ظ„ط¹ظ…ظ„ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…طھط®طµطµ ظپظٹ ط§ظ„ط£ط¯ط§ط، ظˆط§ظ„ط¬ظˆط¯ط© ظˆط§ظ„ط§ط®طھط¨ط§ط±. ظ…ط­ظ„ظ„ ط±ظ‚ظ… 3 ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ط±ظƒط² ط¹ظ„ظ‰ ط§ظ„ط£ط¯ط§ط، ط§ظ„ط¹ظ…ظ„ظٹ ظˆط§ظ„ظ…ظˆط«ظˆظ‚ظٹط© ظˆط§ظ„ط¬ظˆط¯ط©. ط§ظ†طھظ‚ط¯ ط§ظ„ط­ظ„ظˆظ„ ط؛ظٹط± ط§ظ„ط¹ظ…ظ„ظٹط©. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $('merge_context').first().json.question + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ط§ظ„ظˆظٹط¨:\\n' + $('merge_context').first().json.webContext + '\\n\\nط³ظٹط§ظ‚ ظ…ظ† ظ‚ط§ط¹ط¯ط© ط§ظ„ظ…ط¹ط±ظپط©:\\n' + $('merge_context').first().json.ragContext }], temperature: 0.5, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -262,7 +244,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const base = $('merge_context').first().json;\nconst sanitize = (t) => t.replace(/<\\|im_start\\|>[\\s\\S]*?<\\|im_end\\|>|<\\|im_start\\|>|<\\|im_end\\|>|<think>[\\s\\S]*?<\\/think>/g, '').trim();\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return sanitize(r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName);\n  } catch(e) { return 'Error from ' + nodeName + ': ' + e.message; }\n};\nconst securityOpinion = getReply('expert_security');\nconst archOpinion = getReply('expert_architecture');\nconst qualityOpinion = getReply('expert_quality');\nreturn [{ json: { ...base, securityOpinion, archOpinion, qualityOpinion } }];"
+        "jsCode": "const base = $('merge_context').first().json;\nconst getReply = (nodeName) => {\n  try {\n    const r = $(nodeName).first().json;\n    return r.choices?.[0]?.message?.content || r.error || 'No response from ' + nodeName;\n  } catch(e) { return 'Error from ' + nodeName + ': ' + e.message; }\n};\nconst securityOpinion = getReply('expert_security');\nconst archOpinion = getReply('expert_architecture');\nconst qualityOpinion = getReply('expert_quality');\nreturn [{ json: { ...base, securityOpinion, archOpinion, qualityOpinion } }];"
       },
       "id": "tg-0010",
       "name": "collect_opinions",
@@ -292,7 +274,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ظ‡ظٹ طھط­ط¯ظٹ ط§ظ„ط¢ط±ط§ط، ط§ظ„ط«ظ„ط§ط«ط© ظˆظƒط´ظپ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„ط¶ط¹ظٹظپط© ظˆط§ظ„ط§ظپطھط±ط§ط¶ط§طھ ط§ظ„ط®ط§ط·ط¦ط© ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ…ط®ظپظٹط©. ظƒظ† طµط§ط±ظ…ط§ظ‹ ظ„ظƒظ† ط¹ط§ط¯ظ„ط§ظ‹. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„ ط§ظ„ط£طµظ„ظٹ: ' + $json.question + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط£ظ…ظ† ---\\n' + $json.securityOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط© ---\\n' + $json.archOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط¬ظˆط¯ط© ---\\n' + $json.qualityOpinion + '\\n\\nط­ظ„ظ„ ظ‡ط°ظ‡ ط§ظ„ط¢ط±ط§ط، ظˆط§ظƒط´ظپ ظ†ظ‚ط§ط· ط§ظ„ط¶ط¹ظپ ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ…ط®ظپظٹط©.' }], temperature: 0.6, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen2.5:7b', messages: [{ role: 'system', content: 'ط£ظ†طھ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ظپظٹ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ظ…ظ‡ظ…طھظƒ ظ‡ظٹ طھط­ط¯ظٹ ط§ظ„ط¢ط±ط§ط، ط§ظ„ط«ظ„ط§ط«ط© ظˆظƒط´ظپ ط§ظ„ظ†ظ‚ط§ط· ط§ظ„ط¶ط¹ظٹظپط© ظˆط§ظ„ط§ظپطھط±ط§ط¶ط§طھ ط§ظ„ط®ط§ط·ط¦ط© ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ…ط®ظپظٹط©. ظƒظ† طµط§ط±ظ…ط§ظ‹ ظ„ظƒظ† ط¹ط§ط¯ظ„ط§ظ‹. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„ ط§ظ„ط£طµظ„ظٹ: ' + $json.question + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط£ظ…ظ† ---\\n' + $json.securityOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط© ---\\n' + $json.archOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط¬ظˆط¯ط© ---\\n' + $json.qualityOpinion + '\\n\\nط­ظ„ظ„ ظ‡ط°ظ‡ ط§ظ„ط¢ط±ط§ط، ظˆط§ظƒط´ظپ ظ†ظ‚ط§ط· ط§ظ„ط¶ط¹ظپ ظˆط§ظ„ظ…ط®ط§ط·ط± ط§ظ„ظ…ط®ظپظٹط©.' }], temperature: 0.6, max_tokens: 1500 }) }}",
         "options": {
           "timeout": 300000
         }
@@ -339,7 +321,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:32b', messages: [{ role: 'system', content: '/no_think\\nط£ظ†طھ ط±ط¦ظٹط³ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ظ…ظ‡ظ…طھظƒ: 1) ط§ط¯ظ…ط¬ ط¢ط±ط§ط، ط§ظ„ط®ط¨ط±ط§ط، ط§ظ„ط«ظ„ط§ط«ط© 2) ط®ط° ظ…ظ„ط§ط­ط¸ط§طھ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ط¨ط¹ظٹظ† ط§ظ„ط§ط¹طھط¨ط§ط± 3) ط£طµط¯ط± ط§ظ„ظ‚ط±ط§ط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ ط¨ط§ظ„طھظˆطµظٹط§طھ 4) ظ‚ظٹظ‘ظ… ظ…ط³طھظˆظ‰ ط§ظ„ط«ظ‚ط© (ظ…ط±طھظپط¹/ظ…طھظˆط³ط·/ظ…ظ†ط®ظپط¶). ط£ظ†طھط¬ طھظ‚ط±ظٹط±ط§ظ‹ ظ…ظ†ط¸ظ…ط§ظ‹ ظٹط¨ط¯ط£ ط¨ط§ظ„طھظˆطµظٹط© ط«ظ… ط§ظ„طھط¨ط±ظٹط±. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $json.question + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط£ظ…ظ† ---\\n' + $json.securityOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط© ---\\n' + $json.archOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط¬ظˆط¯ط© ---\\n' + $json.qualityOpinion + '\\n\\n--- طھط­ط¯ظٹ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ---\\n' + $json.challenge + '\\n\\nط§ظ„ط±ط¬ط§ط، ط¥طµط¯ط§ط± ط§ظ„ظ‚ط±ط§ط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.3, max_tokens: 1500 }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'deepseek-r1:32b', messages: [{ role: 'system', content: 'ط£ظ†طھ ط±ط¦ظٹط³ ظ…ط¬ظ„ط³ ط§ظ„ط­ظˆظƒظ…ط© ط§ظ„طھظ‚ظ†ظٹط©. ظ…ظ‡ظ…طھظƒ: 1) ط§ط¯ظ…ط¬ ط¢ط±ط§ط، ط§ظ„ط®ط¨ط±ط§ط، ط§ظ„ط«ظ„ط§ط«ط© 2) ط®ط° ظ…ظ„ط§ط­ط¸ط§طھ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ط¨ط¹ظٹظ† ط§ظ„ط§ط¹طھط¨ط§ط± 3) ط£طµط¯ط± ط§ظ„ظ‚ط±ط§ط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ ط¨ط§ظ„طھظˆطµظٹط§طھ 4) ظ‚ظٹظ‘ظ… ظ…ط³طھظˆظ‰ ط§ظ„ط«ظ‚ط© (ظ…ط±طھظپط¹/ظ…طھظˆط³ط·/ظ…ظ†ط®ظپط¶). ط£ظ†طھط¬ طھظ‚ط±ظٹط±ط§ظ‹ ظ…ظ†ط¸ظ…ط§ظ‹ ظٹط¨ط¯ط£ ط¨ط§ظ„طھظˆطµظٹط© ط«ظ… ط§ظ„طھط¨ط±ظٹط±. ط£ط¬ط¨ ط¨ط§ظ„ط¹ط±ط¨ظٹط©.\\n\\nهام جداً: يجب أن تكون جميع إجاباتك باللغة العربية فقط. لا تستخدم أي لغة أخرى في ردك.' }, { role: 'user', content: 'ط§ظ„ط³ط¤ط§ظ„: ' + $json.question + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط£ظ…ظ† ---\\n' + $json.securityOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ظ…ط¹ظ…ط§ط±ظٹط© ---\\n' + $json.archOpinion + '\\n\\n--- ط±ط£ظٹ ط®ط¨ظٹط± ط§ظ„ط¬ظˆط¯ط© ---\\n' + $json.qualityOpinion + '\\n\\n--- طھط­ط¯ظٹ ظ…ط­ط§ظ…ظٹ ط§ظ„ط´ظٹط·ط§ظ† ---\\n' + $json.challenge + '\\n\\nط§ظ„ط±ط¬ط§ط، ط¥طµط¯ط§ط± ط§ظ„ظ‚ط±ط§ط± ط§ظ„ظ†ظ‡ط§ط¦ظٹ.' }], temperature: 0.3, max_tokens: 3000 }) }}",
         "options": {
           "timeout": 600000
         }
@@ -442,17 +424,6 @@
       ]
     },
     "search_web": {
-      "main": [
-        [
-          {
-            "node": "embed_question",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "embed_question": {
       "main": [
         [
           {
@@ -585,22 +556,30 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "errorWorkflow": "",
+    "availableInMCP": false
   },
-  "versionId": "1.0.0",
+  "staticData": null,
   "meta": {
     "templateCredsSetupCompleted": true
   },
+  "pinData": null,
+  "versionId": "b5e789c7-76e2-45aa-a9c0-9f2c1c0dfc20",
   "tags": [
     {
+      "updatedAt": "2026-04-08T20:13:05.715Z",
+      "createdAt": "2026-04-08T20:13:05.715Z",
+      "id": "rDLU9g2iRGhumB46",
       "name": "council"
     },
     {
+      "updatedAt": "2026-04-08T20:13:05.715Z",
+      "createdAt": "2026-04-08T20:13:05.715Z",
+      "id": "8JPBMLrcwHtmf19C",
       "name": "governance"
     }
   ]

@@ -19,8 +19,8 @@ class Pipe:
             description="n8n base URL (Docker internal)",
         )
         timeout: int = Field(
-            default=1500,
-            description="Webhook timeout in seconds (councils take 15-20 min)",
+            default=2400,
+            description="Webhook timeout in seconds (councils take 15-30 min with deepseek-r1:32b)",
         )
 
     def __init__(self):

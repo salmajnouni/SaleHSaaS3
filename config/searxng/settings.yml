@@ -40,30 +40,54 @@ ui:
     simple_style: dark
 
 engines:
-  - name: google
-    engine: google
-    shortcut: g
-    timeout: 10.0
-  - name: duckduckgo
-    engine: duckduckgo
-    shortcut: ddg
-    timeout: 10.0
+  # --- Primary engines (tested & working) ---
   - name: bing
     engine: bing
     shortcut: b
-    timeout: 10.0
+    timeout: 15.0
+  - name: mojeek
+    engine: mojeek
+    shortcut: mj
+    timeout: 15.0
+  - name: startpage
+    engine: startpage
+    shortcut: sp
+    timeout: 15.0
   - name: brave
     engine: brave
     shortcut: br
-    timeout: 10.0
+    timeout: 15.0
+  - name: duckduckgo
+    engine: duckduckgo
+    shortcut: ddg
+    timeout: 15.0
+  - name: google
+    engine: google
+    shortcut: g
+    timeout: 15.0
+  - name: yep
+    engine: yep
+    shortcut: yp
+    timeout: 15.0
+  # --- Knowledge sources ---
   - name: wikipedia
-    engine: wikidata
+    engine: wikipedia
     shortcut: w
+    timeout: 10.0
+  - name: wikidata
+    engine: wikidata
+    shortcut: wd
+    timeout: 10.0
+  # --- IT / Tech ---
+  - name: github
+    engine: github
+    shortcut: gh
+    categories: it
     timeout: 10.0
 
 outgoing:
-  request_timeout: 10.0
-  max_request_timeout: 15.0
-  useragent_suffix: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+  request_timeout: 15.0
+  max_request_timeout: 30.0
+  useragent_suffix: ""
   pool_connections: 100
   pool_maxsize: 20
