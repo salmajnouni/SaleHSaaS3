@@ -8,15 +8,26 @@ Affected workflows:
 - Um Al-Qura (UaJRWaaHtVldwoUl)
 - Auto-Update (YPVhIxCVGsgPpNDM)
 """
+import re
+import sys
 import requests
-import json
 
-env = dict(
-    line.strip().split("=", 1)
-    for line in open(".env")
-    if "=" in line and not line.startswith("#")
-)
-key = env["N8N_API_KEY"]
+try:
+    with open(".env", encoding="utf-8-sig") as f:
+        env = {}
+        for line in f:
+            line = line.strip()
+            if "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                env[k] = v.strip('"').strip("'")
+except FileNotFoundError:
+    print("ERROR: .env file not found")
+    sys.exit(1)
+
+key = env.get("N8N_API_KEY")
+if not key:
+    print("ERROR: N8N_API_KEY not found in .env")
+    sys.exit(1)
 h = {"X-N8N-API-KEY": key, "Content-Type": "application/json"}
 
 # ── Replacement code for fetch-based nodes ──────────────────────────
@@ -81,11 +92,9 @@ const timestamp = new Date().toISOString();
 
 let finalCount = 'N/A';
 try {
-  finalCount = await this.helpers.httpRequest({
-    method: 'GET',
-    url: 'http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/count',
-    json: true
-  });
+  const cols = await this.helpers.httpRequest({ method: 'GET', url: 'http://chromadb:8000/api/v1/collections', json: true });
+  const c = cols.find(x => x.name === 'saleh_knowledge_qwen3');
+  if (c) finalCount = await this.helpers.httpRequest({ method: 'GET', url: `http://chromadb:8000/api/v1/collections/${c.id}/count`, json: true });
 } catch(e) {}
 
 return [{
@@ -159,11 +168,9 @@ const timestamp = new Date().toISOString();
 
 let finalCount = 'N/A';
 try {
-  finalCount = await this.helpers.httpRequest({
-    method: 'GET',
-    url: 'http://chromadb:8000/api/v1/collections/86fce70f-0753-4989-9e4c-54d1ded405cd/count',
-    json: true
-  });
+  const cols = await this.helpers.httpRequest({ method: 'GET', url: 'http://chromadb:8000/api/v1/collections', json: true });
+  const c = cols.find(x => x.name === 'saleh_knowledge_qwen3');
+  if (c) finalCount = await this.helpers.httpRequest({ method: 'GET', url: `http://chromadb:8000/api/v1/collections/${c.id}/count`, json: true });
 } catch(e) {}
 
 return [{
@@ -181,6 +188,9 @@ return [{
 def fix_workflow(wid, label, fetch_fixes):
     """Fix JSON.stringify and fetch issues in a workflow."""
     r = requests.get(f"http://localhost:5678/api/v1/workflows/{wid}", headers=h)
+    if not r.ok:
+        print(f"\n{label}: ERROR fetching workflow {wid} — HTTP {r.status_code}")
+        return False
     wf = r.json()
     nodes = wf.get("nodes", [])
     changes = []
@@ -192,13 +202,8 @@ def fix_workflow(wid, label, fetch_fixes):
         # Fix 1: JSON.stringify in HTTP Request jsonBody
         jb = params.get("jsonBody", "")
         if "JSON.stringify" in jb:
-            # Replace JSON.stringify({...}) with just ({...})
-            new_jb = jb.replace("JSON.stringify(", "(", 1)
-            # Remove trailing ) that was from JSON.stringify
-            if new_jb.endswith(" }}"):
-                # ={{ JSON.stringify({ ... }) }} → ={{ ({ ... }) }}
-                # Actually: remove stringify wrapper, keep expression
-                pass
+            # Remove JSON.stringify(...) wrapper, keeping inner expression
+            new_jb = re.sub(r'JSON\.stringify\((.+?)\)(?=\s*}})', r'\1', jb, flags=re.DOTALL)
             n["parameters"]["jsonBody"] = new_jb
             changes.append(f"  [JSON.stringify→object] {name}")
 
@@ -207,44 +212,57 @@ def fix_workflow(wid, label, fetch_fixes):
             n["parameters"]["jsCode"] = fetch_fixes[name]
             changes.append(f"  [fetch→httpRequest] {name}")
 
+    settings = wf.get("settings", {})
+    settings.pop("binaryMode", None)
+
     payload = {
         "name": wf["name"],
         "nodes": nodes,
         "connections": wf["connections"],
-        "settings": wf.get("settings", {}),
+        "settings": settings,
     }
     r = requests.put(
         f"http://localhost:5678/api/v1/workflows/{wid}", headers=h, json=payload
     )
+    if not r.ok:
+        print(f"\n{label}: UPDATE FAILED — HTTP {r.status_code}: {r.text[:200]}")
+        return False
     r2 = requests.post(
         f"http://localhost:5678/api/v1/workflows/{wid}/activate", headers=h
     )
     print(f"\n{label}: update={r.status_code} activate={r2.status_code}")
     for c in changes:
         print(c)
-    return r.status_code == 200
+    return r.ok and r2.ok
 
 
 # ── Apply fixes ─────────────────────────────────────────────────────
 
-fix_workflow("HuuRe6ooTrbh5rJF", "Legal Scraper", {})
+if __name__ == "__main__":
+    results = []
+    results.append(fix_workflow("HuuRe6ooTrbh5rJF", "Legal Scraper", {}))
 
-fix_workflow(
-    "UaJRWaaHtVldwoUl",
-    "Um Al-Qura",
-    {
-        "🔍 فحص الموجود في ChromaDB": UQN_CHECK_CODE,
-        "📊 تقرير نهائي": UQN_REPORT_CODE,
-    },
-)
+    results.append(fix_workflow(
+        "UaJRWaaHtVldwoUl",
+        "Um Al-Qura",
+        {
+            "🔍 فحص الموجود في ChromaDB": UQN_CHECK_CODE,
+            "📊 تقرير نهائي": UQN_REPORT_CODE,
+        },
+    ))
 
-fix_workflow(
-    "YPVhIxCVGsgPpNDM",
-    "Auto-Update",
-    {
-        "🔍 فحص الناقص في ChromaDB": AUTOUPDATE_CHECK_CODE,
-        "📊 تقرير نهائي": AUTOUPDATE_REPORT_CODE,
-    },
-)
+    results.append(fix_workflow(
+        "YPVhIxCVGsgPpNDM",
+        "Auto-Update",
+        {
+            "🔍 فحص الناقص في ChromaDB": AUTOUPDATE_CHECK_CODE,
+            "📊 تقرير نهائي": AUTOUPDATE_REPORT_CODE,
+        },
+    ))
 
-print("\n✅ All 3 workflows fixed")
+    if all(results):
+        print("\n✅ All 3 workflows fixed")
+    else:
+        failed = sum(1 for r in results if not r)
+        print(f"\n⚠️ {failed}/3 workflows failed")
+        sys.exit(1)

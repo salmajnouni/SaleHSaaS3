@@ -1,6 +1,12 @@
-import requests, json
+import os
+import requests
+import json
 
-h = {'Authorization': 'Bearer sk-YcJBteAjDLbMy5hh9rYlSMjui4PjhNLnafP7BkMbaPE', 'Content-Type': 'application/json'}
+WEBUI_API_KEY = os.getenv("WEBUI_API_KEY")
+if not WEBUI_API_KEY:
+    raise ValueError("WEBUI_API_KEY environment variable is required")
+
+h = {"Authorization": f"Bearer {WEBUI_API_KEY}", "Content-Type": "application/json"}
 
 # Get current model state
 r = requests.get('http://localhost:3000/api/models', headers=h)

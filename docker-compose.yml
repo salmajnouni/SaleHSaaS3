@@ -22,6 +22,8 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.10
@@ -61,7 +63,7 @@ services:
       - N8N_API_KEY=${N8N_API_KEY}
       - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
       - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-      - N8N_LOGIN_EMAIL=${N8N_LOGIN_EMAIL:-salmajnouni@gmail.com}
+      - N8N_LOGIN_EMAIL=${N8N_LOGIN_EMAIL}
       - N8N_LOGIN_PASSWORD=${N8N_PASSWORD}
     networks:
       salehsaas_net:
@@ -93,6 +95,28 @@ services:
         ipv4_address: 172.20.0.30
     ports:
       - "3000:8080"
+
+  cline_proxy:
+    image: python:3.12-slim
+    container_name: salehsaas_cline_proxy
+    restart: unless-stopped
+    depends_on:
+      - open_webui
+    environment:
+      - CLINE_PROXY_HOST=0.0.0.0
+      - CLINE_PROXY_PORT=4010
+      - OPENWEBUI_BASE_URL=http://open_webui:8080
+      - OPENWEBUI_CHAT_URL=http://open_webui:8080/api/chat/completions
+      - WEBUI_API_KEY=${WEBUI_API_KEY}
+    volumes:
+      - ./cline_openwebui_proxy.py:/app/cline_openwebui_proxy.py:ro
+    working_dir: /app
+    command: ["python", "cline_openwebui_proxy.py"]
+    networks:
+      salehsaas_net:
+        ipv4_address: 172.20.0.34
+    ports:
+      - "127.0.0.1:4010:4010"
 
   browserless:
     image: browserless/chrome:latest
@@ -221,6 +245,7 @@ services:
     restart: unless-stopped
     depends_on:
       - chromadb
+      - postgres
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -229,6 +254,11 @@ services:
       - OLLAMA_URL=http://host.docker.internal:11434
       - EMBEDDING_MODEL=qwen3-embedding:0.6b
       - COLLECTION_NAME=saleh_knowledge_qwen3
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=salehsaas
+      - POSTGRES_USER=salehsaas
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       salehsaas_net:
         ipv4_address: 172.20.0.62

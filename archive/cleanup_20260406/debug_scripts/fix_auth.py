@@ -1,7 +1,7 @@
 """Fix Authorization header syntax in all HTTP Request nodes.
 
 The header value needs to be:
-  ={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}
+  ={{ 'Bearer ' + ($vars.WEBUI_API_KEY || env.WEBUI_API_KEY) }}
 Instead of:
   Bearer {{ $vars.WEBUI_API_KEY }}
 
@@ -26,7 +26,7 @@ for node in wf['nodes']:
             if h.get('name') == 'Authorization':
                 old = h['value']
                 if '{{ $vars.WEBUI_API_KEY }}' in old:
-                    h['value'] = "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || 'sk-773169e4bcce483fb5e8268e9bf393dc') }}"
+                    h['value'] = "={{ 'Bearer ' + ($vars.WEBUI_API_KEY || env.WEBUI_API_KEY) }}"
                     print(f"Fixed header in: {node.get('name', node.get('id'))}")
                     print(f"  Old: {old}")
                     print(f"  New: {h['value']}")

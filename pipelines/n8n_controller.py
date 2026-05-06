@@ -15,6 +15,42 @@ import requests
 from pydantic import BaseModel
 
 
+def _normalize_content(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts: List[str] = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+                continue
+
+            if not isinstance(block, dict):
+                continue
+
+            block_type = str(block.get("type", "")).lower()
+            if block_type in {"text", "input_text"}:
+                value = block.get("text") or block.get("input_text")
+                if isinstance(value, str) and value.strip():
+                    parts.append(value)
+
+        return "\n".join(parts).strip()
+
+    if isinstance(content, dict):
+        for key in ("text", "content", "value"):
+            value = content.get(key)
+            if isinstance(value, str):
+                return value
+
+    return ""
+
+
+def _safe_text(content: Any) -> str:
+    """Always return a plain text string from OpenAI-style content payloads."""
+    return _normalize_content(content).strip()
+
+
 class Pipeline:
     _RESERVED_WORKFLOW_REFS = {
         "run_workflow", "list_workflows", "get_workflow", "activate_workflow",
@@ -54,9 +90,10 @@ class Pipeline:
         # Web Search - SearXNG
         searxng_url: str = "http://searxng:8080"
         searxng_max_results: int = 3
+        web_query_max_chars: int = 180
         # Features toggle
         enable_rag: bool = True
-        enable_web_search: bool = False  # DuckDuckGo engine broken in SearXNG - disable until fixed
+        enable_web_search: bool = True
 
     def __init__(self):
         self.type = "filter"
@@ -722,16 +759,32 @@ class Pipeline:
     # ─────────────────────────────────────────
 
     def _get_embedding(self, text: str) -> Optional[List[float]]:
-        try:
-            resp = requests.post(
-                f"{self.valves.ollama_url}/api/embeddings",
-                json={"model": self.valves.embedding_model, "prompt": text},
-                timeout=30,
-            )
-            if resp.status_code == 200:
-                return resp.json().get("embedding", [])
-        except Exception as e:
-            print(f"[n8n-tool] Embedding error: {e}", file=sys.stderr)
+        prompt = _safe_text(text)
+        if not prompt:
+            return None
+
+        last_error: Exception | None = None
+        for attempt in range(3):
+            try:
+                resp = requests.post(
+                    f"{self.valves.ollama_url}/api/embeddings",
+                    json={"model": self.valves.embedding_model, "prompt": prompt},
+                    timeout=45,
+                )
+                if resp.status_code == 200:
+                    embedding = resp.json().get("embedding", [])
+                    if isinstance(embedding, list) and embedding:
+                        return embedding
+                last_error = Exception(f"HTTP {resp.status_code}")
+            except Exception as e:
+                last_error = e
+
+            # Short progressive backoff for transient Ollama slowness.
+            if attempt < 2:
+                time.sleep(1.5 * (attempt + 1))
+
+        if last_error:
+            print(f"[n8n-tool] Embedding error: {last_error}", file=sys.stderr)
         return None
 
     def _get_collection_id(self) -> Optional[str]:
@@ -794,36 +847,71 @@ class Pipeline:
     # Web Search - SearXNG
     # ─────────────────────────────────────────
 
+    def _sanitize_search_query(self, query: Any) -> str:
+        text = _safe_text(query)
+        if not text:
+            return ""
+
+        # Remove URLs and markdown/XML-like wrappers that frequently cause noisy throttled queries.
+        text = re.sub(r"https?://\S+", " ", text)
+        text = re.sub(r"<[^>]{1,200}>", " ", text)
+        text = re.sub(r"[`*_#\[\]{}()|]", " ", text)
+        text = re.sub(r"\s+", " ", text).strip()
+
+        max_chars = max(60, int(self.valves.web_query_max_chars))
+        if len(text) > max_chars:
+            text = text[:max_chars].rsplit(" ", 1)[0].strip() or text[:max_chars].strip()
+
+        return text
+
     def _search_web(self, query: str) -> str:
         """Search the web via local SearXNG for relevant information"""
         if not self.valves.enable_web_search:
             return ""
 
-        try:
-            resp = requests.get(
-                f"{self.valves.searxng_url}/search",
-                params={"q": query, "format": "json", "language": "ar"},
-                timeout=15,
-            )
-            if resp.status_code != 200:
+        query_clean = self._sanitize_search_query(query)
+        if len(query_clean) < 3:
+            return ""
+
+        # Retry once on transient rate limiting to reduce noisy failures.
+        for attempt in range(2):
+            try:
+                resp = requests.get(
+                    f"{self.valves.searxng_url}/search",
+                    params={"q": query_clean, "format": "json", "language": "ar", "safesearch": 1},
+                    timeout=15,
+                )
+                if resp.status_code in (403, 429):
+                    if attempt == 0:
+                        time.sleep(1.5)
+                        continue
+                    return ""
+                if resp.status_code != 200:
+                    return ""
+
+                data = resp.json()
+                results_list = data.get("results", [])[:self.valves.searxng_max_results]
+
+                if not results_list:
+                    return ""
+
+                results = []
+                for r in results_list:
+                    title = _safe_text(r.get("title", ""))
+                    snippet = _safe_text(r.get("content", ""))[:300]
+                    url = _safe_text(r.get("url", ""))
+                    if not title and not snippet:
+                        continue
+                    results.append(f"- **{title}**\n  {snippet}\n  🔗 {url}")
+
+                if results:
+                    return "🌐 **نتائج بحث الويب:**\n" + "\n".join(results)
                 return ""
-
-            data = resp.json()
-            results_list = data.get("results", [])[:self.valves.searxng_max_results]
-
-            if not results_list:
-                return ""
-
-            results = []
-            for r in results_list:
-                title = r.get("title", "")
-                snippet = r.get("content", "")[:300]
-                url = r.get("url", "")
-                results.append(f"- **{title}**\n  {snippet}\n  🔗 {url}")
-
-            return "🌐 **نتائج بحث الويب:**\n" + "\n".join(results)
-        except Exception as e:
-            print(f"[n8n-tool] Web search error: {e}", file=sys.stderr)
+            except Exception as e:
+                if attempt == 0:
+                    time.sleep(1.0)
+                    continue
+                print(f"[n8n-tool] Web search error: {e}", file=sys.stderr)
 
         return ""
 
@@ -868,6 +956,18 @@ class Pipeline:
         content_lower = content.lower()
         return any(kw in content_lower for kw in data_keywords)
 
+    def _wants_web_search(self, content: str) -> bool:
+        """Detect explicit requests to use the internet or search online."""
+        web_keywords = [
+            "استعمل النت", "استخدم النت", "ابحث في النت", "ابحث بالنت", "من النت",
+            "من الانترنت", "استخدم الانترنت", "استعمل الانترنت", "ابحث في الانترنت",
+            "ابحث أونلاين", "ابحث اونلاين", "online", "search online", "web search",
+            "browse the web", "use the internet", "search the web", "آخر أخبار", "اخر اخبار",
+            "آخر المستجدات", "اخر المستجدات", "أحدث الأخبار", "احدث الاخبار",
+        ]
+        content_lower = content.lower()
+        return any(kw in content_lower for kw in web_keywords)
+
     # ─────────────────────────────────────────
     # Filter: Inlet (Before Model)
     # ─────────────────────────────────────────
@@ -882,28 +982,29 @@ class Pipeline:
         if last_msg.get("role") != "user":
             return body
 
-        content = last_msg.get("content", "").strip()
+        content = _safe_text(last_msg.get("content", ""))
         if not content:
             return body
 
         is_automation = self._is_automation_request(content)
         is_data = self._is_data_request(content)
+        wants_web_search = self._wants_web_search(content)
 
         # Normal conversation — pass through untouched
-        if not is_automation and not is_data:
+        if not is_automation and not is_data and not wants_web_search:
             return body
 
         extra_context_parts = []
 
         # ── RAG: Search knowledge base ──
-        if is_data or is_automation:
+        if is_automation or (is_data and not wants_web_search):
             rag_results = self._search_rag(content)
             if rag_results:
                 extra_context_parts.append(rag_results)
 
         # ── Web Search: Find solutions online ──
-        if is_automation:
-            search_query = f"n8n workflow {content}"
+        if is_automation or wants_web_search:
+            search_query = f"n8n workflow {content}" if is_automation else content
             web_results = self._search_web(search_query)
             if web_results:
                 extra_context_parts.append(web_results)
@@ -1011,7 +1112,7 @@ class Pipeline:
             extra_context_parts.append(n8n_context)
 
         # ── Data query context (non-automation) ──
-        if is_data and not is_automation:
+        if is_data and not is_automation and not wants_web_search:
             data_context = """لديك قاعدة معرفة محلية تحتوي على بيانات العملاء والوثائق القانونية والسجلات.
 استخدم المعلومات المتوفرة من قاعدة المعرفة (أعلاه) للإجابة بدقة.
 إذا لم تجد المعلومة المطلوبة، أخبر المستخدم بذلك واقترح طريقة للحصول عليها."""
@@ -1026,7 +1127,8 @@ class Pipeline:
         has_system = False
         for msg in messages:
             if msg.get("role") == "system":
-                msg["content"] = msg["content"] + "\n\n" + combined_context
+                existing = _safe_text(msg.get("content", ""))
+                msg["content"] = (existing + "\n\n" + combined_context).strip() if existing else combined_context
                 has_system = True
                 break
         if not has_system:
@@ -1039,6 +1141,21 @@ class Pipeline:
     # Filter: Outlet (After Model)
     # ─────────────────────────────────────────
 
+    def _append_to_body(self, body: Dict[str, Any], text: str) -> Dict[str, Any]:
+        if not text:
+            return body
+
+        messages = body.get("messages", [])
+        if messages and isinstance(messages[-1], dict) and messages[-1].get("role") == "assistant":
+            existing = _safe_text(messages[-1].get("content", ""))
+            messages[-1]["content"] = (existing + "\n\n" + text).strip() if existing else text
+            body["messages"] = messages
+            return body
+
+        messages.append({"role": "assistant", "content": text})
+        body["messages"] = messages
+        return body
+
     async def outlet(self, body: Dict[str, Any], __user__: Dict = None) -> Dict[str, Any]:
         """Detect n8n workflow JSON in assistant response, auto-execute, and handle errors smartly"""
         messages = body.get("messages", [])
@@ -1049,7 +1166,7 @@ class Pipeline:
         if last_msg.get("role") != "assistant":
             return body
 
-        content = last_msg.get("content", "")
+        content = _safe_text(last_msg.get("content", ""))
 
         # Look for n8n-workflow and n8n-action code blocks
         wf_pattern = r"```n8n-workflow\s*(.*?)\s*```"
@@ -1061,7 +1178,7 @@ class Pipeline:
         latest_user_content = ""
         for msg in reversed(messages):
             if msg.get("role") == "user":
-                latest_user_content = msg.get("content", "")
+                latest_user_content = _safe_text(msg.get("content", ""))
                 break
 
         user_action_payloads = self._extract_action_payloads(latest_user_content)

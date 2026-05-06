@@ -109,6 +109,22 @@ class Pipe:
 
         # Error hunter expects 'error' field, not 'question'
         if council_id == "error_hunter":
+            # Validate: must look like a real error (min 10 chars or contains error-like keywords)
+            q_lower = question.lower().strip()
+            error_keywords = ["error", "exception", "traceback", "failed", "خطأ", "مشكلة", "فشل", "crash", "bug", "issue", "timeout", "refused", "denied", "404", "500", "null", "undefined"]
+            looks_like_error = len(q_lower) >= 10 or any(kw in q_lower for kw in error_keywords)
+            if not looks_like_error:
+                await self.emit_status(__event_emitter__, "complete", "💡 أرسل رسالة خطأ حقيقية", True)
+                return (
+                    "## 🔍 صائد الأخطاء\n\n"
+                    "أحتاج **رسالة خطأ حقيقية** لأبحث عن حلول لها.\n\n"
+                    "**أمثلة:**\n"
+                    "- `ConnectionRefusedError: Connection refused on port 6379`\n"
+                    "- `TypeError: Cannot read property 'map' of undefined`\n"
+                    "- `CORS policy: No 'Access-Control-Allow-Origin' header`\n"
+                    "- `خطأ في الاتصال بقاعدة البيانات PostgreSQL`\n\n"
+                    "الصق رسالة الخطأ هنا وسأبحث لك عن حلول 🔧"
+                )
             payload = {"error": question}
 
         try:

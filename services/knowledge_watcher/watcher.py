@@ -18,7 +18,9 @@ FAILED_DIR = Path("/knowledge_failed")
 
 # إعدادات Open WebUI
 OPEN_WEBUI_URL = os.getenv("OPEN_WEBUI_URL", "http://open_webui:8080")
-WEBUI_API_KEY = os.getenv("WEBUI_API_KEY", "salehsaas_super_secret_key")
+WEBUI_API_KEY = os.getenv("WEBUI_API_KEY")
+if not WEBUI_API_KEY:
+    raise ValueError("WEBUI_API_KEY environment variable is required")
 
 # تهيئة فاحص الامتثال
 pdpl_checker = PDPLComplianceChecker()

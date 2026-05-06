@@ -135,7 +135,7 @@ if __name__ == '__main__':
     # Default Full Assessment
     mock_data = {
         "system_logs": ["/mnt/workspace/iumDLdMeLEk8LXJooJDdK1u4FnvzMAiga1jTUcLZEz/logs/watcher.log"],
-        "databases": ["postgresql://salehsaas:salehsaas_pass@postgres:5432/salehsaas"],
+        "databases": [os.getenv("DATABASE_URL", "postgresql://salehsaas:@postgres:5432/salehsaas")],
         "network_traffic": ["path/to/traffic.pcap"]
     }
     assessment_results = engine.run_full_assessment(mock_data)

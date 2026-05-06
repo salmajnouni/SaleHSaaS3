@@ -1,4 +1,4 @@
-"""Fix Error Hunter workflow to return report content in response."""
+"""Fix Error Hunter workflow: final_response + search query."""
 import requests
 import json
 
@@ -16,12 +16,13 @@ r = requests.get(
 wf = r.json()
 nodes = wf.get("nodes", [])
 
-# Fix final_response to include report text
-FINAL_CODE = """const inp = $('build_report').first().json || {};
-const fail = $('normalize_input').first().json || {};
+# Fix final_response to include report text and handle missing build_report
+FINAL_CODE = """const fail = $('normalize_input').first().json || {};
 if (fail.skip === true) {
   return [{ json: { status: 'rejected', message: fail.reason } }];
 }
+let inp = {};
+try { inp = $('build_report').first().json || {}; } catch(e) { inp = {}; }
 const runId = inp.runId || 'unknown';
 const reportPath = inp.filepath || '';
 const refs = inp.refs ?? 0;
@@ -37,6 +38,21 @@ BUILD_PATCH = True
 changes = []
 for n in nodes:
     name = n.get("name", "")
+
+    if name == "search_searxng":
+        params = n["parameters"]["queryParameters"]["parameters"]
+        for p in params:
+            if p["name"] == "q":
+                p["value"] = "={{ $json.problemText }}"
+        # Add engines parameter to force working engines (bing, github)
+        has_engines = any(p["name"] == "engines" for p in params)
+        if not has_engines:
+            params.append({"name": "engines", "value": "bing,github"})
+        else:
+            for p in params:
+                if p["name"] == "engines":
+                    p["value"] = "bing,github"
+        changes.append("search_searxng: fixed query + forced bing,github engines")
 
     if name == "build_report":
         old_code = n["parameters"]["jsCode"]
@@ -75,3 +91,14 @@ print("Activate:", r2.status_code)
 
 for c in changes:
     print("  ✓", c)
+
+# Verify $() syntax preserved
+wf2 = requests.get("http://localhost:5678/api/v1/workflows/ErrSltnHntrV2", headers=h).json()
+for n in wf2["nodes"]:
+    if n["name"] == "final_response":
+        code = n["parameters"]["jsCode"]
+        ok = "$('normalize_input')" in code and "$('build_report')" in code
+        print(f"  Verify $() syntax preserved: {ok}")
+        if not ok:
+            print("  WARNING: $() stripped! First 200 chars:", code[:200])
+        break

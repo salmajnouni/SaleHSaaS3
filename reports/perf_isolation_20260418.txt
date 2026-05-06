@@ -1,0 +1,15 @@
+Perf isolation report - 2026-04-18 00:39:57
+
+Restart cline_proxy:
+(no stdout)
+
+Benchmarks:
+- direct_ollama_qwen2.5_7b: OK 7.45s code=200 head=Ready! How can I assist you today?
+- proxy_qwen2.5_7b: OK 10.38s code=200 head={"id":"qwen2.5:7b-fdff372e-062b-401c-9d36-b7e27a72f4f8","created":1776461990,"mo
+- proxy_dev_architect: OK 7.24s code=200 head={"id":"qwen2.5:14b-acf1c072-a224-490d-8835-acbe6c98f10b","created":1776461997,"m
+
+Proxy cap lines (last relevant):
+- salehsaas_cline_proxy  | [proxy] caps model=qwen2.5:7b model_in=dev_architect num_ctx=4096 num_predict=512 max_tokens=512 max_completion_tokens=None
+- salehsaas_cline_proxy  | [proxy] caps model=qwen2.5:7b model_in=dev_architect num_ctx=4096 num_predict=512 max_tokens=512 max_completion_tokens=None
+- salehsaas_cline_proxy  | [proxy] caps model=dev_architect model_in=dev_architect num_ctx=4096 num_predict=16 max_tokens=16 max_completion_tokens=None
+- salehsaas_cline_proxy  | [proxy] caps model=dev_architect model_in=dev_architect num_ctx=4096 num_predict=16 max_tokens=16 max_completion_tokens=None

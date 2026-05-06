@@ -1,14 +1,46 @@
 """
 title: Agency Keyword Prompt Filter
 author: Saleh Custom
-version: 2.2 - Clean Valves Fix
+version: 2.3 - Block Content Fix
 license: MIT
 description: Adds agency-agents system prompt when keyword like 'agency frontend' is detected
 requirements: none
 """
 
+import re
 from typing import Optional, Dict, Any, List
 from pydantic import BaseModel
+
+
+def _normalize_content(content: Any) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts: List[str] = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+                continue
+
+            if not isinstance(block, dict):
+                continue
+
+            block_type = str(block.get("type", "")).lower()
+            if block_type in {"text", "input_text"}:
+                value = block.get("text") or block.get("input_text")
+                if isinstance(value, str) and value.strip():
+                    parts.append(value)
+
+        return "\n".join(parts).strip()
+
+    if isinstance(content, dict):
+        for key in ("text", "content", "value"):
+            value = content.get(key)
+            if isinstance(value, str):
+                return value
+
+    return ""
 
 class Valves(BaseModel):
     """Empty Valves - no extra attributes"""
@@ -36,7 +68,8 @@ class Pipeline:
         if last_message.get("role") != "user":
             return body
 
-        content = last_message.get("content", "").strip().lower()
+        original_content = _normalize_content(last_message.get("content", "")).strip()
+        content = original_content.lower()
 
         agency_prompts = {
             "agency frontend": """You are a Senior Frontend Developer agent from agency-agents.
@@ -60,10 +93,17 @@ Format responses with bullet points, tables, or Jira-style tickets."""
             else:
                 for msg in messages:
                     if msg.get("role") == "system":
-                        msg["content"] = prompt + "\n\n" + msg["content"]
+                        existing = _normalize_content(msg.get("content", ""))
+                        msg["content"] = prompt + "\n\n" + existing if existing else prompt
                         break
 
-            last_message["content"] = content.replace(matched_key, "").strip()
+            last_message["content"] = re.sub(
+                re.escape(matched_key),
+                "",
+                original_content,
+                count=1,
+                flags=re.IGNORECASE,
+            ).strip()
             body["messages"] = messages
 
         return body

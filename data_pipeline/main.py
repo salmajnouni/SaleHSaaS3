@@ -4,7 +4,7 @@ import uuid
 import logging
 import tempfile
 import requests as http_requests
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
@@ -139,3 +139,139 @@ def health_check():
 @app.get("/", summary="Root")
 def read_root():
     return {"message": "SaleHSaaS Data Pipeline API v1.0 — Use /docs for API documentation."}
+
+
+# ── Service Logs API ────────────────────────────────────
+
+def _get_pg_conn():
+    """Get PostgreSQL connection for log queries."""
+    import psycopg2
+    return psycopg2.connect(
+        host=os.getenv("POSTGRES_HOST", "postgres"),
+        port=int(os.getenv("POSTGRES_PORT", 5432)),
+        dbname=os.getenv("POSTGRES_DB", "salehsaas"),
+        user=os.getenv("POSTGRES_USER", "salehsaas"),
+        password=os.getenv("POSTGRES_PASSWORD", ""),
+    )
+
+
+@app.get("/logs/recent", summary="Get recent error/warning logs from all containers")
+def get_recent_logs(
+    minutes: int = Query(default=60, ge=1, le=1440, description="How many minutes back"),
+    level: str = Query(default="ERROR", description="Minimum level: ERROR or WARNING"),
+    container: str = Query(default="", description="Filter by container name (empty=all)"),
+    limit: int = Query(default=50, ge=1, le=500),
+):
+    """Query recent service logs from PostgreSQL."""
+    try:
+        conn = _get_pg_conn()
+        cur = conn.cursor()
+
+        levels = ["ERROR"] if level.upper() == "ERROR" else ["ERROR", "WARNING"]
+
+        query = """
+            SELECT id, container, level, message, log_timestamp, collected_at
+            FROM service_logs
+            WHERE collected_at > NOW() - INTERVAL '%s minutes'
+            AND level = ANY(%s)
+        """
+        params = [minutes, levels]
+
+        if container:
+            query += " AND container = %s"
+            params.append(container)
+
+        query += " ORDER BY collected_at DESC LIMIT %s"
+        params.append(limit)
+
+        cur.execute(query, params)
+        rows = cur.fetchall()
+
+        logs = []
+        for row in rows:
+            logs.append({
+                "id": row[0],
+                "container": row[1],
+                "level": row[2],
+                "message": row[3],
+                "log_timestamp": row[4].isoformat() if row[4] else None,
+                "collected_at": row[5].isoformat() if row[5] else None,
+            })
+
+        # Summary by container
+        cur.execute("""
+            SELECT container, level, COUNT(*)
+            FROM service_logs
+            WHERE collected_at > NOW() - INTERVAL '%s minutes'
+            AND level = ANY(%s)
+            GROUP BY container, level
+            ORDER BY COUNT(*) DESC
+        """, [minutes, levels])
+        summary = {}
+        for row in cur.fetchall():
+            c = row[0]
+            if c not in summary:
+                summary[c] = {"errors": 0, "warnings": 0}
+            if row[1] == "ERROR":
+                summary[c]["errors"] = row[2]
+            else:
+                summary[c]["warnings"] = row[2]
+
+        cur.close()
+        conn.close()
+
+        return {
+            "total": len(logs),
+            "minutes": minutes,
+            "level_filter": level,
+            "summary": summary,
+            "logs": logs,
+        }
+    except ImportError:
+        raise HTTPException(status_code=500, detail="psycopg2 not installed in this container")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB error: {str(e)[:300]}")
+
+
+@app.get("/logs/stats", summary="Get log statistics summary")
+def get_log_stats():
+    """Quick stats: how many errors/warnings per container in last hour."""
+    try:
+        conn = _get_pg_conn()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT
+                container,
+                SUM(CASE WHEN level = 'ERROR' THEN 1 ELSE 0 END) as errors,
+                SUM(CASE WHEN level = 'WARNING' THEN 1 ELSE 0 END) as warnings,
+                MAX(collected_at) as last_seen
+            FROM service_logs
+            WHERE collected_at > NOW() - INTERVAL '1 hour'
+            GROUP BY container
+            ORDER BY errors DESC, warnings DESC
+        """)
+        rows = cur.fetchall()
+
+        cur.execute("SELECT COUNT(*) FROM service_logs")
+        total_all = cur.fetchone()[0]
+
+        stats = []
+        for row in rows:
+            stats.append({
+                "container": row[0],
+                "errors_1h": row[1],
+                "warnings_1h": row[2],
+                "last_seen": row[3].isoformat() if row[3] else None,
+            })
+
+        cur.close()
+        conn.close()
+
+        return {
+            "total_logs_in_db": total_all,
+            "containers_with_issues": len(stats),
+            "stats": stats,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"DB error: {str(e)[:300]}")
