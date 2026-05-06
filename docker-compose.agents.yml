@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # ── Paperclip AI - لوحة تحكم الوكلاء ──────────────────────────────────────────
+  paperclip:
+    image: paperclipai/paperclip:latest
+    container_name: salehsaas_paperclip
+    restart: unless-stopped
+    ports:
+      - "8080:8080" # واجهة المستخدم
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@salehsaas_postgres:5432/${POSTGRES_DB}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-deepseek-v3.2:latest}
+      - N8N_WEBHOOK_URL=http://salehsaas_n8n:5678/webhook/paperclip-events
+    volumes:
+      - ./paperclip_data:/app/data
+      - ./saleh_knowledge:/app/knowledge # مشاركة المعرفة مع SaleHSaaS3
+    networks:
+      - salehsaas_net
+    depends_on:
+      - salehsaas_postgres
+
+  # ── Unsloth - محرك التدريب (Fine-tuning) ──────────────────────────────────────
+  unsloth:
+    image: unsloth/unsloth:latest-cuda
+    container_name: salehsaas_unsloth
+    restart: unless-stopped
+    ports:
+      - "8002:8000" # API للتدريب
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    volumes:
+      - ./unsloth_data:/workspace/data
+      - ./lora_models:/workspace/models
+    networks:
+      - salehsaas_net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+networks:
+  salehsaas_net:
+    external: true

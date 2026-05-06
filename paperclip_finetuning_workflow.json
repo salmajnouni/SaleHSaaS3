@@ -1,0 +1,154 @@
+{
+  "name": "Paperclip AI - Unsloth Fine-tuning Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "paperclip-events",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ],
+      "webhookId": "paperclip-events-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.event_type }}",
+              "value2": "task_completed"
+            }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Check Event Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT task_id, prompt, response, feedback FROM agent_tasks WHERE id = $1",
+        "options": {}
+      },
+      "id": "3",
+      "name": "Fetch Task Data (Postgres)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.1,
+      "position": [
+        650,
+        280
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-cred",
+          "name": "SaleHSaaS Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const task = $input.first().json;\nreturn {\n  json: {\n    instruction: task.prompt,\n    output: task.response,\n    feedback: task.feedback\n  }\n};"
+      },
+      "id": "4",
+      "name": "Format for Unsloth",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://salehsaas_unsloth:8000/v1/finetune",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "dataset",
+              "value": "={{ $json }}"
+            },
+            {
+              "name": "model",
+              "value": "deepseek-v3.2:latest"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5",
+      "name": "Trigger Unsloth Fine-tuning",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1050,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Event Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Event Type": {
+      "main": [
+        [
+          {
+            "node": "Fetch Task Data (Postgres)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Task Data (Postgres)": {
+      "main": [
+        [
+          {
+            "node": "Format for Unsloth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for Unsloth": {
+      "main": [
+        [
+          {
+            "node": "Trigger Unsloth Fine-tuning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1"
+}
