@@ -41,6 +41,8 @@
 | 10 | **Data Pipeline** | مبني محلياً | `8001` | استقبال الملفات، التقطيع، وتخزينها في ChromaDB |
 | 11 | **Browserless** | `browserless/chrome:latest` | `3001` | متصفح آلي للخدمات التي تحتاج تنفيذًا متصفحياً |
 | 12 | **Open Terminal** | `ghcr.io/open-webui/open-terminal` | `8000` | طرفية داخلية مرتبطة بالمجلد المحلي `saleh/` |
+| 13 | **Paperclip AI** | `paperclipai/paperclip:latest` | `8080` | منصة تنسيق وكلاء الذكاء الاصطناعي (وحدة الوكلاء) |
+| 14 | **Unsloth** | `unsloth/unsloth:latest` | `8002` | محرك التدريب السريع للنماذج المحلية (وحدة الوكلاء) |
 
 ---
 

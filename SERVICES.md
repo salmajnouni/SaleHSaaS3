@@ -61,3 +61,10 @@ This document provides a detailed overview of all services running within the Sa
 - `GET /config`: المعاملات الفائقة الحالية للتدريب.
 - `POST /train/start`: بدء جلسة تدريب جديدة.
 - `POST /train/stop`: إيقاف التدريب الجاري.
+
+### وحدة الوكلاء (Agents Unit) - `docker-compose.agents.yml`
+
+| Service Name | Container Name | Port (Host:Container) | Description (الوصف) |
+| :--- | :--- | :--- | :--- |
+| **Paperclip AI** | `salehsaas_paperclip` | `8080:8080` | **(لوحة تحكم الوكلاء)** منصة تنسيق وكلاء الذكاء الاصطناعي لإدارة المهام. |
+| **Unsloth** | `salehsaas_unsloth` | `8002:8000` | **(محرك التدريب)** محرك Fine-tuning سريع للنماذج المحلية يعتمد على بيانات Paperclip. |

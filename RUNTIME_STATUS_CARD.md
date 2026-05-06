@@ -16,6 +16,11 @@ Scope: current operational truth for this repository.
 - `tika` (`salehsaas_tika`)
 - `searxng` (`salehsaas_searxng`)
 
+## Agents Unit (docker-compose.agents.yml)
+
+- `paperclip` (`salehsaas_paperclip`) -> `http://localhost:8080` — منصة تنسيق وكلاء الذكاء الاصطناعي
+- `unsloth` (`salehsaas_unsloth`) -> `http://localhost:8002` — محرك التدريب (Fine-tuning)
+
 ## External Services (WSL2)
 
 - `sanirejal_api` (WSL2 Ubuntu-22.04) -> `http://localhost:8500` — إدارة تدريب autoresearch على GPU (AMD ROCm 6.3)

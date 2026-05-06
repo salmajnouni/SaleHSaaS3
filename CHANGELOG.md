@@ -8,6 +8,15 @@
 
 # Changelog
 
+## [4.4.1] - 2026-05-06
+
+### وحدة الوكلاء (Agents Unit)
+- إضافة `docker-compose.agents.yml` لتشغيل Paperclip AI و Unsloth كخدمات مستقلة بجانب النظام الأساسي.
+- دمج Paperclip AI كلوحة تحكم لتنسيق وكلاء الذكاء الاصطناعي (Zero-human company concept).
+- دمج Unsloth كمحرك تدريب (Fine-tuning) سريع للنماذج المحلية يعتمد على بيانات وتجارب Paperclip.
+- إضافة سير عمل n8n جديد (`paperclip_finetuning_workflow.json`) لأتمتة دورة التدريب المستمرة (Data Flywheel) بين Paperclip و Unsloth.
+- تحديث الوثائق التشغيلية (`SERVICES.md`, `RUNTIME_STATUS_CARD.md`, `ARCHITECTURE.md`) لتعكس البنية الجديدة.
+
 ## [4.4.0] - 2026-04-10
 
 ### منظومة التدريب والبحث الذاتي (autoresearch)
